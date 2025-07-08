@@ -21,6 +21,9 @@ class Transaction extends Model
         'technician_id',
         'shipment_id',
         'delivery_id',
+        'company_id',
+        'original_vessel_id',
+        'product_id'
     ];
 
     protected $casts = [
@@ -55,5 +58,24 @@ class Transaction extends Model
     public function technician()
     {
         return $this->belongsTo(User::class, 'technician_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function originalVessel()
+    {
+        return $this->belongsTo(Vessel::class, 'original_vessel_id');
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+    public function documents()
+    {
+        return $this->hasMany(TransactionDocument::class);
     }
 }

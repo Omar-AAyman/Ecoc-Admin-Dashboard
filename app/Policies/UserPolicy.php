@@ -11,9 +11,9 @@ class UserPolicy
         return $user->hasRole('super_admin') || $user->hasRole('client');
     }
 
-    public function view(User $user, User $model)
+    public function view(User $user)
     {
-        return $user->hasRole('super_admin') || ($user->hasRole('client') && $user->company_id === $model->company_id) || $user->id === $model->id;
+        return $user->hasRole('super_admin');
     }
 
     public function create(User $user)

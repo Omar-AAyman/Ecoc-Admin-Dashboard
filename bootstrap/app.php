@@ -13,9 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'restrict.to.role' => \App\Http\Middleware\RestrictToRole::class, // Updated alias
+            'restrict.to.role' => \App\Http\Middleware\RestrictToRole::class,
+            'check.user.status' => \App\Http\Middleware\CheckUserStatus::class,
+            'restrict.client.no.tanks' => \App\Http\Middleware\RestrictClientWithNoTanks::class,
 
-            // Localization middleware aliases
+                  // Localization middleware aliases
             'localizationRoutes' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
             'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
             'localeSessionRedirect' => \Mcamara\LaravelLocalization\Middleware\LocaleSessionRedirect::class,

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tank_id')->constrained()->onDelete('cascade');
             $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('product_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamp('start_date');
             $table->timestamp('end_date')->nullable();

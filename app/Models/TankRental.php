@@ -9,7 +9,6 @@ class TankRental extends Model
     protected $fillable = [
         'tank_id',
         'company_id',
-        'user_id',
         'product_id',
         'start_date',
         'end_date',
@@ -30,11 +29,6 @@ class TankRental extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function product()

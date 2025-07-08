@@ -7,7 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 class Company extends Model
 {
     protected $fillable = ['name', 'contact_info'];
-
+    
+    protected $casts = [
+        'contact_info' => 'array',
+    ];
     public function tanks()
     {
         return $this->hasMany(Tank::class);

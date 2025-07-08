@@ -2,16 +2,36 @@
 
 namespace App\Services;
 
-use App\Models\ActivityLog;
 use App\Models\User;
 use App\Models\Vessel;
 use Illuminate\Support\Facades\DB;
 
 class VesselService
 {
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
+    {
+        $this->activityLogService = $activityLogService;
+    }
+
     public function getVessels()
     {
         return Vessel::all();
+    }
+
+    public function getPaginatedVessels($search = null, $perPage = 10)
+    {
+        $query = Vessel::query();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('nationality', 'like', "%$search%");
+            });
+        }
+
+        return $query->orderBy('id', 'asc')->paginate($perPage);
     }
 
     public function getVessel($id)
@@ -23,13 +43,14 @@ class VesselService
     {
         return DB::transaction(function () use ($data, $user) {
             $vessel = Vessel::create($data);
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'vessel.created',
-                'description' => "Created vessel {$vessel->name}",
-                'model_type' => Vessel::class,
-                'model_id' => $vessel->id,
-            ]);
+            $this->activityLogService->logActivity(
+                $user,
+                'vessel.created',
+                "Created vessel {$vessel->name}",
+                $vessel,
+                [],
+                $vessel->getAttributes()
+            );
             return $vessel;
         });
     }
@@ -38,14 +59,16 @@ class VesselService
     {
         return DB::transaction(function () use ($id, $data, $user) {
             $vessel = Vessel::findOrFail($id);
+            $oldData = $vessel->getAttributes();
             $vessel->update($data);
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'vessel.updated',
-                'description' => "Updated vessel {$vessel->name}",
-                'model_type' => Vessel::class,
-                'model_id' => $vessel->id,
-            ]);
+            $this->activityLogService->logActivity(
+                $user,
+                'vessel.updated',
+                "Updated vessel {$vessel->name}",
+                $vessel,
+                $oldData,
+                $vessel->getAttributes()
+            );
             return $vessel;
         });
     }
@@ -54,14 +77,17 @@ class VesselService
     {
         return DB::transaction(function () use ($id, $user) {
             $vessel = Vessel::findOrFail($id);
+            $oldData = $vessel->getAttributes();
+            $vesselName = $vessel->name;
             $vessel->delete();
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'vessel.deleted',
-                'description' => "Deleted vessel {$vessel->name}",
-                'model_type' => Vessel::class,
-                'model_id' => $id,
-            ]);
+            $this->activityLogService->logActivity(
+                $user,
+                'vessel.deleted',
+                "Deleted vessel {$vesselName}",
+                $vessel,
+                $oldData,
+                []
+            );
             return true;
         });
     }

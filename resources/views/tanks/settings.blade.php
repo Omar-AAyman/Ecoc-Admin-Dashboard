@@ -2,343 +2,465 @@
 
 @section('title', 'Tank Settings')
 
+@section('css')
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #f1f5f9;
+        color: #1f2937;
+    }
+
+    .container-fluid {
+        max-width: 1440px;
+        padding: 0 1.5rem;
+    }
+
+    .hero-header {
+        padding: 2.5rem 0;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 6px 20px rgba(0, 11, 67, 0.2);
+    }
+
+    .hero-header h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0;
+    }
+
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .table {
+        border-radius: 16px;
+        overflow: hidden;
+        background-color: #ffffff;
+    }
+
+    .table th,
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table thead {
+        background-color: #f8f9fa;
+    }
+
+    .table thead th {
+        font-weight: 600;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        height: 38px;
+    }
+
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
+        outline: none;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+        background-color: #000b43;
+        border-color: #000b43;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        border-color: #4b5563;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-danger {
+        background-color: #dc2626;
+        border-color: #dc2626;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-danger:hover {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .pagination-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .pagination-container select {
+        width: auto;
+        max-width: 100px;
+    }
+
+    .search-container {
+        max-width: 300px;
+    }
+
+    .status-flag {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .status-available {
+        background-color: #22c55e;
+    }
+
+    .status-in_use {
+        background-color: #ef4444;
+    }
+
+    .product-tooltip {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .product-tooltip:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: -2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #1f2937;
+        color: #ffffff;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        z-index: 10;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }
+
+    .warning-text {
+        color: #dc2626;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .hero-header h2 {
+            font-size: 1.75rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+        }
+
+        .pagination-container select {
+            max-width: 80px;
+        }
+
+        .search-container {
+            max-width: 200px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-<div class="main-content side-content mt-2 pt-0">
-    <div class="container-fluid">
+<div class="main-content side-content my-2 pt-0">
+    <div class="container-fluid px-4 py-4">
         <div class="inner-body">
-            <h2 class="mb-4">Tank Settings</h2>
-            @if ($tanks->isEmpty())
-            <div class="alert alert-info">No tanks available.</div>
-            @else
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Manage Tanks</h5>
-                    @include('components.alerts')
-                    <a href="{{ route('tanks.create') }}" class="btn btn-primary mb-3"><i class="ti-plus sidemenu-icon"></i> Add</a>
+            <!-- Page Header -->
+            <div class="hero-header">
+                <div class="container">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>Tank Settings
+                        </h2>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Alert Messages -->
+            @include('components.alerts')
+
+            @if ($tanks->isEmpty())
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <div class="text-muted">
+                        <i class="fas fa-search fa-2x mb-3"></i>
+                        <p class="mb-0">No tanks found</p>
+                    </div>
+                </div>
+            </div>
+            @else
+            <!-- Filters and Pagination -->
+            <div class="card mb-4">
                 <div class="card-body">
-                    <div class="table-responsive-wrapper">
-                        <table class="table table-striped" id="table">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="search-container">
+                            <input type="text" id="tank-search" class="form-control" placeholder="Search by number, product, or status..." value="{{ request('search') }}">
+                        </div>
+                        <div class="pagination-container">
+                            <label for="per-page" class="small fw-bold me-2">Show</label>
+                            <select id="per-page" class="form-control">
+                                <option value="10" {{ request('per_page') == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ request('per_page') == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ request('per_page') == 50 ? 'selected' : '' }}>50</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tanks Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="tanks-table">
                             <thead>
                                 <tr>
                                     <th>Number</th>
                                     <th>Capacity (m³)</th>
-                                    <th>Current Level (m³)</th>
+                                    <th>Max Capacity (mt)</th>
+                                    <th>Current Level (mt)</th>
+                                    <th>Fill %</th>
                                     <th>Status</th>
                                     <th>Product</th>
                                     <th>Company</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach ($tanks as $tank)
-                                <tr>
-                                    <td>{{ $tank->number }}</td>
-                                    <td>{{ $tank->cubic_meter_capacity }}</td>
-                                    <td>{{ $tank->current_level }}</td>
-                                    <td>{{ ucfirst($tank->status) }}</td>
-                                    <td>
-                                        <form action="{{ route('tanks.updateSettings', $tank->id) }}" method="POST" class="update-tank-form">
-                                            @csrf
-                                            <select name="product_id" class="select2-product w-100" required>
-                                                <option value="">Select Product</option>
-                                                @foreach ($products as $product)
-                                                <option value="{{ $product->id }}" {{ $tank->product_id == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
-                                                @endforeach
-                                            </select>
-                                    </td>
-                                    <td>
-                                        <select name="company_id" class="select2-company w-100">
-                                            <option value="">No Company</option>
-                                            @foreach ($companies as $company)
-                                            <option value="{{ $company->id }}" {{ $tank->company_id == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                                        </form>
-                                        @if (auth()->user()->hasRole('super_admin'))
-                                        <form action="{{ route('tanks.destroy', $tank->id) }}" method="POST" class="d-inline delete-tank-form">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger delete-btn" data-tank-number="{{ $tank->number }}"><i class="fe fe-trash"></i> Delete</button>
-                                        </form>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
+                            <tbody id="tanks-table-body">
+                                @include('tanks.partials.table')
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-between align-items-center mt-4">
+                <div class="text-muted small" id="pagination-info">
+                    Showing {{ $tanks->firstItem() ?? 0 }} to {{ $tanks->lastItem() ?? 0 }} of {{ $tanks->total() }} entries
+                </div>
+                <div id="pagination-links">
+                    {{ $tanks->appends(request()->all())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
             @endif
         </div>
     </div>
 </div>
-@endsection
 
-@section('css')
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet">
-<style>
-    .select2-container .select2-selection--single {
-        height: 31px;
-        border: 1px solid #ced4da;
-        border-radius: 4px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        line-height: 31px;
-        padding-left: 10px;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 31px;
-    }
-
-    .select2-container {
-        width: 200px !important;
-        display: inline-block;
-        vertical-align: middle;
-    }
-
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #007bff !important;
-    }
-
-</style>
+<!-- Reset Confirmation Modal -->
+<div class="modal fade" id="resetModal" tabindex="-1" aria-labelledby="resetModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resetModalLabel">Confirm Tank Reset</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reset tank <strong id="resetTankNumber"></strong>? This will clear the company, status, and current level.
+                <p class="warning-text">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="resetTankForm" action="" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Reset Tank</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    const gallerySection = document.getElementById('gallery-section');
-    const selectedContainerSection = document.getElementById('selected-container-section');
-    const detailedAnalysisSection = document.getElementById('detailed-analysis-section');
-    const gallery = document.getElementById('gallery');
-    const backButton = document.getElementById('back-to-gallery-button');
-    const moreDetailsButton = document.getElementById('more-details-button');
-    const enlargedContainerDisplay = document.getElementById('enlarged-container-display');
-    const searchInput = document.getElementById('tank-search');
-    const refreshButton = document.getElementById('refresh-tanks');
-
-    // Fetch tank data from the API
-    async function fetchTanks() {
-        try {
-            const response = await fetch('/api/tanks', {
-                headers: {
-                    'Accept': 'application/json'
-                    , 'Authorization': 'Bearer ' + localStorage.getItem('token') // Add if your API requires authentication
-                }
-            });
-            if (!response.ok) {
-                throw new Error('Failed to fetch tanks');
-            }
-            const tanks = await response.json();
-            const mappedTanks = tanks.map(tank => ({
-                id: tank.number
-                , content: tank.product ? .name || 'N/A'
-                , status: tank.status
-                , location: tank.location || 'N/A'
-                , updated: tank.updated_at || 'N/A'
-                , client: tank.company ? .name || 'N/A'
-                , notes: tank.notes || 'N/A'
-                , usageTrend: tank.usage_trend || 'N/A'
-                , maintenanceHistory: tank.maintenance_history || 'N/A'
-                , capacityUtilization: tank.current_level && tank.cubic_meter_capacity ?
-                    `${(tank.current_level / tank.cubic_meter_capacity * 100).toFixed(1)}%` : '0%'
-                , nextMaintenance: tank.next_maintenance || 'N/A'
-                , environmentalReadings: tank.environmental_readings || 'N/A'
-                , liquidColor: getLiquidColor(tank.product ? .name)
-            }));
-            return mappedTanks;
-        } catch (error) {
-            console.error('Error fetching tanks:', error);
-            return [];
-        }
-    }
-
-    // Assign liquid colors based on product name
-    function getLiquidColor(productName) {
-        const colorMap = {
-            'Crude Oil': ['#ef4444', '#b91c1c']
-            , 'Chemical X': ['#4ade80', '#16a34a']
-            , 'Lubricant': ['#60a5fa', '#2563eb']
-            , 'Solvent': ['#fb923c', '#ea580c']
-            , 'Diesel': ['#c084fc', '#9333ea']
-            , 'Kerosene': ['#22d3ee', '#0891b2']
-            , 'Acid': ['#f472b6', '#e82688']
-            , 'Base Oil': ['#fcd34d', '#fbbf24']
-            , 'Coolant': ['#94a3b8', '#64748b']
-            , 'Petroleum': ['#d9f99d', '#a3e635']
+document.addEventListener('DOMContentLoaded', function() {
+    // Debounce function to limit AJAX calls
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
         };
-        return colorMap[productName] || ['#94a3b8', '#64748b'];
     }
 
-    // Render the gallery with fetched tanks
-    async function renderGallery() {
-        const tanks = await fetchTanks();
-        gallery.innerHTML = '';
-        tanks.forEach(container => {
-            const card = document.createElement('div');
-            card.className = 'col-12 col-md-6 col-xl-2 d-flex justify-content-center';
-            let liquidHeight = container.capacityUtilization !== '0%' ? container.capacityUtilization : '0%';
-            let capacityText = container.capacityUtilization || 'N/A';
-            card.innerHTML = `
-                <div class="container-card" data-id="${container.id}">
-                    <div class="barrel">
-                        <div class="barrel-top"></div>
-                        <div class="barrel-rings ring-top"></div>
-                        <div class="barrel-rings ring-bottom"></div>
-                        <div class="liquid-container" style="--liquid-color-light: ${container.liquidColor[0]}; --liquid-color-dark: ${container.liquidColor[1]}; height: ${liquidHeight};">
-                            <div class="liquid-wave"></div>
-                            <div class="liquid-wave"></div>
-                            <div class="liquid-wave"></div>
-                        </div>
-                        <p class="capacity-label">${capacityText}</p>
-                        <div class="container-label">
-                            <p>${container.id}</p>
-                        </div>
-                        <div class="status-badge" style="background-color: ${getStatusColor(container.status)}">${container.status}</div>
-                        <div class="container-info">
-                            <p>${container.content}</p>
-                            <p>${container.status}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            card.querySelector('.container-card').addEventListener('click', () => {
-                showContainerBasicDetails(container);
-            });
-            gallery.appendChild(card);
+    // Function to fetch tanks via AJAX
+    function fetchTanks(search = '', perPage = 10, page = 1) {
+        $.ajax({
+            url: '{{ route("tanks.settings") }}',
+            type: 'GET',
+            data: {
+                search: search,
+                per_page: perPage,
+                page: page,
+                ajax: true
+            },
+            success: function(response) {
+                // Update table body
+                $('#tanks-table-body').html(response.table);
+                // Update pagination links
+                $('#pagination-links').html(response.pagination);
+                // Update showing info
+                $('#pagination-info').text(`Showing ${response.first_item} to ${response.last_item} of ${response.total} entries`);
+                // Reattach reset handlers
+                attachResetHandlers();
+            },
+            error: function(xhr) {
+                console.error('AJAX error:', xhr);
+                alert('An error occurred while fetching tanks. Please try again.');
+            }
         });
-        // Reset gallery state
-        gallery.classList.remove('small');
-        selectedContainerSection.classList.remove('visible');
-        selectedContainerSection.style.display = 'none';
-        detailedAnalysisSection.classList.remove('visible');
-        detailedAnalysisSection.style.display = 'none';
     }
 
-    // Define status colors
-    function getStatusColor(status) {
-        switch (status) {
-            case 'In Use':
-                return '#10B981';
-            case 'Empty':
-                return '#6B7280';
-            case 'Maintenance':
-                return '#EF4444';
-            case 'In Transit':
-                return '#3B82F6';
-            default:
-                return '#9CA3AF';
-        }
-    }
-
-    // Existing detail display functions (unchanged except for minor adjustments)
-    function showContainerBasicDetails(container) {
-        selectedContainerSection.style.display = 'block';
-        selectedContainerSection.classList.add('visible');
-        setTimeout(() => {
-            gallery.classList.add('small');
-            const galleryCards = gallery.querySelectorAll('.container-card');
-            galleryCards.forEach(card => {
-                if (card.dataset.id === container.id) {
-                    card.classList.remove('small');
-                    card.classList.add('selected');
-                } else {
-                    card.classList.add('small');
-                    card.classList.remove('selected');
-                }
+    // Attach reset confirmation handlers
+    function attachResetHandlers() {
+        document.querySelectorAll('.reset-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tankId = this.dataset.tankId;
+                const tankNumber = this.dataset.tankNumber;
+                const form = document.getElementById('resetTankForm');
+                const resetUrl = '{{ route("tanks.reset", ":id") }}'.replace(':id', tankId);
+                form.action = resetUrl;
+                document.getElementById('resetTankNumber').textContent = tankNumber;
+                console.log('Reset button clicked for tank ID:', tankId, 'URL:', resetUrl);
             });
-
-            let liquidHeight = container.capacityUtilization !== '0%' ? container.capacityUtilization : '0%';
-            const enlargedLiquidContainer = enlargedContainerDisplay.querySelector('.liquid-container');
-            enlargedLiquidContainer.style.setProperty('--liquid-color-light', container.liquidColor[0]);
-            enlargedLiquidContainer.style.setProperty('--liquid-color-dark', container.liquidColor[1]);
-            enlargedLiquidContainer.style.height = liquidHeight;
-            document.getElementById('selected-capacity-label').textContent = container.capacityUtilization || 'N/A';
-
-            document.getElementById('selected-container-id').textContent = container.id;
-            document.getElementById('selected-container-content').textContent = container.content;
-            document.getElementById('selected-container-status').textContent = container.status;
-            document.getElementById('detail-header-id').textContent = container.id;
-            document.getElementById('detail-id').textContent = container.id;
-            document.getElementById('detail-content').textContent = container.content;
-            document.getElementById('detail-status').textContent = container.status;
-            document.getElementById('detail-location').textContent = container.location;
-            document.getElementById('detail-updated').textContent = container.updated;
-            document.getElementById('detail-client').textContent = container.client;
-            document.getElementById('detail-notes').textContent = container.notes;
-
-            populateDetailedAnalysis(container);
-            enlargedContainerDisplay.classList.add('active');
-            detailedAnalysisSection.classList.remove('visible');
-            detailedAnalysisSection.style.display = 'none';
-            moreDetailsButton.style.display = 'inline-block';
-            moreDetailsButton.style.backgroundColor = container.liquidColor[0];
-            moreDetailsButton.classList.remove('bg-primary', 'text-white');
-        }, 50);
-    }
-
-    function showFullAnalysis() {
-        detailedAnalysisSection.style.display = 'block';
-        detailedAnalysisSection.classList.add('visible');
-        moreDetailsButton.style.display = 'none';
-    }
-
-    function populateDetailedAnalysis(container) {
-        document.getElementById('analysis-container-id').textContent = container.id;
-        document.getElementById('analysis-usage-trend').textContent = container.usageTrend || 'N/A';
-        document.getElementById('analysis-maintenance-history').textContent = container.maintenanceHistory || 'N/A';
-        document.getElementById('analysis-capacity-utilization').textContent = container.capacityUtilization || 'N/A';
-        document.getElementById('analysis-next-maintenance').textContent = container.nextMaintenance || 'N/A';
-        document.getElementById('analysis-environmental-readings').textContent = container.environmentalReadings || 'N/A';
-    }
-
-    backButton.addEventListener('click', () => {
-        selectedContainerSection.classList.remove('visible');
-        detailedAnalysisSection.classList.remove('visible');
-        enlargedContainerDisplay.classList.remove('active');
-        gallery.classList.remove('small');
-        const galleryCards = gallery.querySelectorAll('.container-card');
-        galleryCards.forEach(card => {
-            card.classList.remove('small', 'selected');
         });
-        setTimeout(() => {
-            selectedContainerSection.style.display = 'none';
-            detailedAnalysisSection.style.display = 'none';
-        }, 500);
-        moreDetailsButton.style.backgroundColor = '';
-        moreDetailsButton.classList.add('bg-primary', 'text-white');
-    });
+    }
 
-    moreDetailsButton.addEventListener('click', showFullAnalysis);
+    // Initial reset handlers
+    attachResetHandlers();
 
     // Search functionality
-    searchInput.addEventListener('input', () => {
-        const searchTerm = searchInput.value.toLowerCase();
-        const tankCards = gallery.querySelectorAll('.container-card');
-        tankCards.forEach(card => {
-            const tankId = card.dataset.id.toLowerCase();
-            const content = card.querySelector('.container-info p:first-child').textContent.toLowerCase();
-            const status = card.querySelector('.container-info p:last-child').textContent.toLowerCase();
-            if (tankId.includes(searchTerm) || content.includes(searchTerm) || status.includes(searchTerm)) {
-                card.parentElement.style.display = '';
-            } else {
-                card.parentElement.style.display = 'none';
-            }
-        });
+    const searchInput = document.getElementById('tank-search');
+    const debouncedSearch = debounce(function() {
+        const searchTerm = searchInput.value;
+        const perPage = document.getElementById('per-page').value;
+        fetchTanks(searchTerm, perPage);
+    }, 300);
+    searchInput.addEventListener('input', debouncedSearch);
+
+    // Per-page change handler
+    document.getElementById('per-page').addEventListener('change', function() {
+        const perPage = this.value;
+        const searchTerm = document.getElementById('tank-search').value;
+        fetchTanks(searchTerm, perPage);
     });
 
-    // Refresh button
-    refreshButton.addEventListener('click', renderGallery);
+    // Pagination link click handler
+    document.getElementById('pagination-links').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (e.target.tagName === 'A' && e.target.getAttribute('href')) {
+            const url = new URL(e.target.getAttribute('href'));
+            const page = url.searchParams.get('page') || 1;
+            const searchTerm = document.getElementById('tank-search').value;
+            const perPage = document.getElementById('per-page').value;
+            fetchTanks(searchTerm, perPage, page);
+        }
+    });
 
-    // Initial render
-    document.addEventListener('DOMContentLoaded', renderGallery);
-
+    // Inject CSRF token meta tag if it doesn't exist
+    let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        csrfTokenMeta = document.createElement('meta');
+        csrfTokenMeta.name = 'csrf-token';
+        csrfTokenMeta.content = '{{ csrf_token() }}';
+        document.head.appendChild(csrfTokenMeta);
+        console.log('CSRF token meta tag created');
+    }
+});
 </script>
 @endsection

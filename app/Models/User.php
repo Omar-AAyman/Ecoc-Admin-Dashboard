@@ -26,7 +26,9 @@ class User extends Authenticatable
         'role_id',
         'company_id',
         'phone',
+        'image',
         'status',
+        'position',
         'reactivated_at',
     ];
 
@@ -55,7 +57,7 @@ class User extends Authenticatable
     {
         return "{$this->first_name} {$this->last_name}";
     }
-    
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -116,5 +118,11 @@ class User extends Authenticatable
     public function transactionsAsTechnician()
     {
         return $this->hasMany(Transaction::class, 'technician_id');
+    }
+
+
+    public function getImageUrlAttribute(): string
+    {
+        return $this->image ? asset('storage/' . $this->image) : asset('panel/assets/img/users/1.jpg');
     }
 }

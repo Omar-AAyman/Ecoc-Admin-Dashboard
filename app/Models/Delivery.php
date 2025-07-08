@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Delivery extends Model
 {
     protected $fillable = [
-        'company_id',
         'transport_type',
         'vessel_id',
         'truck_number',
@@ -23,10 +22,6 @@ class Delivery extends Model
         'delivery_date' => 'date',
     ];
 
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function product()
     {

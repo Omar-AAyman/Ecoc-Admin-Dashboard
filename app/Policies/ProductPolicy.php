@@ -12,7 +12,7 @@ class ProductPolicy
         return $user->hasRole('super_admin');
     }
 
-    public function view(User $user, Product $product)
+    public function view(User $user)
     {
         return $user->hasRole('super_admin');
     }
@@ -22,12 +22,12 @@ class ProductPolicy
         return $user->hasRole('super_admin');
     }
 
-    public function update(User $user, Product $product)
+    public function update(User $user)
     {
         return $user->hasRole('super_admin');
     }
 
-    public function delete(User $user, Product $product)
+    public function delete(User $user)
     {
         return $user->hasRole('super_admin');
     }

@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Tank;
 use App\Models\User;
+use App\Models\Tank;
 
 class TankPolicy
 {
@@ -16,25 +16,20 @@ class TankPolicy
     {
         return $user->hasRole('super_admin') ||
             $user->hasRole('ceo') ||
-            ($user->hasRole('client') && $tank->company_id === $user->company_id);
+            ($user->hasRole('client') && $user->company_id === $tank->company_id);
     }
 
     public function create(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'ceo']);
     }
 
-    public function update(User $user)
+    public function update(User $user, Tank $tank = null)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'ceo']);
     }
 
-    public function settings(User $user)
-    {
-        return $user->hasRole('super_admin');
-    }
-
-    public function delete(User $user)
+    public function delete(User $user, Tank $tank = null)
     {
         return $user->hasRole('super_admin');
     }

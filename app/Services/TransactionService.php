@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\ActivityLog;
 use App\Models\Delivery;
 use App\Models\Shipment;
 use App\Models\Tank;
@@ -13,16 +12,158 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
-    public function getTransactions(User $user)
+    protected $activityLogService;
+
+    public function __construct(ActivityLogService $activityLogService)
     {
-        $query = Transaction::with(['tank', 'destinationTank', 'documents']);
-        if ($user->isClient()) {
-            $query->whereHas('tank', function ($q) use ($user) {
-                $q->where('company_id', $user->company_id);
+        $this->activityLogService = $activityLogService;
+    }
+
+    /**
+     * Get filtered transactions query.
+     *
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getTransactionsQuery(array $filters = [])
+    {
+        $query = Transaction::with(['tank', 'destinationTank', 'originalVessel', 'company', 'product', 'engineer', 'technician'])
+            ->orderBy('date', 'desc');
+
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+        if (!empty($filters['tank_id'])) {
+            $query->where('tank_id', $filters['tank_id']);
+        }
+        if (!empty($filters['destination_tank_id'])) {
+            $query->where('destination_tank_id', $filters['destination_tank_id']);
+        }
+        if (!empty($filters['original_vessel_id'])) {
+            $query->where('original_vessel_id', $filters['original_vessel_id']);
+        }
+        if (!empty($filters['company_id'])) {
+            $query->where('company_id', $filters['company_id']);
+        }
+        if (!empty($filters['product_id'])) {
+            $query->where('product_id', $filters['product_id']);
+        }
+        if (!empty($filters['engineer_id'])) {
+            $query->where('engineer_id', $filters['engineer_id']);
+        }
+        if (!empty($filters['technician_id'])) {
+            $query->where('technician_id', $filters['technician_id']);
+        }
+        if (!empty($filters['transport_type'])) {
+            $query->where('transport_type', $filters['transport_type']);
+        }
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->whereHas('company', function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['search'] . '%');
+                })
+                    ->orWhereHas('product', function ($q) use ($filters) {
+                        $q->where('name', 'like', '%' . $filters['search'] . '%');
+                    })
+                    ->orWhereHas('tank', function ($q) use ($filters) {
+                        $q->where('number', 'like', '%' . $filters['search'] . '%');
+                    });
             });
         }
-        return $query->get();
-    } 
+        if (!empty($filters['from'])) {
+            $query->whereDate('date', '>=', $filters['from']);
+        }
+        if (!empty($filters['to'])) {
+            $query->whereDate('date', '<=', $filters['to']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get statistics for transactions.
+     *
+     * @param array $filters
+     * @return array
+     */
+    public function getStatistics(array $filters = [])
+    {
+        $query = Transaction::query();
+
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+        if (!empty($filters['tank_id'])) {
+            $query->where('tank_id', $filters['tank_id']);
+        }
+        if (!empty($filters['destination_tank_id'])) {
+            $query->where('destination_tank_id', $filters['destination_tank_id']);
+        }
+        if (!empty($filters['original_vessel_id'])) {
+            $query->where('original_vessel_id', $filters['original_vessel_id']);
+        }
+        if (!empty($filters['company_id'])) {
+            $query->where('company_id', $filters['company_id']);
+        }
+        if (!empty($filters['product_id'])) {
+            $query->where('product_id', $filters['product_id']);
+        }
+        if (!empty($filters['engineer_id'])) {
+            $query->where('engineer_id', $filters['engineer_id']);
+        }
+        if (!empty($filters['technician_id'])) {
+            $query->where('technician_id', $filters['technician_id']);
+        }
+        if (!empty($filters['transport_type'])) {
+            $query->where('transport_type', $filters['transport_type']);
+        }
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->whereHas('company', function ($q) use ($filters) {
+                    $q->where('name', 'like', '%' . $filters['search'] . '%');
+                })
+                    ->orWhereHas('product', function ($q) use ($filters) {
+                        $q->where('name', 'like', '%' . $filters['search'] . '%');
+                    })
+                    ->orWhereHas('tank', function ($q) use ($filters) {
+                        $q->where('number', 'like', '%' . $filters['search'] . '%');
+                    });
+            });
+        }
+        if (!empty($filters['from'])) {
+            $query->whereDate('date', '>=', $filters['from']);
+        }
+        if (!empty($filters['to'])) {
+            $query->whereDate('date', '<=', $filters['to']);
+        }
+
+        $totalTransactions = $query->count();
+        $transactionsByType = $query->select('type')
+            ->get()
+            ->groupBy('type')
+            ->map(function ($group) {
+                return [
+                    'type' => $group->first()->type,
+                    'count' => $group->count(),
+                ];
+            })->values();
+
+        return [
+            'totalTransactions' => $totalTransactions,
+            'transactionsByType' => $transactionsByType,
+        ];
+    }
+    /**
+     * Get transaction details for modal.
+     *
+     * @param int $id
+     * @return Transaction
+     */
+    public function getTransactionDetails($id)
+    {
+        return Transaction::with(['tank', 'destinationTank', 'originalVessel', 'company', 'product', 'engineer', 'technician'])
+            ->findOrFail($id);
+    }
 
     public function createTransaction(array $data, array $files, User $user)
     {
@@ -63,51 +204,51 @@ class TransactionService
             $shipmentId = null;
             $deliveryId = null;
 
-            if (!empty($data['shipment']['transport_type'])) {
+            if ($data['type'] === 'loading' && !empty($data['shipment']['transport_type'])) {
                 $shipmentData = [
                     'transport_type' => $data['shipment']['transport_type'],
                     'vessel_id' => $data['shipment']['vessel_id'] ?? null,
                     'truck_number' => $data['shipment']['truck_number'] ?? null,
                     'trailer_number' => $data['shipment']['trailer_number'] ?? null,
                     'driver_name' => $data['shipment']['driver_name'] ?? null,
-                    'product_id' => $data['shipment']['product_id'],
-                    'total_quantity' => $data['shipment']['total_quantity'],
-                    'arrival_date' => $data['shipment']['arrival_date'],
+                    'total_quantity' => $data['quantity'],
+                    'port_of_discharge' => $data['shipment']['port_of_discharge'],
+                    'arrival_date' => $data['date'],
                     'status' => 'Pending',
                 ];
                 $shipment = Shipment::create($shipmentData);
                 $shipmentId = $shipment->id;
-                ActivityLog::create([
-                    'user_id' => $user->id,
-                    'action' => 'shipment.created',
-                    'description' => "Created shipment via {$shipment->vessel_or_vehicle}",
-                    'model_type' => Shipment::class,
-                    'model_id' => $shipment->id,
-                ]);
+                $this->activityLogService->logActivity(
+                    $user,
+                    'shipment.created',
+                    "Created shipment via {$shipment->transport_type}",
+                    $shipment,
+                    [],
+                    $shipmentData
+                );
             }
 
-            if (!empty($data['delivery']['transport_type'])) {
+            if ($data['type'] === 'discharging' && !empty($data['delivery']['transport_type'])) {
                 $deliveryData = [
-                    'company_id' => $data['delivery']['company_id'],
                     'transport_type' => $data['delivery']['transport_type'],
                     'vessel_id' => $data['delivery']['vessel_id'] ?? null,
                     'truck_number' => $data['delivery']['truck_number'] ?? null,
                     'trailer_number' => $data['delivery']['trailer_number'] ?? null,
                     'driver_name' => $data['delivery']['driver_name'] ?? null,
-                    'product_id' => $data['delivery']['product_id'],
-                    'quantity' => $data['delivery']['quantity'],
-                    'delivery_date' => $data['delivery']['delivery_date'],
+                    'quantity' => $data['quantity'],
+                    'delivery_date' => $data['date'],
                     'status' => 'Pending',
                 ];
                 $delivery = Delivery::create($deliveryData);
                 $deliveryId = $delivery->id;
-                ActivityLog::create([
-                    'user_id' => $user->id,
-                    'action' => 'delivery.created',
-                    'description' => "Created delivery for company {$delivery->company->name}",
-                    'model_type' => Delivery::class,
-                    'model_id' => $delivery->id,
-                ]);
+                $this->activityLogService->logActivity(
+                    $user,
+                    'delivery.created',
+                    "Created delivery via {$delivery->transport_type}",
+                    $delivery,
+                    [],
+                    $deliveryData
+                );
             }
 
             $transactionData = [
@@ -125,13 +266,15 @@ class TransactionService
                 'technician_id' => $data['technician_id'] ?? null,
                 'shipment_id' => $shipmentId,
                 'delivery_id' => $deliveryId,
+                'company_id' => $sourceTank->company_id,
+                'original_vessel_id' => $data['original_vessel_id'] ?? null,
+                'product_id' => $sourceTank->product_id,
             ];
 
             $transaction = Transaction::create($transactionData);
 
             $documentTypes = [
                 'measurement_report',
-                'general_discharge_permit',
                 'inspection_form',
                 'customs_release_form',
                 'charge_permit_document',
@@ -157,13 +300,34 @@ class TransactionService
                 }
             }
 
-            ActivityLog::create([
-                'user_id' => $user->id,
-                'action' => 'transaction.created',
-                'description' => "Created {$data['type']} transaction for tank {$sourceTank->number}",
-                'model_type' => Transaction::class,
-                'model_id' => $transaction->id,
+            $oldData = [];
+            $newData = $transaction->only([
+                'tank_id',
+                'type',
+                'destination_tank_id',
+                'quantity',
+                'date',
+                'company_id',
+                'product_id',
+                'original_vessel_id',
+                'work_order_number',
+                'charge_permit_number',
+                'discharge_permit_number',
+                'bill_of_lading_number',
+                'customs_release_number',
+                'engineer_id',
+                'technician_id',
+                'shipment_id',
+                'delivery_id'
             ]);
+            $this->activityLogService->logActivity(
+                $user,
+                'transaction.created',
+                "Created {$data['type']} transaction for tank {$sourceTank->number}",
+                $transaction,
+                $oldData,
+                $newData
+            );
 
             return $transaction;
         });

@@ -42,6 +42,6 @@ class Tank extends Model
 
     public function maxCapacity()
     {
-        return $this->product ? $this->cubic_meter_capacity * $this->product->density : $this->cubic_meter_capacity;
+        return $this->product ? $this->cubic_meter_capacity * $this->product->density : 0;
     }
 }

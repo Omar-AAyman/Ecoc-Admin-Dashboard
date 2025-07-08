@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Services\ProductService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class ProductController extends Controller
 {
@@ -15,9 +17,26 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $products = $this->productService->getProducts();
+        $this->authorize('viewAny', \App\Models\Product::class);
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+
+        $products = $this->productService->getPaginatedProducts($search, $perPage);
+
+        if ($request->ajax()) {
+            $table = View::make('products.partials.table', compact('products'))->render();
+            $pagination = $products->appends(['per_page' => $perPage, 'search' => $search])->links('pagination::bootstrap-5')->render();
+            return response()->json([
+                'table' => $table,
+                'pagination' => $pagination,
+                'first_item' => $products->firstItem() ?? 0,
+                'last_item' => $products->lastItem() ?? 0,
+                'total' => $products->total()
+            ]);
+        }
+
         return view('products.index', compact('products'));
     }
 
@@ -75,5 +94,14 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return back()->withErrors(['error' => $e->getMessage()]);
         }
+    }
+
+    public function getProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        return response()->json([
+            'name' => $product->name,
+            'density' => $product->density,
+        ]);
     }
 }

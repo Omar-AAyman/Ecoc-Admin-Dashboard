@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\VesselService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class VesselController extends Controller
 {
@@ -15,9 +16,26 @@ class VesselController extends Controller
         $this->vesselService = $vesselService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $vessels = $this->vesselService->getVessels();
+        $this->authorize('viewAny', \App\Models\Vessel::class);
+        $perPage = $request->input('per_page', 10);
+        $search = $request->input('search');
+
+        $vessels = $this->vesselService->getPaginatedVessels($search, $perPage);
+
+        if ($request->ajax()) {
+            $table = View::make('vessels.partials.table', compact('vessels'))->render();
+            $pagination = $vessels->appends(['per_page' => $perPage, 'search' => $search])->links('pagination::bootstrap-5')->render();
+            return response()->json([
+                'table' => $table,
+                'pagination' => $pagination,
+                'first_item' => $vessels->firstItem() ?? 0,
+                'last_item' => $vessels->lastItem() ?? 0,
+                'total' => $vessels->total()
+            ]);
+        }
+
         return view('vessels.index', compact('vessels'));
     }
 

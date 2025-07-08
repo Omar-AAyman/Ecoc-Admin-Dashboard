@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
-            $table->enum('transport_type', ['vessel', 'car']);
+            $table->enum('transport_type', ['vessel', 'truck']);
             $table->foreignId('vessel_id')->nullable()->constrained()->onDelete('set null');
             $table->string('truck_number', 50)->nullable();
             $table->string('trailer_number', 50)->nullable();

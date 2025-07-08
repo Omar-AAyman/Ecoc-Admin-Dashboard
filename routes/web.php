@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\{
+    ActivityLogController,
     DashboardController,
     ProductController,
     TankController,
@@ -10,6 +11,7 @@ use App\Http\Controllers\{
     UserController,
     VesselController
 };
+use App\Models\Tank;
 
 // Redirect root URL based on authentication
 Route::get('/', function () {
@@ -23,33 +25,66 @@ Route::get('/', function () {
 Route::group(
     [
         'prefix' => LaravelLocalization::setLocale(),
-        'middleware' => ['localeSessionRedirect', 'localizationRedirect', 'auth']
+        'middleware' => [
+            'localeSessionRedirect',
+            'localizationRedirect',
+            'auth',
+            'check.user.status',
+            'restrict.client.no.tanks',
+            'restrict.to.role:super_admin,ceo,client'
+        ]
     ],
     function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::resource('tanks', TankController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         Route::get('/tanks/settings', [TankController::class, 'settings'])->name('tanks.settings');
         Route::post('/tanks/{id}/settings', [TankController::class, 'updateSettings'])->name('tanks.updateSettings');
-        Route::resource('tanks', TankController::class)->only(['create', 'store', 'edit','destroy']);
+        Route::post('/tanks/{id}/reset', [TankController::class, 'resetTank'])->middleware('restrict.to.role:super_admin,ceo')->name('tanks.reset');
         Route::resource('products', ProductController::class);
         Route::resource('vessels', VesselController::class);
         Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
-        Route::prefix('clients')->middleware('restrict.to.role:super_admin,client')->group(function () {
+        Route::prefix('clients')->group(function () {
             Route::get('/', [UserController::class, 'clientIndex'])->name('clients.index');
             Route::get('/create', [UserController::class, 'clientCreate'])->name('clients.create');
             Route::post('/', [UserController::class, 'clientStore'])->name('clients.store');
             Route::get('/{client}/edit', [UserController::class, 'clientEdit'])->name('clients.edit');
             Route::put('/{client}', [UserController::class, 'clientUpdate'])->name('clients.update');
             Route::delete('/{client}', [UserController::class, 'clientDestroy'])->name('clients.destroy');
+            Route::get('/{client}', [UserController::class, 'clientShow'])->name('clients.show');
         });
 
-        Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
-        Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
-        Route::get('/profile', [UserController::class, 'profile'])->name('profile');
-        Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+        Route::prefix('/transactions')->group(function () {
+            Route::get('/', [TransactionController::class, 'index'])->name('transactions.index');
+            Route::get('/create', [TransactionController::class, 'create'])->name('transactions.create');
+            Route::post('/', [TransactionController::class, 'store'])->name('transactions.store');
+            Route::get('/{id}', [TransactionController::class, 'showDetails'])->name('transactions.show');
+        });
+
+        // Profile Management
+        Route::prefix('/profile')->group(function () {
+            Route::get('/', [UserController::class, 'profile'])->name('profile');
+            Route::put('/', [UserController::class, 'updateProfile'])->name('profile.update');
+        });
+
+        // Activity logs
+        Route::prefix('/activity-logs')->group(function () {
+            Route::get('/', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+            Route::get('/{id}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+        });
     }
 );
+
+Route::prefix('/api')->middleware(['auth', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,client'])->group(function () {
+    Route::get('/tanks/{id}/company', [TankController::class, 'getCompany']);
+    Route::get('/tanks/{id}/product', [TankController::class, 'getProduct']);
+    Route::get('/tanks/{id}/capacity', [TankController::class, 'getCapacity']);
+    Route::get('/tanks/{id}/details', [TankController::class, 'getDetails']);
+    Route::get('/tanks/available', [TankController::class, 'getAvailableTanks']);
+    Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.getProduct');
+    Route::get('/transactions/statistics', [TransactionController::class, 'statistics'])->name('transactions.statistics');
+});
 
 // Auth routes (outside localization)
 require __DIR__ . '/auth.php';

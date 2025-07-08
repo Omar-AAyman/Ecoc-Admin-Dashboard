@@ -1,41 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
-
+<html lang="{{ App::getLocale() }}">
 <head>
-
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <meta name="description" content="Admin Panel laravel Dashboard">
     <meta name="author" content="">
     <meta name="keywords" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicon -->
     <link rel="icon" href="{{ url('panel/assets/img/brand/logo-responsive.png') }}" type="image/x-icon" />
 
     <!-- Title -->
-    <title>{{ env('APP_NAME') }} @if (trim($__env->yieldContent('title')))
-        | @yield('title')
-        @endif
-    </title>
+    <title>{{ env('APP_NAME') }} @if (trim($__env->yieldContent('title'))) | @yield('title') @endif</title>
 
-    <!-- Bootstrap css-->
-    <link href="{{ url('panel/assets/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Icons css-->
+    <!-- Icons CSS -->
     <link href="{{ url('panel/assets/plugins/web-fonts/icons.css') }}" rel="stylesheet" />
     <link href="{{ url('panel/assets/plugins/web-fonts/font-awesome/font-awesome.min.css') }}" rel="stylesheet">
     <link href="{{ url('panel/assets/plugins/web-fonts/plugin.css') }}" rel="stylesheet" />
 
-
-
-    <!--- Style css -->
+    <!-- Style CSS -->
     @if (App::getLocale() == 'en')
     <link href="{{ url('panel/assets/css/style/style.css') }}" rel="stylesheet">
     <link href="{{ url('panel/assets/css/skins.css') }}" rel="stylesheet">
     <link href="{{ url('panel/assets/css/dark-style.css') }}" rel="stylesheet">
-    <link href="{{ url('panel/assets/css/colors/default.css') }}" rel="stylesheet">
     <link id="theme" rel="stylesheet" type="text/css" media="all" href="{{ url('panel/assets/css/colors/color.css') }}">
     <link href="{{ url('panel/assets/css/sidemenu/sidemenu.css') }}" rel="stylesheet">
     <link href="{{ url('panel/assets/switcher/css/switcher.css') }}" rel="stylesheet">
@@ -47,46 +38,39 @@
     <link href="{{ asset('panel/assets/css-rtl/sidemenu/sidemenu.css') }}" rel="stylesheet">
     <link href="{{ asset('panel/assets/switcher/css/switcher-rtl.css') }}" rel="stylesheet">
     @endif
-    <!--- Style css -->
 
-    <!-- Style css-->
-
-
-    <!-- Color css-->
-
-
-    <!-- Select2 css-->
+    <!-- Select2 CSS -->
     <link href="{{ url('panel/assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
 
-    <!-- Mutipleselect css-->
+    <!-- Multiple Select CSS -->
     <link rel="stylesheet" href="{{ url('panel/assets/plugins/multipleselect/multiple-select.css') }}">
 
-    <!-- Sidemenu css-->
-
-
-    <!-- Switcher css-->
-
+    <!-- Switcher CSS -->
     <link href="{{ url('panel/assets/switcher/demo.css') }}" rel="stylesheet">
-    <!-- CkEditor -->
+
+    <!-- CKEditor -->
     <script src="https://cdn.ckeditor.com/4.15.0/full/ckeditor.js"></script>
-    <!-- Include this in your blade layout -->
+
+    <!-- SweetAlert -->
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <style>
+        .language-switcher {
+            display: flex;
+            gap: 10px;
+        }
+
+        .language-switcher a {
+            text-decoration: none;
+            color: #000;
+            /* لون النص الذي ترغب في استخدامه */
+            font-weight: bold;
+            /* إضافة أي خصائص أخرى للتصميم حسب الحاجة */
+        }
+
+    </style>
+    @yield('css')
 </head>
-<style>
-    .language-switcher {
-        display: flex;
-        gap: 10px;
-    }
-
-    .language-switcher a {
-        text-decoration: none;
-        color: #000;
-        /* لون النص الذي ترغب في استخدامه */
-        font-weight: bold;
-        /* إضافة أي خصائص أخرى للتصميم حسب الحاجة */
-    }
-
-</style>
 <body class="main-body leftmenu">
 
     <!-- Loader -->
@@ -113,63 +97,69 @@
             <div class="main-sidebar-body">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                     <li class="nav-header"><span class="nav-label">ECOC Tank Rentals</span></li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'dashboard') active @endif" href="{{ route('dashboard') }}">
+                    <li class="nav-item @if(Route::currentRouteName() == 'dashboard') active @endif">
+                        <a class="nav-link" href="{{ route('dashboard') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-home sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Dashboard</span>
                         </a>
                     </li>
                     @if (auth()->user() && auth()->user()->isSuperAdmin())
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'tanks.settings') active @endif" href="{{ route('tanks.settings') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'tanks.settings') active @endif">
+                        <a class="nav-link" href="{{ route('tanks.settings') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-settings sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Tank Settings</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'products.index') active @endif" href="{{ route('products.index') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'products.index') active @endif">
+                        <a class="nav-link" href="{{ route('products.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-package sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Products</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'vessels.index') active @endif" href="{{ route('vessels.index') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'vessels.index') active @endif">
+                        <a class="nav-link" href="{{ route('vessels.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
-                            <i class="ti-anchor sidemenu-icon"></i>
+                            <i class="fas fa-ship  sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Vessels</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'users.index') active @endif" href="{{ route('users.index') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'users.index') active @endif">
+                        <a class="nav-link" href="{{ route('users.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-user sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Admins</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'clients.index') active @endif" href="{{ route('clients.index') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'clients.index') active @endif">
+                        <a class="nav-link" href="{{ route('clients.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-id-badge sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Clients</span>
                         </a>
                     </li>
+                    <li class="nav-item @if(in_array(Route::currentRouteName(), ['activity-logs.index', 'activity-logs.show'])) active @endif">
+                        <a class="nav-link" href="{{ route('activity-logs.index') }}">
+                            <i class="ti-receipt sidemenu-icon"></i>
+                            <span class="sidemenu-label">Activity Logs</span>
+                        </a>
+                    </li>
                     @endif
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'transactions.create') active @endif" href="{{ route('transactions.create') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'transactions.index') active @endif">
+                        <a class="nav-link " href="{{ route('transactions.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-exchange-vertical sidemenu-icon"></i>
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Transactions</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link @if(Route::currentRouteName() == 'profile') active @endif" href="{{ route('profile') }}">
-                            <span class="shape1"></span><span class="shape2"></span>
-                            <i class="ti-user sidemenu-icon"></i>
-                            <span class="sidemenu-label" style="font-size: 0.9rem;">Profile</span>
-                        </a>
+                    {{-- <li class="nav-item @if(Route::currentRouteName() === 'profile') active @endif">
+                        <a class="nav-link {{ Request::is('profile') ? 'active' : '' }}" href="{{ route('profile') }}">
+                    <span class="shape1"></span><span class="shape2"></span>
+                    <i class="ti-user sidemenu-icon"></i>
+                    <span class="sidemenu-label" style="font-size: 0.9rem;">Profile</span>
+                    </a>
                     </li>
                     <li class="nav-item">
                         <form action="{{ route('logout') }}" method="POST">
@@ -180,7 +170,7 @@
                                 <span class="sidemenu-label" style="font-size: 0.9rem;">Logout</span>
                             </button>
                         </form>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
         </div>
@@ -387,37 +377,36 @@
         @yield('content')
         <!-- End Main Content-->
 
-        <!-- Main Footer-->
-        <div class="main-footer text-center">
-            <div class="container">
-                <div class="row row-sm">
-                    <div class="col-md-12">
-                        <span>Copyright © {{ date('Y') }} <a href="#">{{ env('APP_NAME') }}</a>. Designed
-                            and developed by <a href="https://www.ecoc.com/">Ecoc Develop</a> All rights
-                            reserved.</span>
-                    </div>
+    <!-- Main Footer-->
+    <div class="main-footer text-center">
+        <div class="container">
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <span>Copyright © {{ date('Y') }} <a href="#">{{ env('APP_NAME') }}</a>. All rights reserved. Designed
+                        and developed by <a href="https://omar-aayman.github.io/Portfolio/">Omar Ayman</a>.</span>
                 </div>
             </div>
         </div>
-        <!--End Footer-->
+    </div>
+    <!--End Footer-->
     </div>
     <!-- End Page -->
-
     <!-- Back-to-top -->
     <a href="#top" id="back-to-top"><i class="fe fe-arrow-up"></i></a>
 
-    <!-- Jquery js-->
+    <!-- Jquery JS -->
     <script src="{{ url('panel/assets/plugins/jquery/jquery.min.js') }}"></script>
 
-    <!-- Bootstrap js-->
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url('panel/assets/plugins/bootstrap/js/popper.min.js') }}"></script>
 
-
-
-    <!--- Style css -->
-    @if (App::getLocale() == 'en')
+    <!-- Perfect Scrollbar -->
     <script src="{{ url('panel/assets/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url('panel/assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+
+    <!-- Sidemenu JS -->
+    @if (App::getLocale() == 'en')
     <script src="{{ url('panel/assets/plugins/sidemenu/sidemenu.js') }}"></script>
     <script src="{{ url('panel/assets/plugins/sidebar/sidebar.js') }}"></script>
     @else
@@ -429,50 +418,40 @@
     <script src="{{ asset('panel/assets/switcher/js/switcher-rtl.js') }}"></script>
     @endif
 
-    <!-- Select2 js-->
+    <!-- Select2 JS -->
     <script src="{{ url('panel/assets/plugins/select2/js/select2.min.js') }}"></script>
 
-    <!-- Perfect-scrollbar js -->
-
-
-    <!-- Sidemenu js -->
-
-
-    <!-- Sidebar js -->
-
-
-    <!-- Internal Chart.Bundle js-->
+    <!-- Chart JS -->
     <script src="{{ url('panel/assets/plugins/chart.js/Chart.bundle.min.js') }}"></script>
 
-    <!-- Peity js-->
+    <!-- Peity JS -->
     <script src="{{ url('panel/assets/plugins/peity/jquery.peity.min.js') }}"></script>
 
-    <!-- Internal Morris js -->
+    <!-- Morris JS -->
     <script src="{{ url('panel/assets/plugins/raphael/raphael.min.js') }}"></script>
     <script src="{{ url('panel/assets/plugins/morris.js/morris.min.js') }}"></script>
 
-    <!-- Circle Progress js-->
+    <!-- Circle Progress JS -->
     <script src="{{ url('panel/assets/js/circle-progress.min.js') }}"></script>
     <script src="{{ url('panel/assets/js/chart-circle.js') }}"></script>
 
-    <!-- Internal Dashboard js-->
+    <!-- Internal Dashboard JS -->
     <script src="{{ url('panel/assets/js/index.js') }}"></script>
 
-    <!-- Sticky js -->
+    <!-- Sticky JS -->
     <script src="{{ url('panel/assets/js/sticky.js') }}"></script>
 
-    <!-- Custom js -->
+    <!-- Custom JS -->
     <script src="{{ url('panel/assets/js/custom.js') }}"></script>
 
-    <!-- Switcher js -->
+    <!-- Switcher JS -->
     <script src="{{ url('panel/assets/switcher/js/switcher.js') }}"></script>
-    <!-- REQUIRED SCRIPTS -->
 
-    <!-- DataTables -->
-    <script src="{{ URL::to('/') . '/plugins/datatables/jquery.dataTables.min.js' }}"></script>
-    <script src="{{ URL::to('/') . '/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js' }}"></script>
-    <script src="{{ URL::to('/') . '/plugins/datatables-responsive/js/dataTables.responsive.min.js' }}"></script>
-    <script src="{{ URL::to('/') . '/plugins/datatables-responsive/js/responsive.bootstrap4.min.js' }}"></script>
+    <!-- DataTables JS -->
+    <script src="{{ url('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url('plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script src="{{ url('plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
+    <script src="{{ url('plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
 
     <script>
         $(function() {
@@ -480,29 +459,22 @@
                 "responsive": true
                 , "autoWidth": false
             , });
-        });
-        $(function() {
-            $('[data-toggle="tooltip"]').tooltip()
-        })
-
-        $("textarea").each(function() {
-            CKEDITOR.replace(this);
-        });
-
-    </script>
-    @foreach ($errors->all() as $error)
-    <script>
-        toastr.error('{{ $error }}')
-
-    </script>
-    <script>
-        $(document).ready(function() {
+            $('[data-toggle="tooltip"]').tooltip();
+            $("textarea").each(function() {
+                CKEDITOR.replace(this);
+            });
             $('.js-example-basic-single').select2();
         });
 
     </script>
+
+    @foreach ($errors->all() as $error)
+    <script>
+        toastr.error('{{ $error }}');
+
+    </script>
     @endforeach
+
     @yield('js')
 </body>
-
 </html>

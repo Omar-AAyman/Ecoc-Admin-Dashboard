@@ -24,12 +24,12 @@ class TransactionPolicy
         return $user->hasRole('super_admin');
     }
 
-    public function update(User $user, Transaction $transaction)
+    public function update(User $user)
     {
         return $user->hasRole('super_admin');
     }
 
-    public function delete(User $user, Transaction $transaction)
+    public function delete(User $user)
     {
         return $user->hasRole('super_admin');
     }
