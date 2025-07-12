@@ -1,7 +1,6 @@
 @foreach ($vessels as $vessel)
 <tr>
     <td>{{ $vessel->name }}</td>
-    <td>{{ $vessel->nationality }}</td>
     <td>
         <div class="d-flex gap-1 justify-content-start">
             @can('update', \App\Models\Vessel::class)

@@ -5,9 +5,13 @@ use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\{
     ActivityLogController,
     DashboardController,
+    DriverController,
     ProductController,
+    SearchController,
     TankController,
+    TrailerController,
     TransactionController,
+    TruckController,
     UserController,
     VesselController
 };
@@ -43,6 +47,10 @@ Route::group(
         Route::post('/tanks/{id}/reset', [TankController::class, 'resetTank'])->middleware('restrict.to.role:super_admin,ceo')->name('tanks.reset');
         Route::resource('products', ProductController::class);
         Route::resource('vessels', VesselController::class);
+
+        Route::resource('trucks', TruckController::class);
+        Route::resource('trailers', TrailerController::class);
+        Route::resource('drivers', DriverController::class);
         Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
         Route::prefix('clients')->group(function () {
@@ -58,8 +66,11 @@ Route::group(
         Route::prefix('/transactions')->group(function () {
             Route::get('/', [TransactionController::class, 'index'])->name('transactions.index');
             Route::get('/create', [TransactionController::class, 'create'])->name('transactions.create');
+            Route::get('/{id}/edit', [TransactionController::class, 'edit'])->name('transactions.edit');
+            Route::put('/{id}', [TransactionController::class, 'update'])->name('transactions.update');
             Route::post('/', [TransactionController::class, 'store'])->name('transactions.store');
             Route::get('/{id}', [TransactionController::class, 'showDetails'])->name('transactions.show');
+            Route::get('/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate');
         });
 
         // Profile Management
@@ -73,18 +84,27 @@ Route::group(
             Route::get('/', [ActivityLogController::class, 'index'])->name('activity-logs.index');
             Route::get('/{id}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
         });
+
+        // Search Routes
+        Route::get('/search', [SearchController::class, 'results'])->name('search.results');
     }
 );
 
-Route::prefix('/api')->middleware(['auth', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,client'])->group(function () {
-    Route::get('/tanks/{id}/company', [TankController::class, 'getCompany']);
-    Route::get('/tanks/{id}/product', [TankController::class, 'getProduct']);
-    Route::get('/tanks/{id}/capacity', [TankController::class, 'getCapacity']);
-    Route::get('/tanks/{id}/details', [TankController::class, 'getDetails']);
-    Route::get('/tanks/available', [TankController::class, 'getAvailableTanks']);
-    Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.getProduct');
-    Route::get('/transactions/statistics', [TransactionController::class, 'statistics'])->name('transactions.statistics');
+Route::prefix(LaravelLocalization::setLocale())->group(function () {
+
+    Route::prefix('/api')->middleware(['auth', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,ceo,client'])->group(function () {
+        Route::get('/tanks/{id}/company', [TankController::class, 'getCompany']);
+        Route::get('/tanks/{id}/product', [TankController::class, 'getProduct']);
+        Route::get('/tanks/{id}/capacity', [TankController::class, 'getCapacity']);
+        Route::get('/tanks/{id}/details', [TankController::class, 'getDetails']);
+        Route::get('/tanks/available', [TankController::class, 'getAvailableTanks']);
+        Route::get('/products/{id}', [ProductController::class, 'getProduct'])->name('products.getProduct');
+        Route::get('/transactions/statistics', [TransactionController::class, 'statistics'])->name('transactions.statistics');
+
+        Route::get('/search', [SearchController::class, 'ajaxSearch'])->name('search.ajax');
+    });
 });
+
 
 // Auth routes (outside localization)
 require __DIR__ . '/auth.php';

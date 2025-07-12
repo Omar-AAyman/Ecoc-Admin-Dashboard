@@ -50,7 +50,7 @@ class VesselController extends Controller
         $this->authorize('create', \App\Models\Vessel::class);
         $validated = $request->validate([
             'name' => 'required|string|unique:vessels|max:255',
-            'nationality' => 'required|string|max:255',
+            'nationality' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -73,7 +73,7 @@ class VesselController extends Controller
         $this->authorize('update', \App\Models\Vessel::class);
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:vessels,name,' . $id,
-            'nationality' => 'required|string|max:255',
+            'nationality' => 'nullable|string|max:255',
         ]);
 
         try {

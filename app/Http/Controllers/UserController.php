@@ -375,6 +375,7 @@ class UserController extends Controller
 
         if ($user->isClient()) {
             $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+            $rules['remove_image'] = 'nullable|boolean';
         }
 
         $messages = [
@@ -386,9 +387,10 @@ class UserController extends Controller
             'last_name.max' => 'The last name may not be greater than 255 characters.',
             'password.min' => 'The password must be at least 8 characters.',
             'password.confirmed' => 'The password confirmation does not match.',
-            'image.image' => 'The logo must be an image.',
-            'image.mimes' => 'The logo must be a file of type: jpeg, png, jpg.',
-            'image.max' => 'The logo may not be greater than 2MB.',
+            'image.image' => 'The company logo must be an image.',
+            'image.mimes' => 'The company logo must be a file of type: jpeg, png, jpg.',
+            'image.max' => 'The company logo may not be greater than 2MB.',
+            'remove_image.boolean' => 'The remove image option must be a boolean value.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);

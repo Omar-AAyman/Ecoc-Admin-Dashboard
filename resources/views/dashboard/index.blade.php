@@ -18,7 +18,7 @@
     }
 
     .hero-header {
-        padding: 2.5rem 0;
+        padding: 1.5rem 0;
         border-radius: 16px;
         margin-bottom: 2rem;
         box-shadow: 0 6px 20px rgba(0, 11, 67, 0.2);
@@ -60,13 +60,14 @@
         border-radius: 8px;
         font-weight: 500;
         transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
     }
 
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-primary:hover {
@@ -108,7 +109,6 @@
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
 
-    /* Tank Visualization Styles */
     .container-card {
         width: 200px;
         height: 360px;
@@ -180,8 +180,8 @@
         position: absolute;
         bottom: 0;
         width: 100%;
-        min-height: 10px; /* Increased for visibility */
-        overflow: visible;
+        min-height: 10px;
+        overflow: hidden;
         transform: translateZ(2px);
         border-radius: 0 0 10px 10px;
         transition: height 0.5s ease-in-out;
@@ -359,52 +359,116 @@
         margin-bottom: 1rem;
     }
 
-    [dir="rtl"] .container-label,
-    [dir="rtl"] .container-info,
-    [dir="rtl"] .capacity-label {
-        direction: rtl;
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+        margin-bottom: 2rem;
     }
 
-    [dir="rtl"] .x-button {
-        right: auto;
-        left: 1rem;
+    .details-table {
+        font-size: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    .details-table th, .details-table td {
+        padding: 0.25rem;
+        vertical-align: middle;
+    }
+
+    @media (max-width: 992px) {
+        .hero-header h2 {
+            font-size: 2rem;
+        }
+        .header-actions {
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+        }
     }
 
     @media (max-width: 768px) {
+        .hero-header {
+            padding: 1rem 0;
+        }
         .hero-header h2 {
             font-size: 1.75rem;
+            text-align: center;
         }
-
+        .header-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        .btn {
+            width: 100%;
+            text-align: center;
+        }
         .container-card {
             width: 150px;
             height: 270px;
         }
-
         .container-card.small {
             width: 100px;
             height: 180px;
         }
-
         .container-card.selected {
             width: 140px;
             height: 280px;
         }
-
         .container-label {
             font-size: 1rem;
         }
-
         .container-info, .capacity-label {
             font-size: 0.8rem;
         }
-
         .enlarged-container-detail {
             width: 140px;
             height: 280px;
         }
-
         #tank-search {
             max-width: 200px;
+        }
+        .chart-container {
+            height: 200px;
+        }
+        .details-table {
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-header h2 {
+            font-size: 1.5rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.7rem;
+        }
+        .container-card {
+            width: 120px;
+            height: 220px;
+        }
+        .container-card.small {
+            width: 90px;
+            height: 160px;
+        }
+        .container-card.selected {
+            width: 110px;
+            height: 200px;
+        }
+        .container-label {
+            font-size: 0.9rem;
+        }
+        .container-info, .capacity-label {
+            font-size: 0.7rem;
+        }
+        .enlarged-container-detail {
+            width: 110px;
+            height: 200px;
         }
     }
 </style>
@@ -414,21 +478,85 @@
 <div class="main-content side-content my-2 pt-0">
     <div class="container-fluid px-4 py-4">
         <div class="inner-body">
-            <!-- Page Header -->
+            <!-- Welcome Section -->
             <div class="hero-header">
                 <div class="container">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
-                            <i class="fas fa-tint me-2"></i>Tanks Dashboard
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <h2 class="my-3 my-md-0">
+                            <i class="fas fa-tint me-2"></i>Welcome back, {{ auth()->user()->first_name }}!
                         </h2>
+                    </div>
+                    <p class="text-muted">Total Tanks: {{ $totalTanks }}, Average Capacity Utilization: {{ $avgCapacityUtilization }}%</p>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Rental Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="rentalChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Utilization Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="utilizationChart"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Alert Messages -->
-            @include('components.alerts')
+            <!-- Analysis Cards Section -->
+            <div class="row mt-4">
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Average Capacity Utilization</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <h3>{{ $avgCapacityUtilization }}%</h3>
+                            <p class="text-muted">Average across all tanks</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Overall Analysis</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <p>Active Rentals: {{ $activeRentals }}</p>
+                            <p>Completed Rentals: {{ $completedRentals }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Process Metrics</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <p>Discharge: {{ $totalDischarge }} mt</p>
+                            <p>Load: {{ $totalLoad }} mt</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <div id="selected-container-section" class="card shadow-sm mb-4">
+            <!-- Selected Container Section -->
+            <div id="selected-container-section" class="card shadow-sm my-4">
                 <div class="card-header text-white">
                     <h5 class="card-title mb-0">Tank Details: <span id="detail-header-id"></span></h5>
                     <button id="back-to-gallery-button" class="x-button">×</button>
@@ -463,14 +591,12 @@
                             <p><strong>Content:</strong> <span id="detail-content"></span></p>
                             <p><strong>Status:</strong> <span id="detail-status"></span></p>
                             <p><strong>Max Capacity:</strong> <span id="detail-max-capacity"></span></p>
-                            <p><strong>Current Level:</strong> <span id="detail-current-level"></span></p>
+                            <p><strong>Current capacity:</strong> <span id="detail-current-level"></span></p>
                             <p><strong>Capacity Utilization:</strong> <span id="detail-capacity-utilization"></span></p>
-                            @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
-                                <p><strong>Company:</strong> <span id="detail-company"></span></p>
-                            @endif
+                            <p><strong>Company:</strong> <span id="detail-company"></span></p>
                             <div class="mt-3 d-flex gap-2">
-                                @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
-                                    <a href="#" class="btn btn-primary action-button" id="edit-settings-button">Edit Settings</a>
+                                @if (auth()->user() && auth()->user()->isSuperAdmin())
+                                    <a id="edit-settings-button" class="btn btn-primary action-button">Edit Settings</a>
                                 @endif
                                 <button id="more-details-button" class="btn btn-primary action-button">See More Analysis</button>
                             </div>
@@ -478,17 +604,48 @@
                     </div>
                     <div id="detailed-analysis-section" class="mt-4">
                         <h5 class="fw-semibold mb-3">Detailed Analysis for <span id="analysis-container-id"></span></h5>
-                        <p><strong>Max Capacity:</strong> <span id="analysis-max-capacity"></span></p>
-                        <p><strong>Current Level:</strong> <span id="analysis-current-level"></span></p>
-                        <p><strong>Capacity Utilization:</strong> <span id="analysis-capacity-utilization"></span></p>
-                        <p><strong>Rental History:</strong></p>
-                        <ul id="analysis-rental-history"></ul>
-                        <p><strong>Transactions:</strong></p>
-                        <ul id="analysis-transactions"></ul>
+                        <div class="details-table">
+                            <h6>Rental History</h6>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-sm text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Company</th>
+                                            <th>Product</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="rental-history-table"></tbody>
+                                </table>
+                            </div>
+                            <div class="table-responsive">
+                                <h6 class="mt-3">Transactions</h6>
+                                <table class="table table-striped table-sm text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Work Order</th>
+                                            <th>Bill Of Lading</th>
+                                            <th>Charge Permit</th>
+                                            <th>Discharge Permit</th>
+                                            <th>Type</th>
+                                            <th>Quantity</th>
+                                            <th>Date</th>
+                                            <th>Company</th>
+                                            <th>Product</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transactions-table"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="gallery-section">
+
+            <!-- Gallery Section -->
+            <div id="gallery-section" class="mt-4">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center">
@@ -506,41 +663,10 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const containers = [
-        @foreach (app(\App\Services\TankService::class)->getTanks(auth()->user()) as $tank)
-        {
-            id: "{{ $tank->number }}",
-            dbId: "{{ $tank->id }}",
-            content: "{{ $tank->product ? $tank->product->name : 'N/A' }}",
-            status: "{{ ucfirst($tank->status) }}",
-            cubicMeterCapacity: "{{ $tank->cubic_meter_capacity }}",
-            currentLevel: "{{ $tank->current_level ?? 0 }}",
-            maxCapacity: "{{ $tank->product && $tank->product->density ? number_format($tank->cubic_meter_capacity * $tank->product->density, 2) : $tank->cubic_meter_capacity }}",
-            @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
-            company: "{{ $tank->company ? $tank->company->name : 'N/A' }}",
-            @endif
-            capacityUtilization: "{{ $tank->cubic_meter_capacity > 0 && $tank->product && $tank->product->density ? number_format(($tank->current_level / ($tank->cubic_meter_capacity * $tank->product->density)) * 100, 0) : ($tank->cubic_meter_capacity > 0 ? number_format(($tank->current_level / $tank->cubic_meter_capacity) * 100, 0) : 0) }}%",
-            liquidColor: [
-                @switch($tank->product_id % 10)
-                    @case(1) ["#ef4444", "#b91c1c"], @break
-                    @case(2) ["#4ade80", "#16a34a"], @break
-                    @case(3) ["#60a5fa", "#2563eb"], @break
-                    @case(4) ["#fb923c", "#ea580c"], @break
-                    @case(5) ["#c084fc", "#9333ea"], @break
-                    @case(6) ["#22d3ee", "#0891b2"], @break
-                    @case(7) ["#f472b6", "#e82688"], @break
-                    @case(8) ["#fcd34d", "#fbbf24"], @break
-                    @case(9) ["#94a3b8", "#64748b"], @break
-                    @default ["#d9f99d", "#a3e635"]
-                @endswitch
-            ],
-        },
-        @endforeach
-    ];
+    const tanks = @json($tanks) || [];
+    const performanceTrends = @json($performanceTrends) || { utilization: [], rentals: [], labels: [] };
 
     const gallerySection = document.getElementById('gallery-section');
     const selectedContainerSection = document.getElementById('selected-container-section');
@@ -551,6 +677,53 @@ document.addEventListener('DOMContentLoaded', function () {
     const enlargedContainerDisplay = document.getElementById('enlarged-container-display');
     const searchInput = document.getElementById('tank-search');
     const editSettingsButton = document.getElementById('edit-settings-button');
+    const rentalHistoryTable = document.getElementById('rental-history-table');
+    const transactionsTable = document.getElementById('transactions-table');
+
+    // Initial render of gallery
+    renderGallery(tanks);
+
+    // Rental Chart
+    const rentalChart = new Chart(document.getElementById('rentalChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Active Rentals', 'Completed Rentals'],
+            datasets: [{
+                label: 'Number of Rentals',
+                data: [{{ $activeRentals }}, {{ $completedRentals }}],
+                backgroundColor: ['#4ade80', '#ef4444'],
+                borderColor: ['#16a34a', '#b91c1c'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+
+    // Utilization Trends Chart
+    const utilizationChart = new Chart(document.getElementById('utilizationChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: performanceTrends.labels,
+            datasets: [{
+                label: 'Capacity Utilization (%)',
+                data: performanceTrends.utilization,
+                fill: false,
+                borderColor: '#2563eb',
+                tension: 0.1
+            }, {
+                label: 'Rental Count',
+                data: performanceTrends.rentals,
+                fill: false,
+                borderColor: '#ef4444',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } }
+        }
+    });
 
     function getStatusColor(status) {
         switch (status.toLowerCase()) {
@@ -563,28 +736,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function renderGallery(tanks = containers) {
-        console.log('Rendering gallery with tanks:', tanks); // Debugging
+    function renderGallery(tanks = []) {
+        console.log('Rendering gallery with tanks:', tanks);
+        if (!tanks || tanks.length === 0) {
+            gallery.innerHTML = '<p class="text-center">No tanks available.</p>';
+            return;
+        }
         gallery.innerHTML = '';
         tanks.forEach(container => {
-            const liquidHeight = container.currentLevel && container.maxCapacity && container.maxCapacity > 0 ?
-                `${Math.min((parseFloat(container.currentLevel) / parseFloat(container.maxCapacity)) * 100, 100)}%` : '0%';
-            console.log(`Tank ${container.id}: currentLevel=${container.currentLevel}, maxCapacity=${container.maxCapacity}, liquidHeight=${liquidHeight}`); // Debugging
-            const capacityText = container.currentLevel && container.maxCapacity ?
-                `${parseFloat(container.currentLevel).toFixed(1)} mt / ${parseFloat(container.maxCapacity).toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
-            const tooltipContent = `
-                ID: ${container.id}<br>
-                Content: ${container.content}<br>
-                Status: ${container.status}<br>
-                Max Capacity: ${container.maxCapacity} mt<br>
-                Current Level: ${container.currentLevel} mt<br>
-                Utilization: ${container.capacityUtilization}
-                ${container.company ? `<br>Company: ${container.company}` : ''}
-            `;
+            const maxCapacity = parseFloat(container.maxCapacity.replace(',', ''));
+            const currentLevel = parseFloat(container.currentLevel);
+            const liquidHeight = maxCapacity > 0 ? Math.min((currentLevel / maxCapacity) * 100, 100) + '%' : '0%';
+            console.log(`Tank ${container.id}: currentLevel=${currentLevel}, maxCapacity=${maxCapacity}, liquidHeight=${liquidHeight}`);
+            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
+
             const card = document.createElement('div');
             card.className = 'col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex justify-content-center';
             card.innerHTML = `
-                <div class="container-card" data-id="${container.id}" data-bs-toggle="tooltip" data-bs-html="true" title="${tooltipContent}">
+                <div class="container-card" data-id="${container.id}">
                     <div class="barrel">
                         <div class="barrel-top"></div>
                         <div class="barrel-rings ring-top"></div>
@@ -612,21 +781,6 @@ document.addEventListener('DOMContentLoaded', function () {
             gallery.appendChild(card);
         });
 
-        // Dispose existing tooltips to prevent leaks
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
-            const tooltip = bootstrap.Tooltip.getInstance(element);
-            if (tooltip) tooltip.dispose();
-        });
-
-        // Initialize new tooltips
-        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(element => {
-            new bootstrap.Tooltip(element, {
-                placement: 'top',
-                container: 'body',
-                html: true
-            });
-        });
-
         gallery.classList.remove('small');
         selectedContainerSection.classList.remove('visible');
         selectedContainerSection.style.display = 'none';
@@ -637,14 +791,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showContainerBasicDetails(container) {
-        console.log('Showing details for container:', container); // Debugging
+        console.log('Showing details for container:', container);
         selectedContainerSection.style.display = 'block';
         setTimeout(() => {
             selectedContainerSection.classList.add('visible');
-
-            const selectedContainerHeight = selectedContainerSection.offsetHeight;
-            const sectionMarginBottom = parseFloat(getComputedStyle(selectedContainerSection).marginBottom);
-            const offsetForGallery = selectedContainerHeight + sectionMarginBottom + 10;
 
             gallerySection.style.transition = 'transform 0.5s ease-in-out';
             gallery.classList.add('small');
@@ -653,11 +803,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 card.classList.toggle('selected', card.dataset.id === container.id);
             });
 
-            const liquidHeight = container.currentLevel && container.maxCapacity && container.maxCapacity > 0 ?
-                `${Math.min((parseFloat(container.currentLevel) / parseFloat(container.maxCapacity)) * 100, 100)}%` : '0%';
-            console.log(`Enlarged tank ${container.id}: liquidHeight=${liquidHeight}`); // Debugging
-            const capacityText = container.currentLevel && container.maxCapacity ?
-                `${parseFloat(container.currentLevel).toFixed(1)} mt / ${parseFloat(container.maxCapacity).toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
+            const maxCapacity = parseFloat(container.maxCapacity.replace(',', ''));
+            const currentLevel = parseFloat(container.currentLevel);
+            const liquidHeight = maxCapacity > 0 ? Math.min((currentLevel / maxCapacity) * 100, 100) + '%' : '0%';
+            console.log(`Enlarged tank ${container.id}: liquidHeight=${liquidHeight}`);
+            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
             const liquidContainer = enlargedContainerDisplay.querySelector('.liquid-container');
             liquidContainer.style.setProperty('--liquid-color-light', container.liquidColor[0]);
             liquidContainer.style.setProperty('--liquid-color-dark', container.liquidColor[1]);
@@ -673,19 +823,14 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('detail-id').textContent = container.id;
             document.getElementById('detail-content').textContent = container.content;
             document.getElementById('detail-status').textContent = container.status;
-            document.getElementById('detail-max-capacity').textContent = `${parseFloat(container.maxCapacity).toFixed(1)} mt`;
-            document.getElementById('detail-current-level').textContent = `${parseFloat(container.currentLevel).toFixed(1)} mt`;
+            document.getElementById('detail-max-capacity').textContent = `${maxCapacity.toFixed(1)} mt`;
+            document.getElementById('detail-current-level').textContent = `${currentLevel.toFixed(1)} mt`;
             document.getElementById('detail-capacity-utilization').textContent = container.capacityUtilization;
-            @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
-                document.getElementById('detail-company').textContent = container.company || 'N/A';
-            @endif
+            document.getElementById('detail-company').textContent = container.company || 'N/A';
 
             if (editSettingsButton) {
-                editSettingsButton.href = `/en/tanks/${encodeURIComponent(container.dbId)}/edit`;
+                editSettingsButton.href = `/tanks/${encodeURIComponent(container.dbId)}/edit`;
             }
-
-            // Fetch rental history and transactions via AJAX
-            fetchTankDetails(container.dbId);
 
             enlargedContainerDisplay.classList.remove('active');
             setTimeout(() => {
@@ -697,88 +842,72 @@ document.addEventListener('DOMContentLoaded', function () {
             moreDetailsButton.style.display = 'inline-block';
             moreDetailsButton.style.backgroundColor = container.liquidColor[0];
             moreDetailsButton.classList.remove('btn-primary', 'text-white');
-
-            // Hide tooltips
-            document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(tooltip => {
-                bootstrap.Tooltip.getInstance(tooltip)?.hide();
-            });
         }, 50);
     }
 
-    function fetchTankDetails(tankId) {
-        console.log('Fetching details for tank ID:', tankId); // Debugging
-        $.ajax({
-            url: `/api/tanks/${tankId}/details`,
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            success: function(data) {
-                console.log('Tank details fetched:', data); // Debugging
-                populateDetailedAnalysis(data);
-            },
-            error: function(xhr) {
-                console.error('Error fetching tank details:', xhr.responseText);
-                populateDetailedAnalysis({
-                    id: document.getElementById('detail-id').textContent,
-                    maxCapacity: document.getElementById('detail-max-capacity').textContent,
-                    currentLevel: document.getElementById('detail-current-level').textContent,
-                    capacityUtilization: document.getElementById('detail-capacity-utilization').textContent,
-                    rentals: [],
-                    transactions: []
-                });
-            }
-        });
-    }
+    function populateDetailedAnalysis(container) {
+        document.getElementById('analysis-container-id').textContent = container.id;
 
-    function populateDetailedAnalysis(data) {
-        document.getElementById('analysis-container-id').textContent = data.id;
-        document.getElementById('analysis-max-capacity').textContent = data.maxCapacity;
-        document.getElementById('analysis-current-level').textContent = data.currentLevel;
-        document.getElementById('analysis-capacity-utilization').textContent = data.capacityUtilization;
-
-        const rentalList = document.getElementById('analysis-rental-history');
-        rentalList.innerHTML = '';
-        if (data.rentals && data.rentals.length > 0) {
-            data.rentals.forEach(rental => {
-                const li = document.createElement('li');
-                li.textContent = `From ${rental.start_date} to ${rental.end_date || 'Present'} - Company: ${rental.company_name || 'N/A'}, Product: ${rental.product_name || 'N/A'}`;
-                rentalList.appendChild(li);
+        // Populate rental history table
+        rentalHistoryTable.innerHTML = '';
+        if (container.rentalHistory && container.rentalHistory.length > 0) {
+            container.rentalHistory.forEach(rental => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${rental.company}</td>
+                    <td>${rental.product}</td>
+                    <td>${rental.start_date}</td>
+                    <td>${rental.end_date}</td>
+                `;
+                rentalHistoryTable.appendChild(row);
             });
         } else {
-            const li = document.createElement('li');
-            li.textContent = 'No rental history available.';
-            rentalList.appendChild(li);
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="4">No rental history available.</td>';
+            rentalHistoryTable.appendChild(row);
         }
 
-        const transactionList = document.getElementById('analysis-transactions');
-        transactionList.innerHTML = '';
-        if (data.transactions && data.transactions.length > 0) {
-            data.transactions.forEach(transaction => {
-                const li = document.createElement('li');
-                li.textContent = `ID: ${transaction.id}, Quantity: ${transaction.quantity} mt, Date: ${transaction.created_at}, Type: ${transaction.type || 'N/A'}`;
-                transactionList.appendChild(li);
+        // Populate transactions table
+        transactionsTable.innerHTML = '';
+        if (container.transactions && container.transactions.length > 0) {
+            container.transactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.id || 'N/A'}</td>
+                    <td>${transaction.work_order_number || 'N/A'}</td>
+                    <td>${transaction.bill_of_lading_number || 'N/A'}</td>
+                    <td>${transaction.charge_permit_number || 'N/A'}</td>
+                    <td>${transaction.discharge_permit_number || 'N/A'}</td>
+                    <td>${transaction.type}</td>
+                    <td>${transaction.quantity}</td>
+                    <td>${transaction.date}</td>
+                    <td>${transaction.company || 'N/A'}</td>
+                    <td>${transaction.product || 'N/A'}</td>
+                `;
+                transactionsTable.appendChild(row);
             });
         } else {
-            const li = document.createElement('li');
-            li.textContent = 'No transactions available.';
-            transactionList.appendChild(li);
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="10">No transactions available.</td>';
+            transactionsTable.appendChild(row);
         }
     }
 
-    function showFullAnalysis() {
-        console.log('Showing full analysis'); // Debugging
-        detailedAnalysisSection.style.display = 'block';
-        setTimeout(() => {
-            detailedAnalysisSection.classList.add('visible');
-        }, 0);
-        moreDetailsButton.style.display = 'none';
-    }
-
-    moreDetailsButton.addEventListener('click', showFullAnalysis);
+    let selectedContainer = null;
+    moreDetailsButton.addEventListener('click', function() {
+        selectedContainer = tanks.find(t => t.id === document.getElementById('detail-id').textContent);
+        if (selectedContainer) {
+            populateDetailedAnalysis(selectedContainer);
+            detailedAnalysisSection.style.display = 'block';
+            setTimeout(() => {
+                detailedAnalysisSection.classList.add('visible');
+            }, 0);
+            moreDetailsButton.style.display = 'none';
+        }
+    });
 
     backButton.addEventListener('click', () => {
-        console.log('Back to gallery clicked'); // Debugging
+        console.log('Back to gallery clicked');
         selectedContainerSection.classList.remove('visible');
         detailedAnalysisSection.classList.remove('visible');
         enlargedContainerDisplay.classList.remove('active');
@@ -795,17 +924,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         moreDetailsButton.style.backgroundColor = '';
         moreDetailsButton.classList.add('btn-primary', 'text-white');
-        renderGallery();
+        renderGallery(tanks);
     });
 
-    // Debounced search
     let searchTimeout;
     searchInput.addEventListener('input', () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             const searchTerm = searchInput.value.toLowerCase();
-            console.log('Search term:', searchTerm); // Debugging
-            const filteredTanks = containers.filter(container =>
+            console.log('Search term:', searchTerm);
+            const filteredTanks = tanks.filter(container =>
                 container.id.toLowerCase().includes(searchTerm) ||
                 container.content.toLowerCase().includes(searchTerm) ||
                 container.status.toLowerCase().includes(searchTerm)
@@ -813,9 +941,6 @@ document.addEventListener('DOMContentLoaded', function () {
             renderGallery(filteredTanks);
         }, 300);
     });
-
-    // Initial render
-    renderGallery();
 });
 </script>
 @endsection

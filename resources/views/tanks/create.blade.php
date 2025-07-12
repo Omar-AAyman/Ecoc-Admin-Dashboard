@@ -152,7 +152,7 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-cogs me-2"></i>Create Tank
                         </h2>
                         <a href="{{ route('tanks.settings') }}" class="btn btn-secondary d-flex align-items-center">
@@ -214,7 +214,7 @@
                             <input type="number" id="max_capacity" class="form-control" disabled>
                         </div>
                         <div class="mb-3" id="current-level-group" style="display: none;">
-                            <label for="current_level" class="form-label">Current Level (mt)</label>
+                            <label for="current_level" class="form-label">Current capacity (mt)</label>
                             <input type="number" name="current_level" id="current_level" class="form-control" value="{{ old('current_level', 0) }}" step="0.01" min="0">
                             @error('current_level')
                             <div class="text-danger">{{ $message }}</div>
@@ -236,11 +236,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmLevelModalLabel">Confirm Current Level</h5>
+                <h5 class="modal-title" id="confirmLevelModalLabel">Confirm Current capacity</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Setting a non-zero current level is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
+                Setting a non-zero current capacity is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', function(event) {
         const currentLevel = parseFloat(currentLevelInput.value) || 0;
-        console.log('Form submitted, current level:', currentLevel);
+        console.log('Form submitted, current capacity:', currentLevel);
         if (currentLevel > 0) {
             event.preventDefault();
             confirmModal.show();

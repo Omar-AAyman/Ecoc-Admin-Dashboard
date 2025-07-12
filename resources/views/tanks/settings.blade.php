@@ -259,7 +259,7 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-cogs me-2"></i>Tank Settings
                         </h2>
                     </div>
@@ -308,7 +308,7 @@
                                     <th>Number</th>
                                     <th>Capacity (m³)</th>
                                     <th>Max Capacity (mt)</th>
-                                    <th>Current Level (mt)</th>
+                                    <th>Current Capacity (mt)</th>
                                     <th>Fill %</th>
                                     <th>Status</th>
                                     <th>Product</th>
@@ -347,7 +347,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to reset tank <strong id="resetTankNumber"></strong>? This will clear the company, status, and current level.
+                Are you sure you want to reset tank <strong id="resetTankNumber"></strong>? This will clear the company, status, and current capacity.
                 <p class="warning-text">This action cannot be undone.</p>
             </div>
             <div class="modal-footer">

@@ -14,7 +14,7 @@ class Shipment extends Model
         'driver_name',
         'product_id',
         'total_quantity',
-        'port_of_discharge',
+        'berth_number',
         'arrival_date',
         'status',
     ];

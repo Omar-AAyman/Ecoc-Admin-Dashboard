@@ -10,6 +10,7 @@ class Tank extends Model
         'number',
         'cubic_meter_capacity',
         'current_level',
+        'temperature',
         'status',
         'product_id',
         'company_id',
@@ -40,8 +41,22 @@ class Tank extends Model
         return $this->hasMany(TankRental::class);
     }
 
+    // Calculate max capacity (in metric tons)
     public function maxCapacity()
     {
         return $this->product ? $this->cubic_meter_capacity * $this->product->density : 0;
+    }
+
+    // Accessor for free space (in metric tons)
+    public function getFreeSpaceAttribute()
+    {
+        $maxCapacity = $this->maxCapacity();
+        return $maxCapacity - $this->current_level;
+    }
+
+    // Convert temperature from Celsius to Fahrenheit
+    public function getTemperatureFahrenheitAttribute()
+    {
+        return $this->temperature !== null ? ($this->temperature * 9 / 5) + 32 : null;
     }
 }

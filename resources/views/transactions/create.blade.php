@@ -1,6 +1,6 @@
 @extends('layouts.panel')
 
-@section('title', 'Create Transaction')
+@section('title', isset($transaction) ? 'Duplicate Transaction' : 'Create Transaction')
 
 @section('css')
 <style>
@@ -134,7 +134,6 @@
         object-fit: contain;
         border-radius: 4px;
         border: 1px solid #e5e7eb;
-        /* padding: 2px; */
         background-color: #ffffff;
         vertical-align: middle;
     }
@@ -191,8 +190,8 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
-                            <i class="fas fa-exchange-alt me-2"></i>Create Transaction
+                        <h2 class="my-3 my-md-0">
+                            <i class="fas fa-exchange-alt me-2"></i>{{ isset($transaction) ? 'Duplicate Transaction' : 'Create Transaction' }}
                         </h2>
                         <a href="{{ route('transactions.index') }}" class="btn btn-secondary d-flex align-items-center">
                             <i class="fas fa-arrow-left me-2"></i>Back to Transactions
@@ -218,15 +217,15 @@
                                         <label for="type" class="form-label required">Transaction Type</label>
                                         <select name="type" id="type" class="form-select" required>
                                             <option value="">Select Type</option>
-                                            <option value="loading" {{ old('type') == 'loading' ? 'selected' : '' }}>Loading</option>
-                                            <option value="discharging" {{ old('type') == 'discharging' ? 'selected' : '' }}>Discharging</option>
-                                            <option value="transfer" {{ old('type') == 'transfer' ? 'selected' : '' }}>Transfer</option>
+                                            <option value="loading" {{ (isset($transaction) && $transaction->type == 'loading') || old('type') == 'loading' ? 'selected' : '' }}>Loading</option>
+                                            <option value="discharging" {{ (isset($transaction) && $transaction->type == 'discharging') || old('type') == 'discharging' ? 'selected' : '' }}>Discharging</option>
+                                            <option value="transfer" {{ (isset($transaction) && $transaction->type == 'transfer') || old('type') == 'transfer' ? 'selected' : '' }}>Transfer</option>
                                         </select>
                                         @error('type')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <img id="company-logo" src="" alt="Company Logo" class="company-logo" style="display: none;">
+                                    <img id="company-logo" src="{{ isset($transaction) && $transaction->company && $transaction->company->logo_url ? $transaction->company->logo_url : '' }}" alt="Company Logo" class="company-logo" style="{{ isset($transaction) && $transaction->company && $transaction->company->logo_url ? 'display: inline;' : 'display: none;' }}">
                                 </div>
                             </div>
                         </div>
@@ -242,6 +241,9 @@
                                     </label>
                                     <select name="tank_id" id="tank_id" class="form-select" required>
                                         <option value="">Select Tank</option>
+                                        @foreach($tanks as $tank)
+                                        <option value="{{ $tank->id }}" {{ (isset($transaction) && $transaction->tank_id == $tank->id) || old('tank_id') == $tank->id ? 'selected' : '' }}>{{ $tank->number }}</option>
+                                        @endforeach
                                     </select>
                                     @error('tank_id')
                                     <div class="text-danger">{{ $message }}</div>
@@ -252,7 +254,7 @@
                                     <select name="original_vessel_id" id="original_vessel_id" class="form-select">
                                         <option value="">None</option>
                                         @foreach($vessels as $vessel)
-                                        <option value="{{ $vessel->id }}" {{ old('original_vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
+                                        <option value="{{ $vessel->id }}" {{ (isset($transaction) && $transaction->original_vessel_id == $vessel->id) || old('original_vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
                                         @endforeach
                                     </select>
                                     @error('original_vessel_id')
@@ -263,14 +265,14 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="company_name" class="form-label">Company</label>
-                                    <input type="text" id="company_name" class="form-control" value="{{ old('company_name') }}" disabled>
+                                    <input type="text" id="company_name" class="form-control" value="{{ isset($transaction) && $transaction->company ? $transaction->company->name : old('company_name') }}" disabled>
                                     @error('company_name')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="product_name" class="form-label">Product</label>
-                                    <input type="text" id="product_name" class="form-control" value="{{ old('product_name') }}" disabled>
+                                    <input type="text" id="product_name" class="form-control" value="{{ isset($transaction) && $transaction->product ? $transaction->product->name : old('product_name') }}" disabled>
                                     @error('product_name')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -284,6 +286,11 @@
                                     </label>
                                     <select name="destination_tank_id" id="destination_tank_id" class="form-select">
                                         <option value="">Select Tank</option>
+                                        @if(isset($transaction) && $transaction->type == 'transfer')
+                                        @foreach($tanks as $tank)
+                                        <option value="{{ $tank->id }}" {{ $transaction->destination_tank_id == $tank->id ? 'selected' : '' }}>{{ $tank->number }}</option>
+                                        @endforeach
+                                        @endif
                                     </select>
                                     @error('destination_tank_id')
                                     <div class="text-danger">{{ $message }}</div>
@@ -293,7 +300,7 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="quantity" class="form-label required">Quantity (MT)</label>
-                                    <input type="number" name="quantity" id="quantity" class="form-control" step="0.01" min="0.01" value="{{ old('quantity') }}" required>
+                                    <input type="number" name="quantity" id="quantity" class="form-control" step="0.01" min="0.01" value="{{ isset($transaction) ? $transaction->quantity : old('quantity') }}" required>
                                     <span id="quantity-error" class="text-danger" style="display: none;"></span>
                                     @error('quantity')
                                     <div class="text-danger">{{ $message }}</div>
@@ -301,49 +308,163 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="date" class="form-label required">Date</label>
-                                    <input type="datetime-local" name="date" id="date" class="form-control" value="{{ old('date') }}" required>
+                                    <input type="datetime-local" name="date" id="date" class="form-control" value="{{ isset($transaction) ? $transaction->date->format('Y-m-d\TH:i') : old('date') }}" required>
                                     @error('date')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Shipment Details Section (Shown for Loading) -->
+                        <div id="shipment_details" class="form-field" style="display: none;">
+                            <h4 class="section-header">Shipment Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="work_order_number" class="form-label">Work Order Number</label>
-                                    <input type="text" name="work_order_number" id="work_order_number" class="form-control" value="{{ old('work_order_number') }}">
-                                    @error('work_order_number')
+                                    <label for="shipment_transport_type" class="form-label required">Transport Type</label>
+                                    <select name="shipment[transport_type]" id="shipment_transport_type" class="form-select">
+                                        <option value="">Select Transport Type</option>
+                                        <option value="vessel" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->transport_type == 'vessel') || old('shipment.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
+                                        <option value="truck" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->transport_type == 'truck') || old('shipment.transport_type') == 'truck' ? 'selected' : '' }}>Truck</option>
+                                    </select>
+                                    @error('shipment.transport_type')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-md-6">
-                                    <label for="bill_of_lading_number" class="form-label">Bill of Lading Number</label>
-                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ old('bill_of_lading_number') }}">
-                                    @error('bill_of_lading_number')
+                                <div class="col-12 col-md-6" id="shipment_vessel_id_field" style="display: none;">
+                                    <label for="shipment_vessel_id" class="form-label required">Vessel</label>
+                                    <select name="shipment[vessel_id]" id="shipment_vessel_id" class="form-select">
+                                        <option value="">Select Vessel</option>
+                                        @foreach($vessels as $vessel)
+                                        <option value="{{ $vessel->id }}" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->vessel_id == $vessel->id) || old('shipment.vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('shipment.vessel_id')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
+                            <div id="shipment_truck_fields" class="form-field" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                        <label for="shipment_truck_number" class="form-label required">Truck</label>
+                                        <select name="shipment[truck_number]" id="shipment_truck_number" class="form-select">
+                                            <option value="">Select Truck</option>
+                                            @foreach($trucks as $truck)
+                                            <option value="{{ $truck->truck_number }}" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->truck_number == $truck->truck_number) || old('shipment.truck_number') == $truck->truck_number ? 'selected' : '' }}>{{ $truck->truck_number }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('shipment.truck_number')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="shipment_trailer_number" class="form-label required">Trailer</label>
+                                        <select name="shipment[trailer_number]" id="shipment_trailer_number" class="form-select">
+                                            <option value="">Select Trailer</option>
+                                            @foreach($trailers as $trailer)
+                                            <option value="{{ $trailer->trailer_number }}" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->trailer_number == $trailer->trailer_number) || old('shipment.trailer_number') == $trailer->trailer_number ? 'selected' : '' }}>{{ $trailer->trailer_number }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('shipment.trailer_number')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="shipment_driver_name" class="form-label required">Driver</label>
+                                        <select name="shipment[driver_name]" id="shipment_driver_name" class="form-select">
+                                            <option value="">Select Driver</option>
+                                            @foreach($drivers as $driver)
+                                            <option value="{{ $driver->name }}" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->driver_name == $driver->name) || old('shipment.driver_name') == $driver->name ? 'selected' : '' }}>{{ $driver->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('shipment.driver_name')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mb-3" id="shipment_berth_number_field" style="display: none;">
+                                <div class="col-12 col-md-6">
+                                    <label for="shipment_berth_number" class="form-label required">Berth Number</label>
+                                    <input type="text" name="shipment[berth_number]" id="shipment_berth_number" class="form-control" value="{{ isset($transaction) && $transaction->shipment ? $transaction->shipment->berth_number : old('shipment.berth_number') }}">
+                                    @error('shipment.berth_number')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Details Section (Shown for Discharging) -->
+                        <div id="delivery_details" class="form-field" style="display: none;">
+                            <h4 class="section-header">Delivery Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="customs_release_number" class="form-label">Customs Release Number</label>
-                                    <input type="text" name="customs_release_number" id="customs_release_number" class="form-control" value="{{ old('customs_release_number') }}">
-                                    @error('customs_release_number')
+                                    <label for="delivery_transport_type" class="form-label required">Transport Type</label>
+                                    <select name="delivery[transport_type]" id="delivery_transport_type" class="form-select">
+                                        <option value="">Select Transport Type</option>
+                                        <option value="vessel" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->transport_type == 'vessel') || old('delivery.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
+                                        <option value="truck" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->transport_type == 'truck') || old('delivery.transport_type') == 'truck' ? 'selected' : '' }}>Truck</option>
+                                    </select>
+                                    @error('delivery.transport_type')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-md-6" id="charge_permit_number_field" style="display: none;">
-                                    <label for="charge_permit_number" class="form-label required">Charge Permit Number</label>
-                                    <input type="text" name="charge_permit_number" id="charge_permit_number" class="form-control" value="{{ old('charge_permit_number') }}">
-                                    @error('charge_permit_number')
+                                <div class="col-12 col-md-6" id="delivery_vessel_id_field" style="display: none;">
+                                    <label for="delivery_vessel_id" class="form-label required">Vessel</label>
+                                    <select name="delivery[vessel_id]" id="delivery_vessel_id" class="form-select">
+                                        <option value="">Select Vessel</option>
+                                        @foreach($vessels as $vessel)
+                                        <option value="{{ $vessel->id }}" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->vessel_id == $vessel->id) || old('delivery.vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('delivery.vessel_id')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-md-6" id="discharge_permit_number_field" style="display: none;">
-                                    <label for="discharge_permit_number" class="form-label required">Discharge Permit Number</label>
-                                    <input type="text" name="discharge_permit_number" id="discharge_permit_number" class="form-control" value="{{ old('discharge_permit_number') }}">
-                                    @error('discharge_permit_number')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
+                            </div>
+                            <div id="delivery_truck_fields" class="form-field" style="display: none;">
+                                <div class="row mb-3">
+                                    <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                        <label for="delivery_truck_number" class="form-label required">Truck</label>
+                                        <select name="delivery[truck_number]" id="delivery_truck_number" class="form-select">
+                                            <option value="">Select Truck</option>
+                                            @foreach($trucks as $truck)
+                                            <option value="{{ $truck->truck_number }}" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->truck_number == $truck->truck_number) || old('delivery.truck_number') == $truck->truck_number ? 'selected' : '' }}>{{ $truck->truck_number }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery.truck_number')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="delivery_trailer_number" class="form-label required">Trailer</label>
+                                        <select name="delivery[trailer_number]" id="delivery_trailer_number" class="form-select">
+                                            <option value="">Select Trailer</option>
+                                            @foreach($trailers as $trailer)
+                                            <option value="{{ $trailer->trailer_number }}" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->trailer_number == $trailer->trailer_number) || old('delivery.trailer_number') == $trailer->trailer_number ? 'selected' : '' }}>{{ $trailer->trailer_number }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery.trailer_number')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-12 col-md-6">
+                                        <label for="delivery_driver_name" class="form-label required">Driver</label>
+                                        <select name="delivery[driver_name]" id="delivery_driver_name" class="form-select">
+                                            <option value="">Select Driver</option>
+                                            @foreach($drivers as $driver)
+                                            <option value="{{ $driver->name }}" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->driver_name == $driver->name) || old('delivery.driver_name') == $driver->name ? 'selected' : '' }}>{{ $driver->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('delivery.driver_name')
+                                        <div class="text-danger">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -357,7 +478,7 @@
                                     <select name="engineer_id" id="engineer_id" class="form-select">
                                         <option value="">None</option>
                                         @foreach($engineers as $engineer)
-                                        <option value="{{ $engineer->id }}" {{ old('engineer_id') == $engineer->id ? 'selected' : '' }}>{{ $engineer->full_name }}</option>
+                                        <option value="{{ $engineer->id }}" {{ (isset($transaction) && $transaction->engineer_id == $engineer->id) || old('engineer_id') == $engineer->id ? 'selected' : '' }}>{{ $engineer->full_name }}</option>
                                         @endforeach
                                     </select>
                                     @error('engineer_id')
@@ -369,10 +490,54 @@
                                     <select name="technician_id" id="technician_id" class="form-select">
                                         <option value="">None</option>
                                         @foreach($technicians as $technician)
-                                        <option value="{{ $technician->id }}" {{ old('technician_id') == $technician->id ? 'selected' : '' }}>{{ $technician->full_name }}</option>
+                                        <option value="{{ $technician->id }}" {{ (isset($transaction) && $transaction->technician_id == $technician->id) || old('technician_id') == $technician->id ? 'selected' : '' }}>{{ $technician->full_name }}</option>
                                         @endforeach
                                     </select>
                                     @error('technician_id')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permits Section -->
+                        <div class="form-field" style="display: none;">
+                            <h4 class="section-header">Permits</h4>
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <label for="work_order_number" class="form-label">Work Order Number</label>
+                                    <input type="text" name="work_order_number" id="work_order_number" class="form-control" value="{{ isset($transaction) ? $transaction->work_order_number : old('work_order_number') }}">
+                                    @error('work_order_number')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="bill_of_lading_number" class="form-label">Bill of Lading Number</label>
+                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ isset($transaction) ? $transaction->bill_of_lading_number : old('bill_of_lading_number') }}">
+                                    @error('bill_of_lading_number')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <label for="customs_release_number" class="form-label">Customs Release Number</label>
+                                    <input type="text" name="customs_release_number" id="customs_release_number" class="form-control" value="{{ isset($transaction) ? $transaction->customs_release_number : old('customs_release_number') }}">
+                                    @error('customs_release_number')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-12 col-md-6" id="charge_permit_number_field" style="display: none;">
+                                    <label for="charge_permit_number" class="form-label required">Charge Permit Number</label>
+                                    <input type="text" name="charge_permit_number" id="charge_permit_number" class="form-control" value="{{ isset($transaction) ? $transaction->charge_permit_number : old('charge_permit_number') }}">
+                                    @error('charge_permit_number')
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-12 col-md-6" id="discharge_permit_number_field" style="display: none;">
+                                    <label for="discharge_permit_number" class="form-label required">Discharge Permit Number</label>
+                                    <input type="text" name="discharge_permit_number" id="discharge_permit_number" class="form-control" value="{{ isset($transaction) ? $transaction->discharge_permit_number : old('discharge_permit_number') }}">
+                                    @error('discharge_permit_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -428,132 +593,9 @@
                             </div>
                         </div>
 
-                        <!-- Shipment Details Section (Shown for Loading) -->
-                        <div id="shipment_details" class="form-field" style="display: none;">
-                            <h4 class="section-header">Shipment Details</h4>
-                            <div class="row mb-3">
-                                <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="shipment_transport_type" class="form-label required">Transport Type</label>
-                                    <select name="shipment[transport_type]" id="shipment_transport_type" class="form-select">
-                                        <option value="">Select Transport Type</option>
-                                        <option value="vessel" {{ old('shipment.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
-                                        <option value="truck" {{ old('shipment.transport_type') == 'truck' ? 'selected' : '' }}>Truck</option>
-                                    </select>
-                                    @error('shipment.transport_type')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-12 col-md-6" id="shipment_vessel_id_field" style="display: none;">
-                                    <label for="shipment_vessel_id" class="form-label required">Vessel</label>
-                                    <select name="shipment[vessel_id]" id="shipment_vessel_id" class="form-select">
-                                        <option value="">Select Vessel</option>
-                                        @foreach($vessels as $vessel)
-                                        <option value="{{ $vessel->id }}" {{ old('shipment.vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('shipment.vessel_id')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div id="shipment_truck_fields" class="form-field" style="display: none;">
-                                <div class="row mb-3">
-                                    <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="shipment_truck_number" class="form-label required">Truck Number</label>
-                                        <input type="text" name="shipment[truck_number]" id="shipment_truck_number" class="form-control" value="{{ old('shipment.truck_number') }}">
-                                        @error('shipment.truck_number')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label for="shipment_trailer_number" class="form-label required">Trailer Number</label>
-                                        <input type="text" name="shipment[trailer_number]" id="shipment_trailer_number" class="form-control" value="{{ old('shipment.trailer_number') }}">
-                                        @error('shipment.trailer_number')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-12 col-md-6">
-                                        <label for="shipment_driver_name" class="form-label required">Driver Name</label>
-                                        <input type="text" name="shipment[driver_name]" id="shipment_driver_name" class="form-control" value="{{ old('shipment.driver_name') }}">
-                                        @error('shipment.driver_name')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row mb-3" id="shipment_port_of_discharge_field" style="display: none;">
-                                <div class="col-12 col-md-6">
-                                    <label for="shipment_port_of_discharge" class="form-label required">Port of Discharge</label>
-                                    <input type="text" name="shipment[port_of_discharge]" id="shipment_port_of_discharge" class="form-control" value="{{ old('shipment.port_of_discharge') }}">
-                                    @error('shipment.port_of_discharge')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Delivery Details Section (Shown for Discharging) -->
-                        <div id="delivery_details" class="form-field" style="display: none;">
-                            <h4 class="section-header">Delivery Details</h4>
-                            <div class="row mb-3">
-                                <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="delivery_transport_type" class="form-label required">Transport Type</label>
-                                    <select name="delivery[transport_type]" id="delivery_transport_type" class="form-select">
-                                        <option value="">Select Transport Type</option>
-                                        <option value="vessel" {{ old('delivery.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
-                                        <option value="truck" {{ old('delivery.transport_type') == 'truck' ? 'selected' : '' }}>Truck</option>
-                                    </select>
-                                    @error('delivery.transport_type')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                <div class="col-12 col-md-6" id="delivery_vessel_id_field" style="display: none;">
-                                    <label for="delivery_vessel_id" class="form-label required">Vessel</label>
-                                    <select name="delivery[vessel_id]" id="delivery_vessel_id" class="form-select">
-                                        <option value="">Select Vessel</option>
-                                        @foreach($vessels as $vessel)
-                                        <option value="{{ $vessel->id }}" {{ old('delivery.vessel_id') == $vessel->id ? 'selected' : '' }}>{{ $vessel->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('delivery.vessel_id')
-                                    <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div id="delivery_truck_fields" class="form-field" style="display: none;">
-                                <div class="row mb-3">
-                                    <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="delivery_truck_number" class="form-label required">Truck Number</label>
-                                        <input type="text" name="delivery[truck_number]" id="delivery_truck_number" class="form-control" value="{{ old('delivery.truck_number') }}">
-                                        @error('delivery.truck_number')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <div class="col-12 col-md-6">
-                                        <label for="delivery_trailer_number" class="form-label required">Trailer Number</label>
-                                        <input type="text" name="delivery[trailer_number]" id="delivery_trailer_number" class="form-control" value="{{ old('delivery.trailer_number') }}">
-                                        @error('delivery.trailer_number')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <div class="col-12 col-md-6">
-                                        <label for="delivery_driver_name" class="form-label required">Driver Name</label>
-                                        <input type="text" name="delivery[driver_name]" id="delivery_driver_name" class="form-control" value="{{ old('delivery.driver_name') }}">
-                                        @error('delivery.driver_name')
-                                        <div class="text-danger">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Form Buttons -->
                         <div class="d-flex gap-2 mt-4 form-field" style="display: none;">
-                            <button type="submit" class="btn btn-primary">Save Transaction</button>
+                            <button type="submit" class="btn btn-primary">{{ isset($transaction) ? 'Save Duplicated Transaction' : 'Save Transaction' }}</button>
                             <a href="{{ route('transactions.index') }}" class="btn btn-secondary">Cancel</a>
                         </div>
                     </form>
@@ -649,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'destination_tank_id', 'charge_permit_number', 'discharge_permit_number',
             'charge_permit_document', 'discharge_permit_document',
             'shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number',
-            'shipment_driver_name', 'shipment_port_of_discharge',
+            'shipment_driver_name', 'shipment_berth_number',
             'delivery_vessel_id', 'delivery_truck_number', 'delivery_trailer_number',
             'delivery_driver_name'
         ];
@@ -810,7 +852,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (type === 'loading') {
                         sourceTankInfo.textContent = maxCapacity > 0 ? `(Free Space: ${freeSpace.toFixed(2)} MT)` : '(No capacity)';
                     } else if (type === 'discharging' || type === 'transfer') {
-                        sourceTankInfo.textContent = maxCapacity > 0 ? `(Current Level: ${currentLevel.toFixed(2)} MT)` : '(No capacity)';
+                        sourceTankInfo.textContent = maxCapacity > 0 ? `(Current Capacity: ${currentLevel.toFixed(2)} MT)` : '(No capacity)';
                     }
                 } else {
                     destinationTankData = { current_level: currentLevel, max_capacity: maxCapacity, free_space: freeSpace };
@@ -907,13 +949,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'discharging') {
             maxQuantity = sourceTankData.current_level;
             quantityInput.setAttribute('max', maxQuantity.toFixed(2));
-            quantityError.textContent = `Maximum quantity: ${maxQuantity.toFixed(2)} MT (current level)`;
+            quantityError.textContent = `Maximum quantity: ${maxQuantity.toFixed(2)} MT (current capacity)`;
         } else if (type === 'transfer') {
             const sourceMax = sourceTankData.current_level;
             const destMax = destinationTankData.max_capacity > 0 ? destinationTankData.free_space : Infinity;
             maxQuantity = Math.min(sourceMax, destMax);
             quantityInput.setAttribute('max', maxQuantity.toFixed(2));
-            quantityError.textContent = `Maximum quantity: ${maxQuantity.toFixed(2)} MT (limited by ${sourceMax <= destMax ? 'source current level' : 'destination free space'})`;
+            quantityError.textContent = `Maximum quantity: ${maxQuantity.toFixed(2)} MT (limited by ${sourceMax <= destMax ? 'source current capacity' : 'destination free space'})`;
         }
 
         // Validate current quantity input
@@ -963,13 +1005,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const transportType = shipmentTransportType?.value || '';
         const vesselField = document.getElementById('shipment_vessel_id_field');
         const truckFields = document.getElementById('shipment_truck_fields');
-        const portField = document.getElementById('shipment_port_of_discharge_field');
+        const portField = document.getElementById('shipment_berth_number_field');
 
         vesselField.style.display = 'none';
         truckFields.style.display = 'none';
         portField.style.display = 'none';
 
-        const shipmentFields = ['shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number', 'shipment_driver_name', 'shipment_port_of_discharge'];
+        const shipmentFields = ['shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number', 'shipment_driver_name', 'shipment_berth_number'];
         shipmentFields.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.required = false;
@@ -979,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vesselField.style.display = 'block';
             portField.style.display = 'block';
             document.getElementById('shipment_vessel_id').required = true;
-            document.getElementById('shipment_port_of_discharge').required = true;
+            document.getElementById('shipment_berth_number').required = true;
         } else if (transportType === 'truck') {
             truckFields.style.display = 'block';
             document.getElementById('shipment_truck_number').required = true;
@@ -1051,7 +1093,7 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleShipmentFields();
     toggleDeliveryFields();
 
-    // Initialize form state based on old input
+    // Initialize form state based on old input or transaction data
     if (typeSelect.value) {
         typeSelect.dispatchEvent(new Event('change'));
     }

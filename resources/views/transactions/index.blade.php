@@ -18,17 +18,24 @@
     }
 
     .hero-header {
-        padding: 2.5rem 0;
+        padding: 1.5rem 0;
         border-radius: 16px;
         margin-bottom: 2rem;
         box-shadow: 0 6px 20px rgba(0, 11, 67, 0.2);
-        /* background-color: #ffffff; */
     }
 
     .hero-header h2 {
         font-size: 2.25rem;
         font-weight: 700;
         margin-bottom: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        align-items: center;
     }
 
     .card {
@@ -111,12 +118,14 @@
         font-weight: 500;
         transition: all 0.2s ease;
         padding: 0.5rem 1rem;
+        font-size: 0.875rem;
     }
 
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
         color: #ffffff;
+        padding: 0.5rem 1rem;
     }
 
     .btn-primary:hover {
@@ -126,10 +135,34 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-    .btn-outline-secondary {
-        border-color: #d1d5db;
-        color: #1f2937;
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
     }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        border-color: #4b5563;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-danger {
+        background-color: #dc2626;
+        border-color: #dc2626;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-danger:hover {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
 
     .btn-outline-secondary:hover {
         border-color: #2563eb;
@@ -278,13 +311,36 @@
         margin-top: 0.25rem;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 992px) {
         .hero-header h2 {
-            font-size: 1.75rem;
+            font-size: 2rem;
+        }
+        .header-actions {
+            justify-content: center;
+            margin-top: 1rem;
         }
         .btn {
             padding: 0.4rem 0.8rem;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-header {
+            padding: 1rem 0;
+        }
+        .hero-header h2 {
+            font-size: 1.75rem;
+            text-align: center;
+        }
+        .header-actions {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+        .btn {
+            width: 100%;
+            text-align: center;
         }
         .table th,
         .table td {
@@ -297,6 +353,30 @@
         .transaction-detail {
             font-size: 0.7rem;
         }
+        #statisticsSection .card {
+            margin-bottom: 1rem;
+        }
+        #statisticsSection .col-md-3 {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-header h2 {
+            font-size: 1.5rem;
+        }
+        .btn {
+            font-size: 0.8rem;
+            padding: 0.35rem 0.7rem;
+        }
+        .icon-circle {
+            width: 40px;
+            height: 40px;
+        }
+        .icon-circle i {
+            font-size: 1.25rem;
+        }
     }
 </style>
 @endsection
@@ -308,24 +388,23 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-exchange-alt me-2"></i>Transaction Management
                         </h2>
-                        <div class="d-flex gap-2">
+                        <div class="header-actions">
                             @can('create', \App\Models\Transaction::class)
-                            <a href="{{ route('transactions.create') }}" class="btn btn-primary d-flex align-items-center">
+                            <a href="{{ route('transactions.create') }}" class="btn btn-primary d-flex align-items-center justify-content-center">
                                 <i class="fas fa-plus me-2"></i>New Transaction
                             </a>
                             @endcan
-                            <button class="btn btn-light d-flex align-items-center" type="button" id="showStatsBtn">
+                            <button class="btn btn-light d-flex align-items-center justify-content-center" type="button" id="showStatsBtn">
                                 <i class="fas fa-chart-bar me-2"></i>Show Statistics
                             </button>
-                            <button class="btn btn-outline-secondary d-flex align-items-center filter-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-expanded="{{ request()->hasAny(['type', 'tank_id', 'destination_tank_id', 'original_vessel_id', 'company_id', 'product_id', 'engineer_id', 'technician_id', 'transport_type', 'search', 'from', 'to']) ? 'true' : 'false' }}" aria-controls="filterSection">
+                            <button class="btn btn-outline-secondary d-flex align-items-center justify-content-center filter-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-expanded="{{ request()->hasAny(['type', 'tank_id', 'destination_tank_id', 'original_vessel_id', 'company_id', 'product_id', 'engineer_id', 'technician_id', 'transport_type', 'search', 'from', 'to']) ? 'true' : 'false' }}" aria-controls="filterSection">
                                 <i class="fas fa-filter me-2"></i>Filters
-                                <i class="fas fa-chevron-down ms-2 small"></i>
                             </button>
-                            <a href="{{ route('transactions.index') }}" class="btn btn-outline-danger">
+                            <a href="{{ route('transactions.index') }}" class="btn btn-outline-danger d-flex align-items-center justify-content-center">
                                 <i class="fas fa-redo me-2"></i>Reset
                             </a>
                         </div>
@@ -504,14 +583,6 @@
                                 </select>
                             </div>
                             <div class="col-md-3 my-1">
-                                <label for="filter_transport_type" class="form-label small fw-bold">Transport Type</label>
-                                <select name="transport_type" id="filter_transport_type" class="form-control">
-                                    <option value="">All Transport Types</option>
-                                    <option value="vessel" {{ request('transport_type') === 'vessel' ? 'selected' : '' }}>Vessel</option>
-                                    <option value="truck" {{ request('transport_type') === 'truck' ? 'selected' : '' }}>Truck</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 my-1">
                                 <label for="filter_from" class="form-label small fw-bold">From Date</label>
                                 <input type="date" name="from" id="filter_from" class="form-control" value="{{ request('from') }}">
                             </div>
@@ -544,7 +615,9 @@
                                     <th class="border-0">Product</th>
                                     <th class="border-0">Quantity (MT)</th>
                                     <th class="border-0">Date</th>
+                                    @if (auth()->user() && !auth()->user()->isClient())
                                     <th class="border-0">Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -556,9 +629,9 @@
                                         <span class="transaction-detail">
                                             @if($transaction->type === 'transfer')
                                                 {{ $transaction->tank->number ?? 'N/A' }} -> {{ $transaction->destinationTank->number ?? 'N/A' }}
-                                            @elseif($transaction->type === 'loading')
+                                            @elseif($transaction->type === 'loading' && $transaction->shipment)
                                                 {{ $transaction->shipment->transport_type === 'vessel' ? ($transaction->shipment->vessel->name ?? 'Vessel N/A') : 'Truck' }} -> {{ $transaction->tank->number ?? 'N/A' }}
-                                            @elseif($transaction->type === 'discharging')
+                                            @elseif($transaction->type === 'discharging' && $transaction->delivery)
                                                 {{ $transaction->tank->number ?? 'N/A' }} -> {{ $transaction->delivery->transport_type === 'vessel' ? ($transaction->delivery->vessel->name ?? 'Vessel N/A') : 'Truck' }}
                                             @endif
                                         </span>
@@ -569,13 +642,30 @@
                                     <td>{{ $transaction->product->name ?? 'N/A' }}</td>
                                     <td>{{ number_format($transaction->quantity, 2) }}</td>
                                     <td>{{ $transaction->date->format('d M Y H:i') }}</td>
+                                    @if (auth()->user() && !auth()->user()->isClient())
                                     <td>
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-sm btn-outline-primary" title="View Details">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        </div>
+                                        <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-sm btn-secondary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        @can('create', \App\Models\Transaction::class)
+                                        <a href="{{ route('transactions.duplicate', $transaction->id) }}" class="btn btn-sm btn-light">
+                                            <i class="fas fa-copy"></i>
+                                        </a>
+                                        @endcan
+                                        @can('update', \App\Models\Transaction::class)
+                                        <a href="{{ route('transactions.edit', $transaction->id) }}" class="btn btn-sm btn-primary ">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        @endcan
+                                        @can('delete', \App\Models\Transaction::class)
+                                        <a href="
+                                        {{-- {{ route('transactions.delete', $transaction->id) }} --}}
+                                         " class="btn btn-sm btn-danger" >
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                        @endcan
                                     </td>
+                                    @endif
                                 </tr>
                                 @empty
                                 <tr>
@@ -606,8 +696,6 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const showStatsBtn = document.getElementById('showStatsBtn');
@@ -631,15 +719,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ensure single event listener for filter toggle
     filterToggleBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        e.stopPropagation(); // Prevent event bubbling
+        e.stopPropagation();
         console.log('Filter toggle clicked, aria-expanded:', this.getAttribute('aria-expanded'));
         console.log('Filter section classList:', filterSection.classList);
         try {
             const bsCollapse = bootstrap.Collapse.getOrCreateInstance(filterSection, {
-                toggle: false // Prevent automatic toggle
+                toggle: false
             });
             console.log('Bootstrap Collapse instance:', bsCollapse);
-            // Manually toggle collapse
             if (filterSection.classList.contains('show')) {
                 bsCollapse.hide();
                 filterToggleBtn.setAttribute('aria-expanded', 'false');
@@ -652,7 +739,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error with Bootstrap Collapse:', error);
         }
-    }, { once: false }); // Ensure listener persists
+    }, { once: false });
 
     // Monitor collapse events
     filterSection.addEventListener('show.bs.collapse', function() {

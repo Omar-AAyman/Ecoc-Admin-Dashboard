@@ -158,7 +158,7 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-exchange-alt me-2"></i>Create Transaction
                         </h2>
                         <a href="{{ route('transactions.index') }}" class="btn btn-secondary d-flex align-items-center">
@@ -450,11 +450,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mb-3" id="shipment_port_of_discharge_field" style="display: none;">
+                            <div class="row mb-3" id="shipment_berth_number_field" style="display: none;">
                                 <div class="col-12 col-md-6">
-                                    <label for="shipment_port_of_discharge" class="form-label">Port of Discharge</label>
-                                    <input type="text" name="shipment[port_of_discharge]" id="shipment_port_of_discharge" class="form-control">
-                                    @error('shipment.port_of_discharge')
+                                    <label for="shipment_berth_number" class="form-label">Berth Number</label>
+                                    <input type="text" name="shipment[berth_number]" id="shipment_berth_number" class="form-control">
+                                    @error('shipment.berth_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -583,7 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'destination_tank_id', 'charge_permit_number', 'discharge_permit_number',
             'charge_permit_document', 'discharge_permit_document',
             'shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number',
-            'shipment_driver_name', 'shipment_port_of_discharge',
+            'shipment_driver_name', 'shipment_berth_number',
             'delivery_vessel_id', 'delivery_truck_number', 'delivery_trailer_number',
             'delivery_driver_name'
         ];
@@ -694,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (type === 'loading') {
                         sourceTankInfo.textContent = `(Free Space: ${freeSpace.toFixed(2)} mt)`;
                     } else if (type === 'discharging' || type === 'transfer') {
-                        sourceTankInfo.textContent = `(Current Level: ${currentLevel.toFixed(2)} mt)`;
+                        sourceTankInfo.textContent = `(Current Capacity: ${currentLevel.toFixed(2)} mt)`;
                     }
                 } else if (type === 'transfer') {
                     destinationTankInfo.textContent = `(Free Space: ${freeSpace.toFixed(2)} mt)`;
@@ -741,13 +741,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const transportType = shipmentTransportType?.value || '';
         const vesselField = document.getElementById('shipment_vessel_id_field');
         const truckFields = document.getElementById('shipment_truck_fields');
-        const portField = document.getElementById('shipment_port_of_discharge_field');
+        const portField = document.getElementById('shipment_berth_number_field');
 
         vesselField.style.display = 'none';
         truckFields.style.display = 'none';
         portField.style.display = 'none';
 
-        const shipmentFields = ['shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number', 'shipment_driver_name', 'shipment_port_of_discharge'];
+        const shipmentFields = ['shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number', 'shipment_driver_name', 'shipment_berth_number'];
         shipmentFields.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.required = false;
@@ -757,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vesselField.style.display = 'block';
             portField.style.display = 'block';
             document.getElementById('shipment_vessel_id').required = true;
-            document.getElementById('shipment_port_of_discharge').required = true;
+            document.getElementById('shipment_berth_number').required = true;
         } else if (transportType === 'truck') {
             truckFields.style.display = 'block';
             document.getElementById('shipment_truck_number').required = true;

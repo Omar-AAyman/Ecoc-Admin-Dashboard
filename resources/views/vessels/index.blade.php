@@ -164,7 +164,7 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-ship me-2"></i>Vessels
                         </h2>
                         @can('create', \App\Models\Vessel::class)
@@ -218,7 +218,6 @@
                             <thead>
                                 <tr>
                                     <th>Name</th>
-                                    <th>Nationality</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

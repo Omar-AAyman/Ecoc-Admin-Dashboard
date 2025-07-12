@@ -88,6 +88,40 @@
         margin-top: 0.25rem;
     }
 
+    .custom-file-upload {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background-color: #e5e7eb;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .custom-file-upload:hover {
+        background-color: #d1d5db;
+    }
+
+    .image-preview {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+        margin-top: 0.5rem;
+        border-radius: 4px;
+    }
+
+    .logo-container {
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .logo-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 0.5rem;
+    }
+
     @media (max-width: 768px) {
         .hero-header h2 {
             font-size: 1.75rem;
@@ -103,6 +137,13 @@
             padding: 0.4rem 0.8rem;
             font-size: 0.875rem;
         }
+        .image-preview {
+            max-width: 80px;
+            max-height: 80px;
+        }
+        .logo-name {
+            font-size: 1rem;
+        }
     }
 </style>
 @endsection
@@ -114,7 +155,7 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <h2 class="mb-0">
+                    <h2 class="my-3 my-md-0">
                         <i class="fas fa-user-edit me-2"></i>Edit Profile
                     </h2>
                 </div>
@@ -126,9 +167,29 @@
             <!-- Form -->
             <div class="card">
                 <div class="card-body p-4">
-                    <form action="{{ route('profile.update') }}" method="POST">
+                    <form id="profile-form" action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
+                        @if($user->isClient())
+                        <div class="logo-container">
+                            <label for="image" class="form-label">Company Logo</label>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/jpeg,image/png,image/jpg">
+                            @error('image')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                            @if($user->image)
+                            <div class="mt-2">
+                                <img src="{{ $user->image_url }}" alt="{{ $user->company->name ?? 'Company Logo' }}" class="image-preview">
+                                <div class="form-check mt-2">
+                                    <input type="checkbox" name="remove_image" id="remove_image" class="form-check-input" value="1">
+                                    <label for="remove_image" class="form-check-label">Remove current logo</label>
+                                </div>
+                            </div>
+                            @endif
+                            <div id="image-preview" class="mt-2"></div>
+                            <div class="logo-name">{{ $user->company->name ?? 'No Company' }}</div>
+                        </div>
+                        @endif
                         <div class="mb-3">
                             <label for="first_name" class="form-label">First Name</label>
                             <input type="text" name="first_name" id="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}" required>
@@ -168,4 +229,57 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('image-preview');
+    const removeImageCheckbox = document.getElementById('remove_image');
+    const form = document.getElementById('profile-form');
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function(e) {
+            imagePreview.innerHTML = '';
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'image-preview';
+                    imagePreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+                if (removeImageCheckbox) {
+                    removeImageCheckbox.checked = false;
+                    imageInput.disabled = false;
+                }
+            }
+        });
+    }
+
+    if (removeImageCheckbox) {
+        removeImageCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                imageInput.disabled = true;
+                imageInput.value = '';
+                imagePreview.innerHTML = '';
+            } else {
+                imageInput.disabled = false;
+            }
+        });
+    }
+
+    // Debug form submission
+    form.addEventListener('submit', function(e) {
+        const formData = new FormData(form);
+        console.log('Form Data:');
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value instanceof File ? value.name : value}`);
+        }
+    });
+});
+</script>
 @endsection

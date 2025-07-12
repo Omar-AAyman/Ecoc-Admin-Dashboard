@@ -173,7 +173,7 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-user-edit me-2"></i>Edit Client
                         </h2>
                         <div class="d-flex gap-2">

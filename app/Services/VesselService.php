@@ -2,9 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Delivery;
+use App\Models\Shipment;
+use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Vessel;
 use Illuminate\Support\Facades\DB;
+use Exception;
 
 class VesselService
 {
@@ -77,6 +81,25 @@ class VesselService
     {
         return DB::transaction(function () use ($id, $user) {
             $vessel = Vessel::findOrFail($id);
+
+            // Check if the vessel is associated with any shipments
+            $hasShipments = Shipment::where('vessel_id', $id)->exists();
+            if ($hasShipments) {
+                throw new Exception('Cannot delete vessel because it is associated with one or more shipments.');
+            }
+
+            // Check if the vessel is associated with any deliveries
+            $hasDeliveries = Delivery::where('vessel_id', $id)->exists();
+            if ($hasDeliveries) {
+                throw new Exception('Cannot delete vessel because it is associated with one or more deliveries.');
+            }
+
+            // Check if the vessel is associated with any transactions (via original_vessel_id)
+            $hasTransactions = Transaction::where('original_vessel_id', $id)->exists();
+            if ($hasTransactions) {
+                throw new Exception('Cannot delete vessel because it is associated with one or more transactions.');
+            }
+
             $oldData = $vessel->getAttributes();
             $vesselName = $vessel->name;
             $vessel->delete();

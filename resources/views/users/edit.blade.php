@@ -118,7 +118,7 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <h2 class="mb-0">
+                    <h2 class="my-3 my-md-0">
                         <i class="fas fa-user-edit me-2"></i>Edit Admin
                     </h2>
                 </div>

@@ -23,6 +23,7 @@
         /* border-radius: 16px; */
         margin-bottom: 2rem;
         /* box-shadow: 0 6px 20px rgba(0, 11, 67, 0.2);  */
+
     }
 
     .hero-header h1 {
@@ -56,6 +57,8 @@
 
     .card-discharging {
         border-left-color: #fef200;
+        color: #1f2937;
+
     }
 
     .card-transfer {
@@ -94,7 +97,7 @@
 
     .badge-discharging {
         background-color: #fef200;
-        color: #1f2937;
+        color: #000000 !important;
     }
 
     .badge-transfer {
@@ -121,6 +124,21 @@
         transform: translateY(-2px);
     }
 
+
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
+    }
+
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        border-color: #4b5563;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+    }
+    
     .list-group-item {
         border-radius: 10px;
         margin-bottom: 0.5rem;
@@ -223,8 +241,8 @@
                     @if($transaction->shipment->driver_name)
                     <p><strong>Driver Name:</strong> {{ $transaction->shipment->driver_name }}</p>
                     @endif
-                    @if($transaction->shipment->port_of_discharge)
-                    <p><strong>Port of Discharge:</strong> {{ $transaction->shipment->port_of_discharge }}</p>
+                    @if($transaction->shipment->berth_number)
+                    <p><strong>Port of Discharge:</strong> {{ $transaction->shipment->berth_number }}</p>
                     @endif
                     @if($transaction->shipment->arrival_date)
                     <p><strong>Arrival Date:</strong> {{ $transaction->shipment->arrival_date->format('Y-m-d H:i') }}</p>

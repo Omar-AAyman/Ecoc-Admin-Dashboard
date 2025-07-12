@@ -63,85 +63,232 @@
     }
 
     .form-control {
-        border-radius: 10px;
+        border-radius: 8px;
         border: 1px solid #d1d5db;
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        height: 38px;
     }
 
     .form-control:focus {
-        border-color: #000b43;
-        box-shadow: 0 0 0 0.2rem rgba(0, 11, 67, 0.2);
+        border-color: #2563eb;
+        box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.2);
         outline: none;
     }
 
     .btn {
         border-radius: 8px;
-        padding: 0.5rem 1rem;
         font-weight: 500;
-        transition: background-color 0.2s ease, transform 0.2s ease;
+        transition: all 0.2s ease;
     }
 
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
-        color: #f8f8f8;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
     }
 
     .btn-primary:hover {
-        background-color: #1e3a8a;
-        border-color: #1e3a8a;
+        background-color: #1d4ed8;
+        border-color: #1d4ed8;
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
-
-    .btn-outline-secondary {
-        border-color: #d1d5db;
-        color: #1f2937;
+    .btn-secondary {
+        background-color: #6b7280;
+        border-color: #6b7280;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
     }
 
-    .btn-outline-secondary:hover {
-        border-color: #000b43;
-        color: #000b43;
+    .btn-secondary:hover {
+        background-color: #4b5563;
+        border-color: #4b5563;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
 
-    .btn-outline-danger {
-        border-color: #d1d5db;
-        color: #1f2937;
+    .btn-danger {
+        background-color: #dc2626;
+        border-color: #dc2626;
+        color: #ffffff;
+        padding: 0.5rem 1rem;
     }
 
-    .btn-outline-danger:hover {
-        border-color: #000b43;
-        color: #000b43;
+    .btn-danger:hover {
+        background-color: #b91c1c;
+        border-color: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
+
+    .btn-sm {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .pagination-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .pagination-container select {
+        width: auto;
+        max-width: 100px;
+    }
+
 
     .modal-content {
-        border-radius: 16px;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
     }
 
     .modal-body pre {
         background: #f8f9fa;
         padding: 15px;
         border-radius: 10px;
-        font-size: 0.875rem;
+        font-size: clamp(0.75rem, 2vw, 0.875rem);
         max-height: 400px;
         overflow-y: auto;
     }
 
-    @media (max-width: 768px) {
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .hero-header {
+            padding: 1.5rem 0;
+        }
+
         .hero-header h2 {
-            font-size: 1.75rem;
+            font-size: clamp(1.25rem, 4vw, 2rem);
+            text-align: center;
         }
+
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .d-flex.gap-2 {
+            flex-direction: column;
+            width: 100%;
+        }
+
         .btn {
-            padding: 0.5rem 1rem;
+            width: 100%;
+            text-align: center;
         }
+
+        .card {
+            margin-bottom: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
         .table th,
         .table td {
             padding: 0.75rem;
-            font-size: 0.875rem;
+            font-size: clamp(0.75rem, 2vw, 0.875rem);
         }
-        .card {
-            margin-bottom: 1rem;
+
+        .filter-form .form-control {
+            font-size: clamp(0.75rem, 2vw, 0.875rem);
+            padding: 0.4rem 0.6rem;
+        }
+
+        .btn {
+            padding: 0.4rem 0.8rem;
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+        }
+
+        .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .modal-body pre {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            max-height: 300px;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-header {
+            padding: 1rem 0;
+        }
+
+        .hero-header h2 {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+        }
+
+        .filter-form .form-control {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            padding: 0.35rem 0.5rem;
+        }
+
+        .btn {
+            padding: 0.35rem 0.7rem;
+            font-size: clamp(0.65rem, 2vw, 0.8rem);
+        }
+
+        .table th,
+        .table td {
+            padding: 0.5rem;
+            font-size: clamp(0.65rem, 2vw, 0.8rem);
+        }
+
+        .modal-body pre {
+            padding: 10px;
+            max-height: 250px;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .pagination .page-link {
+            padding: 0.3rem 0.6rem;
+            font-size: clamp(0.65rem, 2vw, 0.8rem);
         }
     }
 </style>
@@ -155,13 +302,12 @@
             <div class="hero-header">
                 <div class="container">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="mb-0">
+                        <h2 class="my-3 my-md-0">
                             <i class="fas fa-history me-2"></i>Activity Logs
                         </h2>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-expanded="false" aria-controls="filterSection">
+                            <button class="btn btn-outline-secondary d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#filterSection" aria-expanded="{{ request()->hasAny(['action', 'model_type', 'user_id', 'search', 'from', 'to']) ? 'true' : 'false' }}" aria-controls="filterSection">
                                 <i class="fas fa-filter me-2"></i> Filters
-                                <i class="fas fa-chevron-down ms-2 small"></i>
                             </button>
                             <a href="{{ route('activity-logs.index') }}" class="btn btn-outline-danger">
                                 <i class="fas fa-redo me-2"></i> Reset
@@ -181,8 +327,8 @@
                         <h5 class="mb-0">Advanced Filters</h5>
                     </div>
                     <div class="card-body">
-                        <form id="filter-form" method="GET" action="{{ route('activity-logs.index') }}" class="row g-3">
-                            <div class="col-md-3 my-1">
+                        <form id="filter-form" method="GET" action="{{ route('activity-logs.index') }}" class="row g-3 filter-form">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_action" class="form-label small fw-bold">Action</label>
                                 <select name="action" id="filter_action" class="form-control">
                                     <option value="">All Actions</option>
@@ -191,7 +337,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3 my-1">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_model_type" class="form-label small fw-bold">Model Type</label>
                                 <select name="model_type" id="filter_model_type" class="form-control">
                                     <option value="">All Models</option>
@@ -200,7 +346,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3 my-1">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_user_id" class="form-label small fw-bold">User</label>
                                 <select name="user_id" id="filter_user_id" class="form-control">
                                     <option value="">All Users</option>
@@ -209,19 +355,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3 my-1">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_search" class="form-label small fw-bold">Search Description</label>
                                 <input type="text" name="search" id="filter_search" class="form-control" value="{{ request('search') }}" placeholder="Search description...">
                             </div>
-                            <div class="col-md-3 my-1">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_from" class="form-label small fw-bold">From Date</label>
                                 <input type="date" name="from" id="filter_from" class="form-control" value="{{ request('from') }}">
                             </div>
-                            <div class="col-md-3 my-1">
+                            <div class="col-12 col-md-6 col-lg-3 my-1">
                                 <label for="filter_to" class="form-label small fw-bold">To Date</label>
                                 <input type="date" name="to" id="filter_to" class="form-control" value="{{ request('to') }}">
                             </div>
-                            <div class="col-md-3 d-flex align-items-end my-1">
+                            <div class="col-12 col-md-6 col-lg-3 d-flex align-items-end my-1">
                                 <button type="submit" class="btn btn-primary w-100">
                                     <i class="fas fa-search me-2"></i>Apply Filters
                                 </button>
@@ -321,56 +467,55 @@
 @endsection
 
 @section('js')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const filterToggleBtn = document.querySelector('[data-bs-toggle="collapse"]');
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterToggleBtn = document.querySelector('[data-bs-toggle="collapse"]');
 
-    // Ensure collapse toggle works
-    filterToggleBtn.addEventListener('click', function() {
-        const isExpanded = this.getAttribute('aria-expanded') === 'true';
-        this.querySelector('.fas.fa-chevron-down').classList.toggle('fa-chevron-up', !isExpanded);
-        this.querySelector('.fas.fa-chevron-down').classList.toggle('fa-chevron-down', isExpanded);
-    });
+        // Ensure collapse toggle works
+        filterToggleBtn.addEventListener('click', function() {
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.querySelector('.fas.fa-chevron-down').classList.toggle('fa-chevron-up', !isExpanded);
+            this.querySelector('.fas.fa-chevron-down').classList.toggle('fa-chevron-down', isExpanded);
+        });
 
-    // Inject CSRF token meta tag if it doesn't exist
-    let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-    if (!csrfTokenMeta) {
-        csrfTokenMeta = document.createElement('meta');
-        csrfTokenMeta.name = 'csrf-token';
-        csrfTokenMeta.content = '{{ csrf_token() }}';
-        document.head.appendChild(csrfTokenMeta);
-    }
+        // Inject CSRF token meta tag if it doesn't exist
+        let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfTokenMeta) {
+            csrfTokenMeta = document.createElement('meta');
+            csrfTokenMeta.name = 'csrf-token';
+            csrfTokenMeta.content = '{{ csrf_token() }}';
+            document.head.appendChild(csrfTokenMeta);
+            console.log('CSRF token meta tag created');
+        }
 
-    // Handle View Details button click
-    $('.view-details').on('click', function() {
-        const logId = $(this).data('id');
-        $.ajax({
-            url: '/activity-logs/' + logId,
-            method: 'GET',
-            headers: {
-                'X-CSRF-TOKEN': csrfTokenMeta.content,
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            success: function(data) {
-                $('#modal-id').text(data.id);
-                $('#modal-user').text(data.user);
-                $('#modal-action').text(data.action);
-                $('#modal-description').text(data.description);
-                $('#modal-model-type').text(data.model_type);
-                $('#modal-model-id').text(data.model_id);
-                $('#modal-created-at').text(data.created_at);
-                $('#modal-details').text(JSON.stringify(data.details, null, 2));
-                $('#detailsModal').modal('show');
-            },
-            error: function(xhr) {
-                console.error('Error fetching log details:', xhr.responseText);
-                alert('Failed to load log details.');
-            }
+        // Handle View Details button click
+        $('.view-details').on('click', function() {
+            const logId = $(this).data('id');
+            $.ajax({
+                url: '/activity-logs/' + logId,
+                method: 'GET',
+                headers: {
+                    'X-CSRF-TOKEN': csrfTokenMeta.content,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function(data) {
+                    $('#modal-id').text(data.id);
+                    $('#modal-user').text(data.user);
+                    $('#modal-action').text(data.action);
+                    $('#modal-description').text(data.description);
+                    $('#modal-model-type').text(data.model_type);
+                    $('#modal-model-id').text(data.model_id);
+                    $('#modal-created-at').text(data.created_at);
+                    $('#modal-details').text(JSON.stringify(data.details, null, 2));
+                    $('#detailsModal').modal('show');
+                },
+                error: function(xhr) {
+                    console.error('Error fetching log details:', xhr.responseText);
+                    alert('Failed to load log details.');
+                }
+            });
         });
     });
-});
 </script>
 @endsection

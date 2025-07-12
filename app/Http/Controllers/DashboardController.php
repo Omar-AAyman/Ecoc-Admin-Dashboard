@@ -17,7 +17,17 @@ class DashboardController extends Controller
 
     public function index(Request $request)
     {
-        $tanks = $this->tankService->getTanks($request->user());
-        return view('dashboard.index', compact('tanks'));
+        $user = $request->user();
+        $stats = $this->tankService->getDashboardStats($user);
+        return view('dashboard.index', [
+            'totalTanks' => $stats['totalTanks'],
+            'avgCapacityUtilization' => $stats['avgCapacityUtilization'],
+            'activeRentals' => $stats['activeRentals'],
+            'completedRentals' => $stats['completedRentals'],
+            'totalDischarge' => $stats['totalDischarge'],
+            'totalLoad' => $stats['totalLoad'],
+            'tanks' => $stats['tanks'],
+            'performanceTrends' => $stats['performanceTrends'],
+        ]);
     }
 }

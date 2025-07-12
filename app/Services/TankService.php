@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Models\ActivityLog;
 use App\Models\Tank;
 use App\Models\TankRental;
+use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TankService
 {
@@ -21,21 +23,93 @@ class TankService
 
     public function getTanks(User $user)
     {
+        $tanks = collect();
         if ($user->hasAnyRole(['super_admin', 'ceo'])) {
-            return Tank::with(['product', 'company'])->orderBy('id', 'asc')->get();
-        }
-
-        if ($user->isClient()) {
-            if (!$user->company_id || !Tank::where('company_id', $user->company_id)->exists()) {
-                return new Collection();
-            }
-            return Tank::with(['product', 'company'])
-                ->where('company_id', $user->company_id)
+            $tanks = Tank::with(['product', 'company', 'tankRentals', 'transactions', 'destinationTransactions'])
                 ->orderBy('id', 'asc')
                 ->get();
+        } elseif ($user->isClient()) {
+            if ($user->company_id && Tank::where('company_id', $user->company_id)->exists()) {
+                $tanks = Tank::with(['product', 'company', 'tankRentals', 'transactions', 'destinationTransactions'])
+                    ->where('company_id', $user->company_id)
+                    ->orderBy('id', 'asc')
+                    ->get();
+            } else {
+                Log::warning('No company assigned or no tanks for client: ' . $user->email);
+            }
+        } else {
+            Log::warning('User has no role or permission to view tanks: ' . $user->email);
         }
 
-        return new Collection();
+        if ($tanks->isEmpty()) {
+            Log::warning('Empty tanks collection for user: ' . $user->email);
+        }
+
+        return $tanks->map(function ($tank) {
+            $maxCapacity = $tank->product && $tank->product->density ? $tank->cubic_meter_capacity * $tank->product->density : $tank->cubic_meter_capacity;
+            $currentLevel = $tank->current_level ?? 0;
+            $capacityUtilization = $maxCapacity > 0 ? min(($currentLevel / $maxCapacity) * 100, 100) : 0;
+
+            // Format rental history
+            $rentalHistory = $tank->tankRentals->map(function ($rental) {
+                return [
+                    'company' => $rental->company ? $rental->company->name : 'N/A',
+                    'product' => $rental->product ? $rental->product->name : 'N/A',
+                    'start_date' => $rental->start_date ? $rental->start_date->format('Y-m-d') : 'N/A',
+                    'end_date' => $rental->end_date ? $rental->end_date->format('Y-m-d') : 'Ongoing',
+                    'details' => $rental->details ? json_encode($rental->details) : 'N/A',
+                ];
+            })->values();
+
+            // Format transactions, splitting transfers
+            $transactions = $tank->transactions->merge($tank->destinationTransactions)->map(function ($transaction) use ($tank) {
+                $type = $transaction->type;
+                if ($type === 'transfer') {
+                    $type = $tank->id === $transaction->tank_id ? 'discharge (transfer)' : 'load (transfer)';
+                }
+                return [
+                    'id' => $transaction->id,
+                    'type' => $type,
+                    'quantity' => $transaction->quantity . ' mt',
+                    'date' => $transaction->date ? $transaction->date->format('Y-m-d') : 'N/A',
+                    'work_order_number' => $transaction->work_order_number ?? 'N/A',
+                    'charge_permit_number' => $transaction->charge_permit_number ?? 'N/A',
+                    'discharge_permit_number' => $transaction->discharge_permit_number ?? 'N/A',
+                    'bill_of_lading_number' => $transaction->bill_of_lading_number ?? 'N/A',
+                    'customs_release_number' => $transaction->customs_release_number ?? 'N/A',
+                    'engineer' => $transaction->engineer ? $transaction->engineer->full_name : 'N/A',
+                    'technician' => $transaction->technician ? $transaction->technician->full_name : 'N/A',
+                    'company' => $transaction->company ? $transaction->company->name : 'N/A',
+                    'product' => $transaction->product ? $transaction->product->name : 'N/A',
+                ];
+            })->values();
+
+            return [
+                'id' => $tank->number,
+                'dbId' => $tank->id,
+                'content' => $tank->product ? $tank->product->name : 'N/A',
+                'status' => ucfirst($tank->status),
+                'cubicMeterCapacity' => $tank->cubic_meter_capacity,
+                'currentLevel' => $currentLevel,
+                'maxCapacity' => number_format($maxCapacity, 2, '.', ''),
+                'company' => $tank->company ? $tank->company->name : 'N/A',
+                'capacityUtilization' => number_format($capacityUtilization, 0) . '%',
+                'liquidColor' => match ($tank->product_id % 10) {
+                    1 => ['#ef4444', '#b91c1c'],
+                    2 => ['#4ade80', '#16a34a'],
+                    3 => ['#60a5fa', '#2563eb'],
+                    4 => ['#fb923c', '#ea580c'],
+                    5 => ['#c084fc', '#9333ea'],
+                    6 => ['#22d3ee', '#0891b2'],
+                    7 => ['#f472b6', '#e82688'],
+                    8 => ['#fcd34d', '#fbbf24'],
+                    9 => ['#94a3b8', '#64748b'],
+                    default => ['#d9f99d', '#a3e635'],
+                },
+                'rentalHistory' => $rentalHistory,
+                'transactions' => $transactions,
+            ];
+        })->all();
     }
 
     public function getPaginatedTanks(User $user, $perPage = 10, $search = null)
@@ -88,7 +162,7 @@ class TankService
                 $product = \App\Models\Product::findOrFail($data['product_id']);
                 $maxCapacity = $data['cubic_meter_capacity'] * $product->density;
                 if ($data['current_level'] > $maxCapacity) {
-                    throw new \Exception("Current level ({$data['current_level']} mt) exceeds max capacity ($maxCapacity mt) for the selected product.");
+                    throw new \Exception("Current capacity ({$data['current_level']} mt) exceeds max capacity ($maxCapacity mt) for the selected product.");
                 }
             }
 
@@ -144,7 +218,7 @@ class TankService
                 $cubicMeterCapacity = $data['cubic_meter_capacity'] ?? $tank->cubic_meter_capacity;
                 $maxCapacity = $cubicMeterCapacity * $product->density;
                 if ($data['current_level'] > $maxCapacity) {
-                    throw new \Exception("Current level ({$data['current_level']} mt) exceeds max capacity ($maxCapacity mt) for the selected product.");
+                    throw new \Exception("Current capacity ({$data['current_level']} mt) exceeds max capacity ($maxCapacity mt) for the selected product.");
                 }
             }
 
@@ -204,7 +278,7 @@ class TankService
                 $this->activityLogService->logActivity(
                     $user,
                     'tank.level_updated',
-                    "Manually updated current level for tank {$tank->number} from {$oldData['current_level']} mt to {$data['current_level']} mt by user {$user->full_name} (ID: {$user->id}) at " . Carbon::now()->toDateTimeString(),
+                    "Manually updated current capacity for tank {$tank->number} from {$oldData['current_level']} mt to {$data['current_level']} mt by user {$user->full_name} (ID: {$user->id}) at " . Carbon::now()->toDateTimeString(),
                     $tank,
                     [
                         'current_level' => $oldData['current_level'],
@@ -261,7 +335,7 @@ class TankService
             $this->activityLogService->logActivity(
                 $user,
                 'tank.reset',
-                "Reset tank {$tank->number} (company, product, status, and current level)",
+                "Reset tank {$tank->number} (company, product, status, and current capacity)",
                 $tank,
                 $oldData,
                 $newData
@@ -293,5 +367,125 @@ class TankService
             );
             return true;
         });
+    }
+
+    public function getDashboardStats(User $user)
+    {
+        $tanks = $this->getTanks($user);
+        $totalTanks = count($tanks);
+        $avgCapacityUtilization = array_sum(array_map(function ($tank) {
+            return (float)str_replace('%', '', $tank['capacityUtilization']);
+        }, $tanks)) / ($totalTanks ?: 1);
+
+        $activeRentals = collect($tanks)->reduce(function ($carry, $tank) {
+            return $carry + $tank['rentalHistory']->filter(function ($rental) {
+                return $rental['end_date'] === 'Ongoing';
+            })->count();
+        }, 0);
+
+        $completedRentals = collect($tanks)->reduce(function ($carry, $tank) {
+            return $carry + $tank['rentalHistory']->filter(function ($rental) {
+                return $rental['end_date'] !== 'Ongoing' && $rental['end_date'] !== 'N/A';
+            })->count();
+        }, 0);
+
+        $totalDischarge = 0;
+        $totalLoad = 0;
+        foreach ($tanks as $tank) {
+            foreach ($tank['transactions'] as $transaction) {
+                $quantity = (float)str_replace(' mt', '', $transaction['quantity']);
+                if (in_array($transaction['type'], ['discharging', 'discharge (transfer)'])) {
+                    $totalDischarge += $quantity;
+                }
+                if (in_array($transaction['type'], ['loading', 'load (transfer)'])) {
+                    $totalLoad += $quantity;
+                }
+            }
+        }
+
+        $activeRentalDays = collect($tanks)->flatMap->rentalHistory->filter(function ($rental) {
+            return $rental['end_date'] === 'Ongoing';
+        })->sum(function ($rental) {
+            $start = Carbon::parse($rental['start_date']);
+            return $start->diffInDays(Carbon::now());
+        });
+
+        $months = [];
+        $utilizationData = [];
+        $rentalsData = [];
+        $currentDate = Carbon::now()->startOfMonth();
+        for ($i = 0; $i < 5; $i++) {
+            $month = $currentDate->copy()->subMonths($i);
+            $months[] = $month->format('M Y');
+
+            // Fetch tanks with rentals or transactions in the month
+            $monthlyTanks = Tank::with(['product', 'tankRentals', 'transactions', 'destinationTransactions'])
+                ->where(function ($query) use ($month) {
+                    $query->whereHas('tankRentals', function ($q) use ($month) {
+                        $q->where('start_date', '<=', $month->endOfMonth())
+                          ->where(function ($q) use ($month) {
+                              $q->where('end_date', '>=', $month->startOfMonth())
+                                ->orWhereNull('end_date');
+                          });
+                    })
+                    ->orWhereHas('transactions', function ($q) use ($month) {
+                        $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    })
+                    ->orWhereHas('destinationTransactions', function ($q) use ($month) {
+                        $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    });
+                })
+                ->get();
+
+            // Calculate average utilization for tanks with activity in the month
+            $totalUtilization = $monthlyTanks->avg(function ($tank) use ($month) {
+                $maxCapacity = $tank->product && $tank->product->density ? $tank->cubic_meter_capacity * $tank->product->density : $tank->cubic_meter_capacity;
+                $currentLevel = 0;
+
+                // Estimate utilization based on transactions in the month
+                $transactions = $tank->transactions->merge($tank->destinationTransactions)
+                    ->filter(function ($transaction) use ($month) {
+                        return Carbon::parse($transaction->date)->between($month->startOfMonth(), $month->endOfMonth());
+                    });
+
+                foreach ($transactions as $transaction) {
+                    $quantity = (float)$transaction->quantity;
+                    if (in_array($transaction->type, ['loading', 'load (transfer)'])) {
+                        $currentLevel += $quantity;
+                    } elseif (in_array($transaction->type, ['discharging', 'discharge (transfer)'])) {
+                        $currentLevel -= $quantity;
+                    }
+                }
+
+                // Ensure currentLevel is non-negative and doesn't exceed maxCapacity
+                $currentLevel = max(0, min($currentLevel, $maxCapacity));
+                return $maxCapacity > 0 ? min(($currentLevel / $maxCapacity) * 100, 100) : 0;
+            }) ?: 0;
+            $utilizationData[] = number_format($totalUtilization, 1);
+
+            // Count rentals active in the month
+            $monthlyRentals = TankRental::where('start_date', '<=', $month->endOfMonth())
+                ->where(function ($q) use ($month) {
+                    $q->where('end_date', '>=', $month->startOfMonth())
+                      ->orWhereNull('end_date');
+                })->count();
+            $rentalsData[] = $monthlyRentals;
+        }
+        $performanceTrends = [
+            'labels' => array_reverse($months),
+            'utilization' => array_reverse($utilizationData),
+            'rentals' => array_reverse($rentalsData),
+        ];
+
+        return [
+            'totalTanks' => $totalTanks,
+            'avgCapacityUtilization' => number_format($avgCapacityUtilization, 2),
+            'activeRentals' => $activeRentals,
+            'completedRentals' => $completedRentals,
+            'totalDischarge' => number_format($totalDischarge, 2),
+            'totalLoad' => number_format($totalLoad, 2),
+            'tanks' => $tanks,
+            'performanceTrends' => $performanceTrends,
+        ];
     }
 }

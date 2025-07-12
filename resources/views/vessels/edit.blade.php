@@ -129,7 +129,7 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <h2 class="mb-0">
+                    <h2 class="my-3 my-md-0">
                         <i class="fas fa-ship me-2"></i>Edit Vessel
                     </h2>
                 </div>
@@ -145,20 +145,11 @@
                         @csrf
                         @method('PUT')
                         <div class="row mb-3">
-                            <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                <label for="name" class="form-label">Name</label>
-                                <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $vessel->name) }}" required>
-                                @error('name')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
-                            <div class="col-12 col-md-6">
-                                <label for="nationality" class="form-label">Nationality</label>
-                                <input type="text" name="nationality" id="nationality" class="form-control" value="{{ old('nationality', $vessel->nationality) }}" required>
-                                @error('nationality')
-                                <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" name="name" id="name" class="form-control" value="{{ old('name', $vessel->name) }}" required>
+                            @error('name')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
                         </div>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">Update Vessel</button>

@@ -268,18 +268,21 @@ class UserService
         return DB::transaction(function () use ($data, $authUser) {
             $oldData = $authUser->only(['first_name', 'last_name', 'phone', 'image']);
 
-            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile && $authUser->isClient()) {
-                $data['image'] = $data['image']->store('logos', 'public');
-                if ($authUser->image) {
-                    Storage::disk('public')->delete($authUser->image);
+            if ($authUser->isClient()) {
+                if (isset($data['remove_image']) && $data['remove_image'] == '1') {
+                    if ($authUser->image) {
+                        Storage::disk('public')->delete($authUser->image);
+                    }
+                    $data['image'] = null;
+                } elseif (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $data['image'] = $data['image']->store('logos', 'public');
+                    if ($authUser->image) {
+                        Storage::disk('public')->delete($authUser->image);
+                    }
+                } else {
+                    unset($data['image']);
                 }
-            } elseif (isset($data['image']) && $data['image'] === null && $authUser->isClient()) {
-                if ($authUser->image) {
-                    Storage::disk('public')->delete($authUser->image);
-                }
-                $data['image'] = null;
-            } elseif (!$authUser->isClient()) {
-                unset($data['image']);
+                unset($data['remove_image']);
             }
 
             if (isset($data['password']) && $data['password']) {
@@ -290,10 +293,12 @@ class UserService
             }
             unset($data['email']);
             $authUser->update($data);
+
             $newData = $authUser->only(['first_name', 'last_name', 'phone', 'image']);
             if (isset($data['password'])) {
                 $newData['password_changed'] = true;
             }
+
             $this->activityLogService->logActivity(
                 $authUser,
                 'profile.updated',
@@ -302,6 +307,7 @@ class UserService
                 $oldData,
                 $newData
             );
+
             return $authUser;
         });
     }
