@@ -383,7 +383,17 @@
             <div class="container">
                 <div class="row row-sm">
                     <div class="col-md-12">
-                        <span>Copyright © {{ date('Y') }} <a href="#">{{ env('APP_NAME') }}</a>. All rights reserved. Designed and developed by <a href="https://omar-aayman.github.io/Portfolio/">Omar Ayman</a>.</span>
+                        <span>Copyright © {{ date('Y') }}
+                            <strong>
+                                <a href="#">{{ env('APP_NAME') }}</a>
+                            </strong>
+                            . All rights reserved. Designed and developed by
+                            {{-- <a href="https://omar-aayman.github.io/Portfolio/"> --}}
+                                <strong>
+                                    Brand Bakers
+                                </strong>
+                            {{-- </a> --}}
+                            .</span>
                     </div>
                 </div>
             </div>

@@ -120,7 +120,29 @@
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
     }
+    .action-buttons {
+        padding: 0.5rem;
+    }
 
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 38px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn i {
+        margin-right: 0.25rem;
+    }
+
+    .action-btn .btn-text {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
@@ -162,7 +184,6 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
-
 
     .btn-outline-secondary:hover {
         border-color: #2563eb;
@@ -311,6 +332,42 @@
         margin-top: 0.25rem;
     }
 
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }
+
+    .warning-text {
+        color: #dc2626;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
     @media (max-width: 992px) {
         .hero-header h2 {
             font-size: 2rem;
@@ -322,6 +379,22 @@
         .btn {
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
+        }
+        .action-buttons .d-flex {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: flex-start;
+            padding: 0.5rem 1rem;
+            min-height: 44px; /* Touch-friendly size */
+        }
+
+        .action-btn .btn-text {
+            display: inline !important; /* Show text on tablet and below */
         }
     }
 
@@ -353,6 +426,9 @@
         .transaction-detail {
             font-size: 0.7rem;
         }
+        .modal-title {
+            font-size: 1.1rem;
+        }
         #statisticsSection .card {
             margin-bottom: 1rem;
         }
@@ -369,6 +445,18 @@
         .btn {
             font-size: 0.8rem;
             padding: 0.35rem 0.7rem;
+        }
+        .action-btn {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .action-btn i {
+            font-size: 0.9rem;
+        }
+
+        .action-btn .btn-text {
+            font-size: 0.7rem;
         }
         .icon-circle {
             width: 40px;
@@ -644,25 +732,23 @@
                                     <td>{{ $transaction->date->format('d M Y H:i') }}</td>
                                     @if (auth()->user() && !auth()->user()->isClient())
                                     <td>
-                                        <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-sm btn-secondary">
+                                        <a href="{{ route('transactions.show', $transaction->id) }}" class="btn btn-sm btn-secondary mb-1">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                         @can('create', \App\Models\Transaction::class)
-                                        <a href="{{ route('transactions.duplicate', $transaction->id) }}" class="btn btn-sm btn-light">
+                                        <a href="{{ route('transactions.duplicate', $transaction->id) }}" class="btn btn-sm btn-light my-1">
                                             <i class="fas fa-copy"></i>
                                         </a>
                                         @endcan
                                         @can('update', \App\Models\Transaction::class)
-                                        <a href="{{ route('transactions.edit', $transaction->id) }}" class="btn btn-sm btn-primary ">
+                                         <a href="{{ route('transactions.edit', $transaction->id) }}" class="btn btn-sm btn-primary my-1">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         @endcan
                                         @can('delete', \App\Models\Transaction::class)
-                                        <a href="
-                                        {{-- {{ route('transactions.delete', $transaction->id) }} --}}
-                                         " class="btn btn-sm btn-danger" >
+                                        <button type="button" class="btn btn-sm btn-danger delete-btn my-1" data-transaction-id="{{ $transaction->id }}" data-transaction-desc="{{ $transaction->type }} (ID: {{ $transaction->id }})" data-bs-toggle="modal" data-bs-target="#deleteModal" title="Delete">
                                             <i class="fas fa-trash"></i>
-                                        </a>
+                                        </button>
                                         @endcan
                                     </td>
                                     @endif
@@ -690,6 +776,30 @@
                 </div>
                 {{ $transactions->appends(request()->all())->links('pagination::bootstrap-5') }}
             </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Confirm Transaction Deletion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete transaction <strong id="deleteTransactionDesc"></strong>? This will reverse any tank level changes and remove associated documents.
+                            <p class="warning-text">This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <form id="deleteTransactionForm" action="" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete Transaction</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -715,6 +825,24 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(csrfTokenMeta);
         console.log('CSRF token meta tag created');
     }
+
+    // Attach delete confirmation handlers
+    function attachDeleteHandlers() {
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const transactionId = this.dataset.transactionId;
+                const transactionDesc = this.dataset.transactionDesc;
+                const form = document.getElementById('deleteTransactionForm');
+                const deleteUrl = '{{ route("transactions.destroy", ":id") }}'.replace(':id', transactionId);
+                form.action = deleteUrl;
+                document.getElementById('deleteTransactionDesc').textContent = transactionDesc;
+                console.log('Delete button clicked for transaction ID:', transactionId, 'URL:', deleteUrl);
+            });
+        });
+    }
+
+    // Initial delete handlers
+    attachDeleteHandlers();
 
     // Ensure single event listener for filter toggle
     filterToggleBtn.addEventListener('click', function(e) {

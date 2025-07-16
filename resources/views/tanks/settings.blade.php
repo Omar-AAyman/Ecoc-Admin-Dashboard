@@ -143,12 +143,13 @@
         max-width: 300px;
     }
 
-    .status-flag {
+    .status-badge {
         display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-right: 8px;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        color: white;
+        text-transform: capitalize;
     }
 
     .status-available {
@@ -247,6 +248,11 @@
         .modal-title {
             font-size: 1.1rem;
         }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+        }
     }
 </style>
 @endsection
@@ -313,6 +319,8 @@
                                     <th>Status</th>
                                     <th>Product</th>
                                     <th>Company</th>
+                                    <th>Temperature (°C)</th>
+                                    <th>Temperature (°F)</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>

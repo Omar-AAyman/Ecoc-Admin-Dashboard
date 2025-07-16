@@ -1,5 +1,5 @@
 <div class="bg-dark text-white vh-100 p-3" style="width: 250px;">
-    <h4 class="mb-4">ECOC Dashboard</h4>
+    <h4 class="mb-4">Ecoc Dashboard</h4>
     <ul class="nav flex-column">
         <li class="nav-item">
             <a class="nav-link text-white" href="{{ route('dashboard') }}">Dashboard</a>

@@ -124,12 +124,12 @@
 
     .container-card.small {
         width: 120px;
-        height: 200px;
+        height: 216px;
     }
 
     .container-card.selected {
         width: 180px;
-        height: 320px;
+        height: 324px;
         box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.9);
     }
 
@@ -242,6 +242,7 @@
 
     .container-card.small .container-label {
         font-size: 0.9rem;
+        top: 20px;
     }
 
     .container-card.selected .container-label {
@@ -250,52 +251,75 @@
 
     .container-info {
         position: absolute;
-        bottom: 10px;
+        top: 55px;
+        margin-top: 0.5rem;
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        align-items: center;
         text-align: center;
+        justify-content: center;
+        padding: 0.6rem;
         color: white;
         font-size: 0.9rem;
         line-height: 1.3;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-        transform: translateZ(5px);
+        transform: translateZ(10px);
         pointer-events: none;
-        z-index: 5;
+        z-index: 10;
     }
 
     .container-card.small .container-info {
-        font-size: 0.7rem;
+        top: 36px;
+        margin-top: 0.3rem;
+        gap: 0rem;
+        font-size: 0.55rem;
+        line-height: 0.8;
+        padding: 0.35rem;
+        z-index: 10;
+    }
+
+    .container-card.small .container-info p {
+        line-height: 1.0;
+    }
+
+    .container-card.small .container-info #capacity {
+        line-height: 1.3;
     }
 
     .container-card.selected .container-info {
-        font-size: 0.8rem;
+        gap: 0.2rem;
+        font-size: 0.85rem;
+        line-height: 1.3;
+        padding: 0.5rem;
+        z-index: 10;
     }
 
-    .capacity-label {
-        position: absolute;
-        top: 40%;
-        width: 100%;
-        text-align: center;
-        color: white;
-        font-weight: bold;
-        font-size: 1rem;
-        line-height: 1.2;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
-        transform: translateZ(15px);
-        pointer-events: none;
-        z-index: 15;
+    .client-image {
+        max-width: 60px;
+        max-height: 60px;
+        border-radius: 8px;
+        object-fit: contain;
+        /* background-color: rgba(255, 255, 255, 0.85); */
+        margin-bottom: 0.5rem;
     }
 
-    .container-card.small .capacity-label {
-        font-size: 0.7rem;
+    .container-card.small .client-image {
+        max-width: 48px;
+        max-height: 48px;
+        margin-bottom: 0.3rem;
     }
 
-    .container-card.selected .capacity-label {
-        font-size: 0.9rem;
+    .container-card.selected .client-image,
+    .enlarged-container-detail .client-image {
+        max-width: 54px;
+        max-height: 54px;
     }
 
     .enlarged-container-detail {
         width: 180px;
-        height: 320px;
+        height: 324px;
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
@@ -351,7 +375,7 @@
         border-radius: 0.25rem;
         font-size: 0.75rem;
         color: white;
-        z-index: 10;
+        z-index: 12;
     }
 
     #tank-search {
@@ -376,7 +400,168 @@
         vertical-align: middle;
     }
 
+    #gallery {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(200px, 1fr));
+        gap: 1rem;
+        justify-content: center;
+        padding: 0 0.5rem;
+    }
+
+    @media (max-width: 1200px) {
+        #gallery {
+            grid-template-columns: repeat(4, minmax(190px, 1fr));
+        }
+        .container-card {
+            width: 190px;
+            height: 342px;
+        }
+        .container-card.small {
+            width: 114px;
+            height: 205px;
+        }
+        .container-card.selected {
+            width: 171px;
+            height: 308px;
+        }
+        .enlarged-container-detail {
+            width: 171px;
+            height: 308px;
+        }
+        .container-label {
+            font-size: 1.1rem;
+        }
+        .container-info {
+            top: 55px;
+            margin-top: 0.5rem;
+            gap: 0.2rem;
+            font-size: 0.85rem;
+            line-height: 1.0;
+            padding: 0.5rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info #capacity {
+            line-height: 1.3;
+        }
+
+        .client-image {
+            max-width: 57px;
+            max-height: 57px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.small .container-label {
+            font-size: 0.85rem;
+            top: 18px;
+        }
+        .container-card.small .container-info {
+            top: 36px;
+            margin-top: 0.3rem;
+            gap: 0.1rem;
+            font-size: 0.6rem;
+            line-height: 1.0;
+            padding: 0.3rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info p {
+            line-height: 1.0;
+        }
+        .container-card.small .client-image {
+            max-width: 46px;
+            max-height: 46px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.selected .container-label {
+            font-size: 1rem;
+        }
+        .container-card.selected .container-info {
+            gap: 0.2rem;
+            font-size: 0.8rem;
+            line-height: 1.0;
+            padding: 0.45rem;
+            z-index: 10;
+        }
+        .container-card.selected .client-image {
+            max-width: 51px;
+            max-height: 51px;
+        }
+    }
+
     @media (max-width: 992px) {
+        #gallery {
+            grid-template-columns: repeat(3, minmax(180px, 1fr));
+        }
+        .container-card {
+            width: 180px;
+            height: 324px;
+        }
+        .container-card.small {
+            width: 108px;
+            height: 194px;
+        }
+        .container-card.selected {
+            width: 162px;
+            height: 292px;
+        }
+        .enlarged-container-detail {
+            width: 162px;
+            height: 292px;
+        }
+        .container-label {
+            font-size: 1rem;
+        }
+        .container-info {
+            top: 55px;
+            margin-top: 0.5rem;
+            gap: 0.2rem;
+            font-size: 0.8rem;
+            line-height: 1.0;
+            padding: 0.45rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info #capacity {
+            line-height: 1.3;
+        }
+
+        .client-image {
+            max-width: 54px;
+            max-height: 54px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.small .container-label {
+            font-size: 0.8rem;
+            top: 16px;
+        }
+        .container-card.small .container-info {
+            top: 36px;
+            margin-top: 0.3rem;
+            gap: 0rem;
+            font-size: 0.55rem;
+            line-height: 0.8;
+            padding: 0.25rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info p {
+            line-height: 1.0;
+        }
+        .container-card.small .client-image {
+            max-width: 40px;
+            max-height: 40px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.selected .container-label {
+            font-size: 0.95rem;
+        }
+        .container-card.selected .container-info {
+            gap: 0.2rem;
+            font-size: 0.75rem;
+            line-height: 1.0;
+            padding: 0.4rem;
+            z-index: 10;
+        }
+        .container-card.selected .client-image {
+            max-width: 49px;
+            max-height: 49px;
+        }
         .hero-header h2 {
             font-size: 2rem;
         }
@@ -391,6 +576,81 @@
     }
 
     @media (max-width: 768px) {
+        #gallery {
+            grid-template-columns: repeat(2, minmax(170px, 1fr));
+        }
+        .container-card {
+            width: 170px;
+            height: 306px;
+        }
+        .container-card.small {
+            width: 102px;
+            height: 184px;
+        }
+        .container-card.selected {
+            width: 153px;
+            height: 275px;
+        }
+        .enlarged-container-detail {
+            width: 153px;
+            height: 275px;
+        }
+        .container-label {
+            font-size: 0.95rem;
+        }
+        .container-info {
+            top: 55px;
+            margin-top: 0.5rem;
+            gap: 0.2rem;
+            font-size: 0.75rem;
+            line-height: 1.0;
+            padding: 0.4rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info #capacity {
+            line-height: 1.3;
+        }
+
+        .client-image {
+            max-width: 51px;
+            max-height: 51px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.small .container-label {
+            font-size: 0.75rem;
+            top: 15px;
+        }
+        .container-card.small .container-info {
+            top: 36px;
+            margin-top: 0.3rem;
+            gap: 0.1rem;
+            font-size: 0.5rem;
+            line-height: 1.0;
+            padding: 0.25rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info p {
+            line-height: 1.0;
+        }
+        .container-card.small .client-image {
+            max-width: 41px;
+            max-height: 41px;
+            /* background-color: rgba(255, 255, 255, 0.85); */
+        }
+        .container-card.selected .container-label {
+            font-size: 0.9rem;
+        }
+        .container-card.selected .container-info {
+            gap: 0.2rem;
+            font-size: 0.7rem;
+            line-height: 1.0;
+            padding: 0.35rem;
+            z-index: 10;
+        }
+        .container-card.selected .client-image {
+            max-width: 35px;
+            max-height: 35px;
+        }
         .hero-header {
             padding: 1rem 0;
         }
@@ -407,31 +667,6 @@
             width: 100%;
             text-align: center;
         }
-        .container-card {
-            width: 150px;
-            height: 270px;
-        }
-        .container-card.small {
-            width: 100px;
-            height: 180px;
-        }
-        .container-card.selected {
-            width: 140px;
-            height: 280px;
-        }
-        .container-label {
-            font-size: 1rem;
-        }
-        .container-info, .capacity-label {
-            font-size: 0.8rem;
-        }
-        .enlarged-container-detail {
-            width: 140px;
-            height: 280px;
-        }
-        #tank-search {
-            max-width: 200px;
-        }
         .chart-container {
             height: 200px;
         }
@@ -441,34 +676,87 @@
     }
 
     @media (max-width: 576px) {
+        #gallery {
+            grid-template-columns: 1fr;
+        }
+        .container-card {
+            width: 160px;
+            height: 288px;
+        }
+        .container-card.small {
+            width: 96px;
+            height: 173px;
+        }
+        .container-card.selected {
+            width: 144px;
+            height: 259px;
+        }
+        .enlarged-container-detail {
+            width: 144px;
+            height: 259px;
+        }
+        .container-label {
+            font-size: 0.9rem;
+        }
+        .container-info {
+            top: 55px;
+            margin-top: 0.5rem;
+            gap: 0.2rem;
+            font-size: 0.7rem;
+            line-height: 1.0;
+            padding: 0.35rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info #capacity {
+            line-height: 1.3;
+        }
+
+        .client-image {
+            max-width: 48px;
+            max-height: 48px;
+            /* background-color: rgba(255, 255, 255, 0.8); */
+        }
+        .container-card.small .container-label {
+            font-size: 0.7rem;
+            top: 14px;
+        }
+        .container-card.small .container-info {
+            top: 36px;
+            margin-top: 0.3rem;
+            gap: 0rem;
+            font-size: 0.45rem;
+            line-height: 0.8;
+            padding: 0.2rem;
+            z-index: 10;
+        }
+        .container-card.small .container-info p {
+            line-height: 1.0;
+        }
+        .container-card.small .client-image {
+            max-width: 30px;
+            max-height: 30px;
+            /* background-color: rgba(255, 255, 255, 0.8); */
+        }
+        .container-card.selected .container-label {
+            font-size: 0.85rem;
+        }
+        .container-card.selected .container-info {
+            gap: 0.2rem;
+            font-size: 0.65rem;
+            line-height: 1.0;
+            padding: 0.3rem;
+            z-index: 10;
+        }
+        .container-card.selected .client-image {
+            max-width: 43px;
+            max-height: 43px;
+        }
         .hero-header h2 {
             font-size: 1.5rem;
         }
         .btn {
             font-size: 0.8rem;
             padding: 0.35rem 0.7rem;
-        }
-        .container-card {
-            width: 120px;
-            height: 220px;
-        }
-        .container-card.small {
-            width: 90px;
-            height: 160px;
-        }
-        .container-card.selected {
-            width: 110px;
-            height: 200px;
-        }
-        .container-label {
-            font-size: 0.9rem;
-        }
-        .container-info, .capacity-label {
-            font-size: 0.7rem;
-        }
-        .enlarged-container-detail {
-            width: 110px;
-            height: 200px;
         }
     }
 </style>
@@ -486,79 +774,16 @@
                             <i class="fas fa-tint me-2"></i>Welcome back, {{ auth()->user()->first_name }}!
                         </h2>
                     </div>
-                    <p class="text-muted">Total Tanks: {{ $totalTanks }}, Average Capacity Utilization: {{ $avgCapacityUtilization }}%</p>
-                </div>
-            </div>
-
-            <!-- Charts Section -->
-            <div class="row">
-                <div class="col-12 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Rental Overview</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="rentalChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Utilization Trends</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <canvas id="utilizationChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analysis Cards Section -->
-            <div class="row mt-4">
-                <div class="col-12 col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Average Capacity Utilization</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <h3>{{ $avgCapacityUtilization }}%</h3>
-                            <p class="text-muted">Average across all tanks</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Overall Analysis</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <p>Active Rentals: {{ $activeRentals }}</p>
-                            <p>Completed Rentals: {{ $completedRentals }}</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Process Metrics</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <p>Discharge: {{ $totalDischarge }} mt</p>
-                            <p>Load: {{ $totalLoad }} mt</p>
-                        </div>
-                    </div>
+                    @unless(auth()->user()->isClient())
+                        <p class="text-muted">Total Tanks: {{ $totalTanks }}, Average Capacity Utilization: {{ $avgCapacityUtilization }}%</p>
+                    @endunless
                 </div>
             </div>
 
             <!-- Selected Container Section -->
             <div id="selected-container-section" class="card shadow-sm my-4">
                 <div class="card-header text-white">
-                    <h5 class="card-title mb-0">Tank Details: <span id="detail-header-id"></span></h5>
+                    <h5 class="card-title mb-0 text-center">Tank Details: <span id="detail-header-id"></span></h5>
                     <button id="back-to-gallery-button" class="x-button">×</button>
                 </div>
                 <div class="card-body">
@@ -574,13 +799,15 @@
                                         <div class="liquid-wave"></div>
                                         <div class="liquid-wave"></div>
                                     </div>
-                                    <p class="capacity-label" id="selected-capacity-label"></p>
                                     <div class="container-label">
                                         <p id="selected-container-id"></p>
                                     </div>
                                     <div class="container-info">
-                                        <p id="selected-container-content"></p>
-                                        <p id="selected-container-status"></p>
+                                        <img id="selected-client-image" class="client-image" src="" alt="Client Logo" />
+                                        <p id="selected-company-name"></p>
+                                        <p id="selected-product"></p>
+                                        <p id="selected-capacity"></p>
+                                        <p id="selected-container-temperature"></p>
                                     </div>
                                     <div class="status-badge" id="selected-status-badge"></div>
                                 </div>
@@ -591,9 +818,10 @@
                             <p><strong>Content:</strong> <span id="detail-content"></span></p>
                             <p><strong>Status:</strong> <span id="detail-status"></span></p>
                             <p><strong>Max Capacity:</strong> <span id="detail-max-capacity"></span></p>
-                            <p><strong>Current capacity:</strong> <span id="detail-current-level"></span></p>
+                            <p><strong>Current Capacity:</strong> <span id="detail-current-level"></span></p>
                             <p><strong>Capacity Utilization:</strong> <span id="detail-capacity-utilization"></span></p>
-                            <p><strong>Company:</strong> <span id="detail-company"></span></p>
+                            <p><strong>Client:</strong> <span id="detail-company"></span></p>
+                            <p><strong>Temperature:</strong> <span id="detail-temperature"></span></p>
                             <div class="mt-3 d-flex gap-2">
                                 @if (auth()->user() && auth()->user()->isSuperAdmin())
                                     <a id="edit-settings-button" class="btn btn-primary action-button">Edit Settings</a>
@@ -605,12 +833,13 @@
                     <div id="detailed-analysis-section" class="mt-4">
                         <h5 class="fw-semibold mb-3">Detailed Analysis for <span id="analysis-container-id"></span></h5>
                         <div class="details-table">
+                            <p><strong>Temperature:</strong> <span id="analysis-temperature"></span></p>
                             <h6>Rental History</h6>
                             <div class="table-responsive">
                                 <table class="table table-striped table-sm text-center">
                                     <thead>
                                         <tr>
-                                            <th>Company</th>
+                                            <th>Client</th>
                                             <th>Product</th>
                                             <th>Start Date</th>
                                             <th>End Date</th>
@@ -632,7 +861,7 @@
                                             <th>Type</th>
                                             <th>Quantity</th>
                                             <th>Date</th>
-                                            <th>Company</th>
+                                            <th>Client</th>
                                             <th>Product</th>
                                         </tr>
                                     </thead>
@@ -655,7 +884,74 @@
                         </div>
                     </div>
                 </div>
-                <div id="gallery" class="row"></div>
+                <div id="gallery"></div>
+            </div>
+
+            <!-- Charts Section -->
+            @unless(auth()->user()->isClient())
+                <div class="row mt-4">
+                    <div class="col-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0 text-center">Rental Overview</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="rentalChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0 text-center">Utilization Trends</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="utilizationChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Cards Section -->
+                <div class="row mt-4">
+                    <div class="col-12 col-md-4 my-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0 text-center">Average Capacity Utilization</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <h3>{{ $avgCapacityUtilization }}%</h3>
+                                <p class="text-muted">Average across all tanks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 my-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0 text-center">Overall Analysis</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p>Active Rentals: {{ $activeRentals }}</p>
+                                <p>Completed Rentals: {{ $completedRentals }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 my-3">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0 text-center">Process Metrics</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p>Discharge: {{ $totalDischarge }} mt</p>
+                                <p>Load: {{ $totalLoad }} mt</p>
+                            </div>
+                        </div>
+                    </div>
+                @endunless
             </div>
         </div>
     </div>
@@ -667,6 +963,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const tanks = @json($tanks) || [];
     const performanceTrends = @json($performanceTrends) || { utilization: [], rentals: [], labels: [] };
+    const isClient = @json(auth()->user()->isClient());
 
     const gallerySection = document.getElementById('gallery-section');
     const selectedContainerSection = document.getElementById('selected-container-section');
@@ -683,47 +980,49 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial render of gallery
     renderGallery(tanks);
 
-    // Rental Chart
-    const rentalChart = new Chart(document.getElementById('rentalChart').getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: ['Active Rentals', 'Completed Rentals'],
-            datasets: [{
-                label: 'Number of Rentals',
-                data: [{{ $activeRentals }}, {{ $completedRentals }}],
-                backgroundColor: ['#4ade80', '#ef4444'],
-                borderColor: ['#16a34a', '#b91c1c'],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+    // Initialize charts only for non-clients
+    let rentalChart, utilizationChart;
+    if (!isClient) {
+        rentalChart = new Chart(document.getElementById('rentalChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Active Rentals', 'Completed Rentals'],
+                datasets: [{
+                    label: 'Number of Rentals',
+                    data: [{{ $activeRentals }}, {{ $completedRentals }}],
+                    backgroundColor: ['#4ade80', '#ef4444'],
+                    borderColor: ['#16a34a', '#b91c1c'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
+        });
 
-    // Utilization Trends Chart
-    const utilizationChart = new Chart(document.getElementById('utilizationChart').getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: performanceTrends.labels,
-            datasets: [{
-                label: 'Capacity Utilization (%)',
-                data: performanceTrends.utilization,
-                fill: false,
-                borderColor: '#2563eb',
-                tension: 0.1
-            }, {
-                label: 'Rental Count',
-                data: performanceTrends.rentals,
-                fill: false,
-                borderColor: '#ef4444',
-                tension: 0.1
-            }]
-        },
-        options: {
-            scales: { y: { beginAtZero: true } }
-        }
-    });
+        utilizationChart = new Chart(document.getElementById('utilizationChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: performanceTrends.labels,
+                datasets: [{
+                    label: 'Capacity Utilization (%)',
+                    data: performanceTrends.utilization,
+                    fill: false,
+                    borderColor: '#2563eb',
+                    tension: 0.1
+                }, {
+                    label: 'Rental Count',
+                    data: performanceTrends.rentals,
+                    fill: false,
+                    borderColor: '#ef4444',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
 
     function getStatusColor(status) {
         switch (status.toLowerCase()) {
@@ -747,11 +1046,31 @@ document.addEventListener('DOMContentLoaded', function () {
             const maxCapacity = parseFloat(container.maxCapacity.replace(',', ''));
             const currentLevel = parseFloat(container.currentLevel);
             const liquidHeight = maxCapacity > 0 ? Math.min((currentLevel / maxCapacity) * 100, 100) + '%' : '0%';
-            console.log(`Tank ${container.id}: currentLevel=${currentLevel}, maxCapacity=${maxCapacity}, liquidHeight=${liquidHeight}`);
-            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
+            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : '';
+            const temperatureText = container.temperatureCelsius !== 'N/A' ? `${container.temperatureCelsius}°C / ${container.temperatureFahrenheit}°F` : '';
+            const clientImage = container.clientImage && container.clientImage !== 'N/A' ? container.clientImage : '';
+            const companyName = container.companyName && container.companyName !== 'N/A' ? container.companyName : '';
+            const product = container.product && container.product !== 'N/A' ? container.product : '';
 
             const card = document.createElement('div');
-            card.className = 'col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 d-flex justify-content-center';
+            card.className = 'container-card-wrapper';
+            const containerInfoContent = [];
+            if (clientImage) {
+                containerInfoContent.push(`<img src="${clientImage}" class="client-image" alt="Client Logo" />`);
+            }
+            if (companyName) {
+                containerInfoContent.push(`<p>${companyName}</p>`);
+            }
+            if (product) {
+                containerInfoContent.push(`<p>${product}</p>`);
+            }
+            if (capacityText) {
+                containerInfoContent.push(`<p id="capacity">${capacityText}</p>`);
+            }
+            if (temperatureText) {
+                containerInfoContent.push(`<p>${temperatureText}</p>`);
+            }
+
             card.innerHTML = `
                 <div class="container-card" data-id="${container.id}">
                     <div class="barrel">
@@ -763,13 +1082,11 @@ document.addEventListener('DOMContentLoaded', function () {
                             <div class="liquid-wave"></div>
                             <div class="liquid-wave"></div>
                         </div>
-                        <p class="capacity-label">${capacityText}</p>
                         <div class="container-label">
                             <p>${container.id}</p>
                         </div>
                         <div class="container-info">
-                            <p>${container.content}</p>
-                            <p>${container.status}</p>
+                            ${containerInfoContent.join('')}
                         </div>
                         <div class="status-badge" style="background-color: ${getStatusColor(container.status)}">${container.status}</div>
                     </div>
@@ -806,27 +1123,62 @@ document.addEventListener('DOMContentLoaded', function () {
             const maxCapacity = parseFloat(container.maxCapacity.replace(',', ''));
             const currentLevel = parseFloat(container.currentLevel);
             const liquidHeight = maxCapacity > 0 ? Math.min((currentLevel / maxCapacity) * 100, 100) + '%' : '0%';
-            console.log(`Enlarged tank ${container.id}: liquidHeight=${liquidHeight}`);
-            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : 'N/A';
+            const capacityText = maxCapacity > 0 ? `${currentLevel.toFixed(1)} mt / ${maxCapacity.toFixed(1)} mt (${container.capacityUtilization})` : '';
+            const temperatureText = container.temperatureCelsius !== 'N/A' ? `${container.temperatureCelsius}°C / ${container.temperatureFahrenheit}°F` : '';
+            const clientImage = container.clientImage && container.clientImage !== 'N/A' ? container.clientImage : '';
+            const companyName = container.companyName && container.companyName !== 'N/A' ? container.companyName : '';
+            const product = container.product && container.product !== 'N/A' ? container.product : '';
+
             const liquidContainer = enlargedContainerDisplay.querySelector('.liquid-container');
             liquidContainer.style.setProperty('--liquid-color-light', container.liquidColor[0]);
             liquidContainer.style.setProperty('--liquid-color-dark', container.liquidColor[1]);
             liquidContainer.style.height = liquidHeight;
-            document.getElementById('selected-capacity-label').textContent = capacityText;
+
+            document.getElementById('selected-container-id').textContent = container.id;
+
+            const containerInfo = enlargedContainerDisplay.querySelector('.container-info');
+            containerInfo.innerHTML = '';
+            if (clientImage) {
+                const img = document.createElement('img');
+                img.src = clientImage;
+                img.className = 'client-image';
+                img.alt = 'Client Logo';
+                containerInfo.appendChild(img);
+            }
+            if (companyName) {
+                const p = document.createElement('p');
+                p.textContent = companyName;
+                containerInfo.appendChild(p);
+            }
+            if (product) {
+                const p = document.createElement('p');
+                p.textContent = product;
+                containerInfo.appendChild(p);
+            }
+            if (capacityText) {
+                const p = document.createElement('p');
+                p.id = 'capacity';
+                p.textContent = capacityText;
+                containerInfo.appendChild(p);
+            }
+            if (temperatureText) {
+                const p = document.createElement('p');
+                p.textContent = temperatureText;
+                containerInfo.appendChild(p);
+            }
+
             document.getElementById('selected-status-badge').textContent = container.status;
             document.getElementById('selected-status-badge').style.backgroundColor = getStatusColor(container.status);
 
-            document.getElementById('selected-container-id').textContent = container.id;
-            document.getElementById('selected-container-content').textContent = container.content;
-            document.getElementById('selected-container-status').textContent = container.status;
             document.getElementById('detail-header-id').textContent = container.id;
             document.getElementById('detail-id').textContent = container.id;
-            document.getElementById('detail-content').textContent = container.content;
+            document.getElementById('detail-content').textContent = container.content || '';
             document.getElementById('detail-status').textContent = container.status;
-            document.getElementById('detail-max-capacity').textContent = `${maxCapacity.toFixed(1)} mt`;
-            document.getElementById('detail-current-level').textContent = `${currentLevel.toFixed(1)} mt`;
-            document.getElementById('detail-capacity-utilization').textContent = container.capacityUtilization;
-            document.getElementById('detail-company').textContent = container.company || 'N/A';
+            document.getElementById('detail-max-capacity').textContent = maxCapacity > 0 ? `${maxCapacity.toFixed(1)} mt` : '';
+            document.getElementById('detail-current-level').textContent = currentLevel >= 0 ? `${currentLevel.toFixed(1)} mt` : '';
+            document.getElementById('detail-capacity-utilization').textContent = container.capacityUtilization || '';
+            document.getElementById('detail-company').textContent = container.company || '';
+            document.getElementById('detail-temperature').textContent = temperatureText || '';
 
             if (editSettingsButton) {
                 editSettingsButton.href = `/tanks/${encodeURIComponent(container.dbId)}/edit`;
@@ -835,6 +1187,7 @@ document.addEventListener('DOMContentLoaded', function () {
             enlargedContainerDisplay.classList.remove('active');
             setTimeout(() => {
                 enlargedContainerDisplay.classList.add('active');
+                selectedContainerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 0);
 
             detailedAnalysisSection.classList.remove('visible');
@@ -848,16 +1201,18 @@ document.addEventListener('DOMContentLoaded', function () {
     function populateDetailedAnalysis(container) {
         document.getElementById('analysis-container-id').textContent = container.id;
 
-        // Populate rental history table
+        const temperatureText = container.temperatureCelsius !== 'N/A' ? `${container.temperatureCelsius}°C / ${container.temperatureFahrenheit}°F` : '';
+        document.getElementById('analysis-temperature').textContent = temperatureText;
+
         rentalHistoryTable.innerHTML = '';
         if (container.rentalHistory && container.rentalHistory.length > 0) {
             container.rentalHistory.forEach(rental => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${rental.company}</td>
-                    <td>${rental.product}</td>
-                    <td>${rental.start_date}</td>
-                    <td>${rental.end_date}</td>
+                    <td>${rental.company || ''}</td>
+                    <td>${rental.product || ''}</td>
+                    <td>${rental.start_date || ''}</td>
+                    <td>${rental.end_date || ''}</td>
                 `;
                 rentalHistoryTable.appendChild(row);
             });
@@ -867,22 +1222,21 @@ document.addEventListener('DOMContentLoaded', function () {
             rentalHistoryTable.appendChild(row);
         }
 
-        // Populate transactions table
         transactionsTable.innerHTML = '';
         if (container.transactions && container.transactions.length > 0) {
             container.transactions.forEach(transaction => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${transaction.id || 'N/A'}</td>
-                    <td>${transaction.work_order_number || 'N/A'}</td>
-                    <td>${transaction.bill_of_lading_number || 'N/A'}</td>
-                    <td>${transaction.charge_permit_number || 'N/A'}</td>
-                    <td>${transaction.discharge_permit_number || 'N/A'}</td>
-                    <td>${transaction.type}</td>
-                    <td>${transaction.quantity}</td>
-                    <td>${transaction.date}</td>
-                    <td>${transaction.company || 'N/A'}</td>
-                    <td>${transaction.product || 'N/A'}</td>
+                    <td>${transaction.id || ''}</td>
+                    <td>${transaction.work_order_number || ''}</td>
+                    <td>${transaction.bill_of_lading_number || ''}</td>
+                    <td>${transaction.charge_permit_number || ''}</td>
+                    <td>${transaction.discharge_permit_number || ''}</td>
+                    <td>${transaction.type || ''}</td>
+                    <td>${transaction.quantity || ''}</td>
+                    <td>${transaction.date || ''}</td>
+                    <td>${transaction.company || ''}</td>
+                    <td>${transaction.product || ''}</td>
                 `;
                 transactionsTable.appendChild(row);
             });

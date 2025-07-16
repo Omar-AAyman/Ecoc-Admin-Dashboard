@@ -174,7 +174,7 @@
                         @method('PUT')
                         <div class="mb-3">
                             <label for="cubic_meter_capacity" class="form-label">Original Capacity (m³)</label>
-                            <input type="number" id="cubic_meter_capacity" class="form-control" value="{{ $tank->cubic_meter_capacity }}" disabled>
+                            <input type="number" name="cubic_meter_capacity" id="cubic_meter_capacity" class="form-control" value="{{ old('cubic_meter_capacity', $tank->cubic_meter_capacity) }}" required>
                         </div>
                         <div class="mb-3">
                             <label for="company_id" class="form-label">Company</label>
@@ -190,8 +190,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="product_id" class="form-label">Product</label>
+                            <option value="" {{ old('product_id', $tank->product_id) ? '' : 'selected' }}>None</option>
                             <select name="product_id" id="product_id" class="form-select">
-                                <option value="" {{ old('product_id', $tank->product_id) ? '' : 'selected' }}>None</option>
                                 @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ old('product_id', $tank->product_id) == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
                                 @endforeach
@@ -205,9 +205,16 @@
                             <input type="number" id="max_capacity" class="form-control" disabled>
                         </div>
                         <div class="mb-3" id="current-level-group" style="display: {{ $tank->product_id ? 'block' : 'none' }};">
-                            <label for="current_level" class="form-label">Current capacity (mt)</label>
+                            <label for="current_level" class="form-label">Current Capacity (mt)</label>
                             <input type="number" name="current_level" id="current_level" class="form-control" value="{{ old('current_level', $tank->current_level) }}" step="0.01" min="0">
                             @error('current_level')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="mb-3" id="temperature-group" style="display: {{ $tank->product_id ? 'block' : 'none' }};">
+                            <label for="temperature" class="form-label">Temperature (°C)</label>
+                            <input type="number" name="temperature" id="temperature" class="form-control" value="{{ old('temperature', $tank->temperature) }}" step="0.01" min="-50" max="100">
+                            @error('temperature')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
@@ -227,11 +234,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmLevelModalLabel">Confirm Current capacity</h5>
+                <h5 class="modal-title" id="confirmLevelModalLabel">Confirm Tank Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Setting the current capacity manually is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
+                Setting the current capacity or temperature manually is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -257,7 +264,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxCapacityInput = document.getElementById('max_capacity');
     const maxCapacityGroup = document.getElementById('max-capacity-group');
     const currentLevelGroup = document.getElementById('current-level-group');
+    const temperatureGroup = document.getElementById('temperature-group');
     const currentLevelInput = document.getElementById('current_level');
+    const temperatureInput = document.getElementById('temperature');
     const form = document.getElementById('edit-tank-form');
     const confirmModal = new bootstrap.Modal(document.getElementById('confirmLevelModal'));
     const confirmSubmit = document.getElementById('confirmSubmit');
@@ -273,19 +282,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     maxCapacityInput.value = (cubicMeterCapacity * density).toFixed(2);
                     maxCapacityGroup.style.display = 'block';
                     currentLevelGroup.style.display = 'block';
+                    temperatureGroup.style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Error fetching product density:', error);
                     maxCapacityInput.value = '';
                     maxCapacityGroup.style.display = 'none';
                     currentLevelGroup.style.display = 'none';
+                    temperatureGroup.style.display = 'none';
                     currentLevelInput.value = 0;
+                    temperatureInput.value = '';
                 });
         } else {
             maxCapacityInput.value = '';
             maxCapacityGroup.style.display = 'none';
             currentLevelGroup.style.display = 'none';
+            temperatureGroup.style.display = 'none';
             currentLevelInput.value = 0;
+            temperatureInput.value = '';
         }
     }
 
@@ -297,7 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     form.addEventListener('submit', function(event) {
         const currentLevel = parseFloat(currentLevelInput.value) || 0;
-        if (currentLevel > 0) {
+        const temperature = parseFloat(temperatureInput.value);
+        if (currentLevel > 0 || temperature) {
             event.preventDefault();
             confirmModal.show();
         }

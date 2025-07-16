@@ -185,7 +185,6 @@
 <div class="main-content side-content my-2 pt-0">
     <div class="container-fluid px-4 py-4">
         <div class="inner-body">
-            <!-- Page Header -->
             @can('create', \App\Models\Transaction::class)
             <div class="hero-header">
                 <div class="container">
@@ -200,10 +199,8 @@
                 </div>
             </div>
 
-            <!-- Alert Messages -->
             @include('components.alerts')
 
-            <!-- Form -->
             <div class="card">
                 <div class="card-body p-4">
                     <form action="{{ route('transactions.store') }}" method="POST" enctype="multipart/form-data">
@@ -321,7 +318,7 @@
                             <h4 class="section-header">Shipment Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="shipment_transport_type" class="form-label required">Transport Type</label>
+                                    <label for="shipment_transport_type" class="form-label">Transport Type</label>
                                     <select name="shipment[transport_type]" id="shipment_transport_type" class="form-select">
                                         <option value="">Select Transport Type</option>
                                         <option value="vessel" {{ (isset($transaction) && $transaction->shipment && $transaction->shipment->transport_type == 'vessel') || old('shipment.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
@@ -332,7 +329,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="shipment_vessel_id_field" style="display: none;">
-                                    <label for="shipment_vessel_id" class="form-label required">Vessel</label>
+                                    <label for="shipment_vessel_id" class="form-label">Vessel</label>
                                     <select name="shipment[vessel_id]" id="shipment_vessel_id" class="form-select">
                                         <option value="">Select Vessel</option>
                                         @foreach($vessels as $vessel)
@@ -347,7 +344,7 @@
                             <div id="shipment_truck_fields" class="form-field" style="display: none;">
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="shipment_truck_number" class="form-label required">Truck</label>
+                                        <label for="shipment_truck_number" class="form-label">Truck</label>
                                         <select name="shipment[truck_number]" id="shipment_truck_number" class="form-select">
                                             <option value="">Select Truck</option>
                                             @foreach($trucks as $truck)
@@ -359,7 +356,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label for="shipment_trailer_number" class="form-label required">Trailer</label>
+                                        <label for="shipment_trailer_number" class="form-label">Trailer</label>
                                         <select name="shipment[trailer_number]" id="shipment_trailer_number" class="form-select">
                                             <option value="">Select Trailer</option>
                                             @foreach($trailers as $trailer)
@@ -373,7 +370,7 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6">
-                                        <label for="shipment_driver_name" class="form-label required">Driver</label>
+                                        <label for="shipment_driver_name" class="form-label">Driver</label>
                                         <select name="shipment[driver_name]" id="shipment_driver_name" class="form-select">
                                             <option value="">Select Driver</option>
                                             @foreach($drivers as $driver)
@@ -388,7 +385,7 @@
                             </div>
                             <div class="row mb-3" id="shipment_berth_number_field" style="display: none;">
                                 <div class="col-12 col-md-6">
-                                    <label for="shipment_berth_number" class="form-label required">Berth Number</label>
+                                    <label for="shipment_berth_number" class="form-label">Berth Number</label>
                                     <input type="text" name="shipment[berth_number]" id="shipment_berth_number" class="form-control" value="{{ isset($transaction) && $transaction->shipment ? $transaction->shipment->berth_number : old('shipment.berth_number') }}">
                                     @error('shipment.berth_number')
                                     <div class="text-danger">{{ $message }}</div>
@@ -402,7 +399,7 @@
                             <h4 class="section-header">Delivery Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="delivery_transport_type" class="form-label required">Transport Type</label>
+                                    <label for="delivery_transport_type" class="form-label">Transport Type</label>
                                     <select name="delivery[transport_type]" id="delivery_transport_type" class="form-select">
                                         <option value="">Select Transport Type</option>
                                         <option value="vessel" {{ (isset($transaction) && $transaction->delivery && $transaction->delivery->transport_type == 'vessel') || old('delivery.transport_type') == 'vessel' ? 'selected' : '' }}>Vessel</option>
@@ -413,7 +410,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="delivery_vessel_id_field" style="display: none;">
-                                    <label for="delivery_vessel_id" class="form-label required">Vessel</label>
+                                    <label for="delivery_vessel_id" class="form-label">Vessel</label>
                                     <select name="delivery[vessel_id]" id="delivery_vessel_id" class="form-select">
                                         <option value="">Select Vessel</option>
                                         @foreach($vessels as $vessel)
@@ -428,7 +425,7 @@
                             <div id="delivery_truck_fields" class="form-field" style="display: none;">
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="delivery_truck_number" class="form-label required">Truck</label>
+                                        <label for="delivery_truck_number" class="form-label">Truck</label>
                                         <select name="delivery[truck_number]" id="delivery_truck_number" class="form-select">
                                             <option value="">Select Truck</option>
                                             @foreach($trucks as $truck)
@@ -440,7 +437,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label for="delivery_trailer_number" class="form-label required">Trailer</label>
+                                        <label for="delivery_trailer_number" class="form-label">Trailer</label>
                                         <select name="delivery[trailer_number]" id="delivery_trailer_number" class="form-select">
                                             <option value="">Select Trailer</option>
                                             @foreach($trailers as $trailer)
@@ -454,7 +451,7 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6">
-                                        <label for="delivery_driver_name" class="form-label required">Driver</label>
+                                        <label for="delivery_driver_name" class="form-label">Driver</label>
                                         <select name="delivery[driver_name]" id="delivery_driver_name" class="form-select">
                                             <option value="">Select Driver</option>
                                             @foreach($drivers as $driver)
@@ -512,8 +509,8 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="bill_of_lading_number" class="form-label">Bill of Lading Number</label>
-                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ isset($transaction) ? $transaction->bill_of_lading_number : old('bill_of_lading_number') }}">
+                                    <label for="bill_of_lading_number" class="form-label required">Bill of Lading Number</label>
+                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ isset($transaction) ? $transaction->bill_of_lading_number : old('bill_of_lading_number') }}" required>
                                     @error('bill_of_lading_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -528,14 +525,14 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="charge_permit_number_field" style="display: none;">
-                                    <label for="charge_permit_number" class="form-label required">Charge Permit Number</label>
+                                    <label for="charge_permit_number" class="form-label">Charge Permit Number</label>
                                     <input type="text" name="charge_permit_number" id="charge_permit_number" class="form-control" value="{{ isset($transaction) ? $transaction->charge_permit_number : old('charge_permit_number') }}">
                                     @error('charge_permit_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_number_field" style="display: none;">
-                                    <label for="discharge_permit_number" class="form-label required">Discharge Permit Number</label>
+                                    <label for="discharge_permit_number" class="form-label">Discharge Permit Number</label>
                                     <input type="text" name="discharge_permit_number" id="discharge_permit_number" class="form-control" value="{{ isset($transaction) ? $transaction->discharge_permit_number : old('discharge_permit_number') }}">
                                     @error('discharge_permit_number')
                                     <div class="text-danger">{{ $message }}</div>
@@ -556,7 +553,9 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-md-6">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="inspection_form" class="form-label">Inspection Form</label>
                                     <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
@@ -564,9 +563,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <div class="col-12 col-md-6">
                                     <label for="customs_release_form" class="form-label">Customs Release Form</label>
                                     <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
@@ -574,8 +571,10 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
+                            </div>
+                            <div class="row mb-3">
                                 <div class="col-12 col-md-6" id="charge_permit_document_field" style="display: none;">
-                                    <label for="charge_permit_document" class="form-label required">Charge Permit Document</label>
+                                    <label for="charge_permit_document" class="form-label">Charge Permit Document</label>
                                     <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
                                     @error('charge_permit_document')
@@ -583,7 +582,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_document_field" style="display: none;">
-                                    <label for="discharge_permit_document" class="form-label required">Discharge Permit Document</label>
+                                    <label for="discharge_permit_document" class="form-label">Discharge Permit Document</label>
                                     <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
                                     @error('discharge_permit_document')
@@ -629,12 +628,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const companyLogo = document.getElementById('company-logo');
     const form = document.querySelector('form');
 
-    // Store tank data
     let sourceTankData = { current_level: 0, max_capacity: 0, free_space: 0 };
     let destinationTankData = { current_level: 0, max_capacity: 0, free_space: 0 };
-    let lastSourceTankId = null; // Track last selected source tank to prevent loop
+    let lastSourceTankId = null;
 
-    // Debounce function to limit API calls
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -647,25 +644,21 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    // Initialize form: hide all fields except type dropdown
     formFields.forEach(field => {
         if (!field.querySelector('#type')) {
             field.style.display = 'none';
         }
     });
 
-    // Transaction type change handler
     typeSelect.addEventListener('change', function() {
         const type = this.value;
 
-        // Hide all fields except type dropdown
         formFields.forEach(field => {
             if (!field.querySelector('#type')) {
                 field.style.display = 'none';
             }
         });
 
-        // Hide type-specific fields
         destinationTankField.style.display = 'none';
         chargePermitNumberField.style.display = 'none';
         dischargePermitNumberField.style.display = 'none';
@@ -684,11 +677,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         quantityInput.removeAttribute('max');
         document.getElementById('quantity-error').style.display = 'none';
-        lastSourceTankId = null; // Reset last source tank
+        lastSourceTankId = null;
 
-        // Reset required attributes to avoid form validation issues
         const fieldsToReset = [
-            'destination_tank_id', 'charge_permit_number', 'discharge_permit_number',
+            'destination_tank_id', 'work_order_number', 'customs_release_number',
+            'charge_permit_number', 'discharge_permit_number',
+            'measurement_report', 'inspection_form', 'customs_release_form',
             'charge_permit_document', 'discharge_permit_document',
             'shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number',
             'shipment_driver_name', 'shipment_berth_number',
@@ -700,17 +694,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (element) element.required = false;
         });
 
-        // Show relevant fields based on transaction type
+        document.getElementById('bill_of_lading_number').required = true;
+
         if (type) {
-            // Show common fields
             formFields.forEach(field => {
                 if (field.querySelector('#tank_id') || field.querySelector('#original_vessel_id') ||
                     field.querySelector('#company_name') || field.querySelector('#product_name') ||
                     field.querySelector('#quantity') || field.querySelector('#date') ||
                     field.querySelector('#work_order_number') || field.querySelector('#bill_of_lading_number') ||
                     field.querySelector('#customs_release_number') || field.querySelector('#engineer_id') ||
-                    field.querySelector('#technician_id') || field.querySelector('#measurement_report') ||
-                    field.querySelector('#inspection_form') || field.querySelector('#customs_release_form') ||
+                    field.querySelector('#technician_id') ||
+                    field.querySelector('#measurement_report') || field.querySelector('#inspection_form') ||
+                    field.querySelector('#customs_release_form') ||
                     field.tagName === 'DIV' && field.classList.contains('d-flex')) {
                     field.style.display = 'block';
                 }
@@ -723,34 +718,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 chargePermitDocumentField.style.display = 'block';
                 dischargePermitDocumentField.style.display = 'block';
                 document.getElementById('destination_tank_id').required = true;
-                document.getElementById('charge_permit_number').required = true;
-                document.getElementById('discharge_permit_number').required = true;
-                document.getElementById('charge_permit_document').required = true;
-                document.getElementById('discharge_permit_document').required = true;
             } else if (type === 'loading') {
                 chargePermitNumberField.style.display = 'block';
                 chargePermitDocumentField.style.display = 'block';
                 shipmentDetails.style.display = 'block';
-                document.getElementById('charge_permit_number').required = true;
-                document.getElementById('charge_permit_document').required = true;
             } else if (type === 'discharging') {
                 dischargePermitNumberField.style.display = 'block';
                 dischargePermitDocumentField.style.display = 'block';
                 deliveryDetails.style.display = 'block';
-                document.getElementById('discharge_permit_number').required = true;
-                document.getElementById('discharge_permit_document').required = true;
             }
 
-            // Fetch and populate tank dropdowns
             fetchAvailableTanks(type);
         }
     });
 
-    // Fetch available tanks based on transaction type
     const fetchAvailableTanks = debounce(function(type) {
         if (!type) return;
 
-        // Include source_tank_id for transfer transactions
         const sourceTankId = type === 'transfer' ? sourceTankSelect.value : '';
         const url = `/api/tanks/available?type=${type}${sourceTankId ? `&source_tank_id=${sourceTankId}` : ''}`;
 
@@ -786,7 +770,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
 
-                // Update tank info and quantity validation only if source tank is still selected
                 if (sourceTankId && sourceTankId === lastSourceTankId) {
                     fetchTankData(sourceTankId, true);
                 }
@@ -803,7 +786,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }, 300);
 
-    // Fetch product, company, and capacity when tank changes
     function fetchTankData(tankId, isSourceTank = true) {
         if (!tankId) {
             if (isSourceTank) {
@@ -818,23 +800,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 destinationTankData = { current_level: 0, max_capacity: 0, free_space: 0 };
             }
             updateQuantityValidation();
-            // Refresh destination tanks for transfer if source tank is cleared
             if (isSourceTank && typeSelect.value === 'transfer') {
                 fetchAvailableTanks('transfer');
             }
             return;
         }
 
-        // Update last source tank ID only if source tank changes
         if (isSourceTank) {
             if (tankId === lastSourceTankId) {
-                // Prevent recursive calls if tank hasn't changed
                 return;
             }
             lastSourceTankId = tankId;
         }
 
-        // Fetch tank capacity
         fetch(`/api/tanks/${tankId}/capacity`, {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -862,7 +840,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 updateQuantityValidation();
 
-                // Fetch destination tanks for transfer only if source tank changed
                 if (isSourceTank && type === 'transfer') {
                     fetchAvailableTanks('transfer');
                 }
@@ -879,7 +856,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateQuantityValidation();
             });
 
-        // Fetch product name
         fetch(`/api/tanks/${tankId}/product`, {
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -898,7 +874,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-        // Fetch company name and logo
         if (isSourceTank) {
             fetch(`/api/tanks/${tankId}/company`, {
                 headers: {
@@ -924,7 +899,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Update quantity validation
     function updateQuantityValidation() {
         const type = typeSelect.value;
         const quantityError = document.getElementById('quantity-error');
@@ -958,7 +932,6 @@ document.addEventListener('DOMContentLoaded', function() {
             quantityError.textContent = `Maximum quantity: ${maxQuantity.toFixed(2)} MT (limited by ${sourceMax <= destMax ? 'source current capacity' : 'destination free space'})`;
         }
 
-        // Validate current quantity input
         const currentQuantity = parseFloat(quantityInput.value) || 0;
         if (currentQuantity > maxQuantity && maxQuantity > 0) {
             quantityError.style.display = 'block';
@@ -970,7 +943,6 @@ document.addEventListener('DOMContentLoaded', function() {
         quantityInput.disabled = false;
     }
 
-    // Tank change handlers
     sourceTankSelect.addEventListener('change', function() {
         fetchTankData(this.value, true);
     });
@@ -981,10 +953,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Quantity input validation
     quantityInput.addEventListener('input', updateQuantityValidation);
 
-    // Prevent form submission if quantity is invalid
     form.addEventListener('submit', function(e) {
         const currentQuantity = parseFloat(quantityInput.value) || 0;
         const maxQuantity = parseFloat(quantityInput.getAttribute('max')) || Infinity;
@@ -1000,7 +970,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Toggle shipment fields
     function toggleShipmentFields() {
         const transportType = shipmentTransportType?.value || '';
         const vesselField = document.getElementById('shipment_vessel_id_field');
@@ -1030,7 +999,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Toggle delivery fields
     function toggleDeliveryFields() {
         const transportType = deliveryTransportType?.value || '';
         const vesselField = document.getElementById('delivery_vessel_id_field');
@@ -1056,7 +1024,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // File input validation
     const fileInputs = [
         'measurement_report', 'inspection_form', 'customs_release_form',
         'charge_permit_document', 'discharge_permit_document'
@@ -1068,7 +1035,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const file = this.files[0];
                 if (file) {
                     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-                    const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+                    const maxSize = 2 * 1024 * 1024; // 2MB
                     if (!validTypes.includes(file.type)) {
                         alert('Invalid file type. Only PDF, JPG, and PNG are accepted.');
                         this.value = '';
@@ -1081,7 +1048,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Attach change event listeners for shipment and delivery transport types
     if (shipmentTransportType) {
         shipmentTransportType.addEventListener('change', toggleShipmentFields);
     }
@@ -1089,11 +1055,9 @@ document.addEventListener('DOMContentLoaded', function() {
         deliveryTransportType.addEventListener('change', toggleDeliveryFields);
     }
 
-    // Initialize shipment and delivery fields
     toggleShipmentFields();
     toggleDeliveryFields();
 
-    // Initialize form state based on old input or transaction data
     if (typeSelect.value) {
         typeSelect.dispatchEvent(new Event('change'));
     }
@@ -1110,7 +1074,6 @@ document.addEventListener('DOMContentLoaded', function() {
         deliveryTransportType.dispatchEvent(new Event('change'));
     }
 
-    // Inject CSRF token meta tag if it doesn't exist
     let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     if (!csrfTokenMeta) {
         csrfTokenMeta = document.createElement('meta');

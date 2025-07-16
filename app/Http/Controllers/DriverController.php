@@ -49,7 +49,7 @@ class DriverController extends Controller
     {
         $this->authorize('create', \App\Models\Driver::class);
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:drivers,name',
         ]);
 
         try {
@@ -71,7 +71,7 @@ class DriverController extends Controller
     {
         $this->authorize('update', \App\Models\Driver::class);
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:drivers,name,' . $id,
         ]);
 
         try {

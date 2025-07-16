@@ -51,9 +51,9 @@ Route::group(
         Route::resource('trucks', TruckController::class);
         Route::resource('trailers', TrailerController::class);
         Route::resource('drivers', DriverController::class);
-        Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('users', UserController::class)->middleware('restrict.to.role:super_admin,ceo')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
-        Route::prefix('clients')->group(function () {
+        Route::prefix('clients')->middleware('restrict.to.role:super_admin,ceo')->group(function () {
             Route::get('/', [UserController::class, 'clientIndex'])->name('clients.index');
             Route::get('/create', [UserController::class, 'clientCreate'])->name('clients.create');
             Route::post('/', [UserController::class, 'clientStore'])->name('clients.store');
@@ -71,6 +71,7 @@ Route::group(
             Route::post('/', [TransactionController::class, 'store'])->name('transactions.store');
             Route::get('/{id}', [TransactionController::class, 'showDetails'])->name('transactions.show');
             Route::get('/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate');
+            Route::delete('/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
         });
 
         // Profile Management

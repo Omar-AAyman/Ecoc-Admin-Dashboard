@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container text-center mt-5">
-        <h1>Welcome to {{ config('app.name', 'Ecoc Dashboard') }}</h1>
+        <h1>Welcome to {{ config('app.name', 'ECOC Dashboard') }}</h1>
         @if (auth()->check())
             <p>Hello, {{ auth()->user()->first_name }}! <a href="{{ route('dashboard') }}">Go to Dashboard</a></p>
         @else

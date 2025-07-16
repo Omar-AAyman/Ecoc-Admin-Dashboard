@@ -30,10 +30,22 @@ class TankService
                 ->get();
         } elseif ($user->isClient()) {
             if ($user->company_id && Tank::where('company_id', $user->company_id)->exists()) {
-                $tanks = Tank::with(['product', 'company', 'tankRentals', 'transactions', 'destinationTransactions'])
-                    ->where('company_id', $user->company_id)
-                    ->orderBy('id', 'asc')
-                    ->get();
+                $tanks = Tank::with([
+                    'product',
+                    'company',
+                    'tankRentals' => function ($query) use ($user) {
+                        $query->where('company_id', $user->company_id);
+                    },
+                    'transactions' => function ($query) use ($user) {
+                        $query->where('company_id', $user->company_id);
+                    },
+                    'destinationTransactions' => function ($query) use ($user) {
+                        $query->where('company_id', $user->company_id);
+                    }
+                ])
+                ->where('company_id', $user->company_id)
+                ->orderBy('id', 'asc')
+                ->get();
             } else {
                 Log::warning('No company assigned or no tanks for client: ' . $user->email);
             }
@@ -45,7 +57,7 @@ class TankService
             Log::warning('Empty tanks collection for user: ' . $user->email);
         }
 
-        return $tanks->map(function ($tank) {
+        return $tanks->map(function ($tank) use ($user) {
             $maxCapacity = $tank->product && $tank->product->density ? $tank->cubic_meter_capacity * $tank->product->density : $tank->cubic_meter_capacity;
             $currentLevel = $tank->current_level ?? 0;
             $capacityUtilization = $maxCapacity > 0 ? min(($currentLevel / $maxCapacity) * 100, 100) : 0;
@@ -61,8 +73,40 @@ class TankService
                 ];
             })->values();
 
-            // Format transactions, splitting transfers
-            $transactions = $tank->transactions->merge($tank->destinationTransactions)->map(function ($transaction) use ($tank) {
+            // Get the most recent active rental to determine the client
+            $activeRental = $tank->tankRentals->whereNull('end_date')->sortByDesc('start_date')->first();
+            $client = $activeRental ? $activeRental->company->users()->where('role_id', function ($query) {
+                $query->select('id')->from('roles')->where('name', 'client')->first()->id ?? null;
+            })->first() : null;
+            $clientImage = $client ? $client->image_url : 'N/A'; // Using the accessor from User model
+
+            // Format transactions, splitting transfers and applying date filter for clients
+            $transactions = $tank->transactions->merge($tank->destinationTransactions);
+            if ($user->isClient()) {
+                // Get tank IDs from rentals for the user's company
+                $rentedTankIds = TankRental::where('company_id', $user->company_id)
+                    ->pluck('tank_id')
+                    ->unique();
+
+                // Filter transactions to those after the start_date of any active rental
+                $transactions = $transactions->filter(function ($transaction) use ($tank, $user, $rentedTankIds) {
+                    if (!$rentedTankIds->contains($tank->id)) {
+                        return false;
+                    }
+                    $activeRentals = TankRental::where('tank_id', $tank->id)
+                        ->where('company_id', $user->company_id)
+                        ->whereNull('end_date')
+                        ->get();
+                    if ($activeRentals->isEmpty()) {
+                        return false;
+                    }
+                    return $activeRentals->contains(function ($rental) use ($transaction) {
+                        return $transaction->date && $transaction->date->gt($rental->start_date);
+                    });
+                });
+            }
+
+            $transactions = $transactions->map(function ($transaction) use ($tank) {
                 $type = $transaction->type;
                 if ($type === 'transfer') {
                     $type = $tank->id === $transaction->tank_id ? 'discharge (transfer)' : 'load (transfer)';
@@ -94,6 +138,11 @@ class TankService
                 'maxCapacity' => number_format($maxCapacity, 2, '.', ''),
                 'company' => $tank->company ? $tank->company->name : 'N/A',
                 'capacityUtilization' => number_format($capacityUtilization, 0) . '%',
+                'temperatureCelsius' => $tank->temperature !== null ? number_format($tank->temperature, 2) : 'N/A',
+                'temperatureFahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) : 'N/A',
+                'clientImage' => $clientImage, // New: Client's image URL
+                'companyName' => $tank->company ? $tank->company->name : 'N/A', // New: Explicit company name
+                'product' => $tank->product ? $tank->product->name : 'N/A', // New: Explicit product name
                 'liquidColor' => match ($tank->product_id % 10) {
                     1 => ['#ef4444', '#b91c1c'],
                     2 => ['#4ade80', '#16a34a'],
@@ -166,6 +215,13 @@ class TankService
                 }
             }
 
+            // Validate temperature
+            if (isset($data['temperature']) && $data['temperature'] !== null) {
+                if (!is_numeric($data['temperature']) || $data['temperature'] < -50 || $data['temperature'] > 100) {
+                    throw new \Exception("Temperature must be a number between -50°C and 100°C.");
+                }
+            }
+
             // Set status based on company_id or product_id
             $data['status'] = (isset($data['company_id']) && $data['company_id']) || (isset($data['product_id']) && $data['product_id']) ? 'In Use' : 'Available';
             $tank = Tank::create($data);
@@ -200,6 +256,17 @@ class TankService
                 );
             }
 
+            if (isset($data['temperature']) && $data['temperature'] !== null) {
+                $this->activityLogService->logActivity(
+                    $user,
+                    'tank.temperature_updated',
+                    "Set initial temperature for tank {$tank->number} to {$data['temperature']}°C",
+                    $tank,
+                    [],
+                    ['temperature' => $data['temperature']]
+                );
+            }
+
             return $tank;
         });
     }
@@ -219,6 +286,13 @@ class TankService
                 $maxCapacity = $cubicMeterCapacity * $product->density;
                 if ($data['current_level'] > $maxCapacity) {
                     throw new \Exception("Current capacity ({$data['current_level']} mt) exceeds max capacity ($maxCapacity mt) for the selected product.");
+                }
+            }
+
+            // Validate temperature
+            if (isset($data['temperature']) && $data['temperature'] !== null) {
+                if (!is_numeric($data['temperature']) || $data['temperature'] < -50 || $data['temperature'] > 100) {
+                    throw new \Exception("Temperature must be a number between -50°C and 100°C.");
                 }
             }
 
@@ -299,6 +373,31 @@ class TankService
                 );
             }
 
+            if (isset($data['temperature']) && $data['temperature'] != ($oldData['temperature'] ?? null)) {
+                $this->activityLogService->logActivity(
+                    $user,
+                    'tank.temperature_updated',
+                    "Manually updated temperature for tank {$tank->number} from " . ($oldData['temperature'] ?? 'N/A') . "°C to {$data['temperature']}°C by user {$user->full_name} (ID: {$user->id}) at " . Carbon::now()->toDateTimeString(),
+                    $tank,
+                    [
+                        'temperature' => $oldData['temperature'] ?? null,
+                        'updated_at' => Carbon::now()->toDateTimeString(),
+                        'updated_by' => [
+                            'user_id' => $user->id,
+                            'username' => $user->full_name
+                        ]
+                    ],
+                    [
+                        'temperature' => $data['temperature'],
+                        'updated_at' => Carbon::now()->toDateTimeString(),
+                        'updated_by' => [
+                            'user_id' => $user->id,
+                            'username' => $user->full_name
+                        ]
+                    ]
+                );
+            }
+
             return $tank;
         });
     }
@@ -329,13 +428,14 @@ class TankService
                 'company_id' => null,
                 'product_id' => null,
                 'current_level' => 0,
+                'temperature' => null,
                 'status' => 'Available',
             ];
             $tank->update($newData);
             $this->activityLogService->logActivity(
                 $user,
                 'tank.reset',
-                "Reset tank {$tank->number} (company, product, status, and current capacity)",
+                "Reset tank {$tank->number} (company, product, status, current capacity, and temperature)",
                 $tank,
                 $oldData,
                 $newData
@@ -419,33 +519,82 @@ class TankService
             $months[] = $month->format('M Y');
 
             // Fetch tanks with rentals or transactions in the month
-            $monthlyTanks = Tank::with(['product', 'tankRentals', 'transactions', 'destinationTransactions'])
-                ->where(function ($query) use ($month) {
-                    $query->whereHas('tankRentals', function ($q) use ($month) {
-                        $q->where('start_date', '<=', $month->endOfMonth())
+            $monthlyTanks = Tank::with([
+                'product',
+                'tankRentals' => function ($query) use ($month, $user) {
+                    $query->where('start_date', '<=', $month->endOfMonth())
                           ->where(function ($q) use ($month) {
                               $q->where('end_date', '>=', $month->startOfMonth())
                                 ->orWhereNull('end_date');
                           });
-                    })
-                    ->orWhereHas('transactions', function ($q) use ($month) {
-                        $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
-                    })
-                    ->orWhereHas('destinationTransactions', function ($q) use ($month) {
-                        $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
-                    });
+                    if ($user->isClient()) {
+                        $query->where('company_id', $user->company_id);
+                    }
+                },
+                'transactions' => function ($query) use ($month, $user) {
+                    $query->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    if ($user->isClient()) {
+                        $query->where('company_id', $user->company_id);
+                    }
+                },
+                'destinationTransactions' => function ($query) use ($month, $user) {
+                    $query->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    if ($user->isClient()) {
+                        $query->where('company_id', $user->company_id);
+                    }
+                }
+            ])
+            ->where(function ($query) use ($month, $user) {
+                $query->whereHas('tankRentals', function ($q) use ($month, $user) {
+                    $q->where('start_date', '<=', $month->endOfMonth())
+                      ->where(function ($q) use ($month) {
+                          $q->where('end_date', '>=', $month->startOfMonth())
+                            ->orWhereNull('end_date');
+                      });
+                    if ($user->isClient()) {
+                        $q->where('company_id', $user->company_id);
+                    }
                 })
-                ->get();
+                ->orWhereHas('transactions', function ($q) use ($month, $user) {
+                    $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    if ($user->isClient()) {
+                        $q->where('company_id', $user->company_id);
+                    }
+                })
+                ->orWhereHas('destinationTransactions', function ($q) use ($month, $user) {
+                    $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                    if ($user->isClient()) {
+                        $q->where('company_id', $user->company_id);
+                    }
+                });
+                if ($user->isClient()) {
+                    $query->where('company_id', $user->company_id);
+                }
+            })
+            ->get();
 
             // Calculate average utilization for tanks with activity in the month
-            $totalUtilization = $monthlyTanks->avg(function ($tank) use ($month) {
+            $totalUtilization = $monthlyTanks->avg(function ($tank) use ($month, $user) {
                 $maxCapacity = $tank->product && $tank->product->density ? $tank->cubic_meter_capacity * $tank->product->density : $tank->cubic_meter_capacity;
                 $currentLevel = 0;
 
                 // Estimate utilization based on transactions in the month
                 $transactions = $tank->transactions->merge($tank->destinationTransactions)
-                    ->filter(function ($transaction) use ($month) {
-                        return Carbon::parse($transaction->date)->between($month->startOfMonth(), $month->endOfMonth());
+                    ->filter(function ($transaction) use ($month, $user, $tank) {
+                        $isValid = Carbon::parse($transaction->date)->between($month->startOfMonth(), $month->endOfMonth());
+                        if ($user->isClient()) {
+                            $activeRentals = TankRental::where('tank_id', $tank->id)
+                                ->where('company_id', $user->company_id)
+                                ->whereNull('end_date')
+                                ->get();
+                            if ($activeRentals->isEmpty()) {
+                                return false;
+                            }
+                            $isValid = $isValid && $activeRentals->contains(function ($rental) use ($transaction) {
+                                return $transaction->date && $transaction->date->gt($rental->start_date);
+                            });
+                        }
+                        return $isValid;
                     });
 
                 foreach ($transactions as $transaction) {
@@ -465,9 +614,12 @@ class TankService
 
             // Count rentals active in the month
             $monthlyRentals = TankRental::where('start_date', '<=', $month->endOfMonth())
-                ->where(function ($q) use ($month) {
+                ->where(function ($q) use ($month, $user) {
                     $q->where('end_date', '>=', $month->startOfMonth())
                       ->orWhereNull('end_date');
+                    if ($user->isClient()) {
+                        $q->where('company_id', $user->company_id);
+                    }
                 })->count();
             $rentalsData[] = $monthlyRentals;
         }

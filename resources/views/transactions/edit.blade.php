@@ -319,7 +319,7 @@
                             <h4 class="section-header">Shipment Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="shipment_transport_type" class="form-label required">Transport Type</label>
+                                    <label for="shipment_transport_type" class="form-label">Transport Type</label>
                                     <select name="shipment[transport_type]" id="shipment_transport_type" class="form-select">
                                         <option value="">Select Transport Type</option>
                                         <option value="vessel" {{ $transaction->shipment && $transaction->shipment->transport_type == 'vessel' ? 'selected' : '' }}>Vessel</option>
@@ -330,7 +330,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="shipment_vessel_id_field" style="display: none;">
-                                    <label for="shipment_vessel_id" class="form-label required">Vessel</label>
+                                    <label for="shipment_vessel_id" class="form-label">Vessel</label>
                                     <select name="shipment[vessel_id]" id="shipment_vessel_id" class="form-select">
                                         <option value="">Select Vessel</option>
                                         @foreach($vessels as $vessel)
@@ -345,7 +345,7 @@
                             <div id="shipment_truck_fields" class="form-field" style="display: none;">
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="shipment_truck_number" class="form-label required">Truck</label>
+                                        <label for="shipment_truck_number" class="form-label">Truck</label>
                                         <select name="shipment[truck_number]" id="shipment_truck_number" class="form-select">
                                             <option value="">Select Truck</option>
                                             @foreach($trucks as $truck)
@@ -357,7 +357,7 @@
                                         @enderror
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label for="shipment_trailer_number" class="form-label required">Trailer</label>
+                                        <label for="shipment_trailer_number" class="form-label">Trailer</label>
                                         <select name="shipment[trailer_number]" id="shipment_trailer_number" class="form-select">
                                             <option value="">Select Trailer</option>
                                             @foreach($trailers as $trailer)
@@ -371,7 +371,7 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6">
-                                        <label for="shipment_driver_name" class="form-label required">Driver</label>
+                                        <label for="shipment_driver_name" class="form-label">Driver</label>
                                         <select name="shipment[driver_name]" id="shipment_driver_name" class="form-select">
                                             <option value="">Select Driver</option>
                                             @foreach($drivers as $driver)
@@ -386,7 +386,7 @@
                             </div>
                             <div class="row mb-3" id="shipment_berth_number_field" style="display: none;">
                                 <div class="col-12 col-md-6">
-                                    <label for="shipment_berth_number" class="form-label required">Berth Number</label>
+                                    <label for="shipment_berth_number" class="form-label">Berth Number</label>
                                     <input type="text" name="shipment[berth_number]" id="shipment_berth_number" class="form-control" value="{{ $transaction->shipment ? $transaction->shipment->berth_number : '' }}">
                                     @error('shipment.berth_number')
                                     <div class="text-danger">{{ $message }}</div>
@@ -400,7 +400,7 @@
                             <h4 class="section-header">Delivery Details</h4>
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                    <label for="delivery_transport_type" class="form-label required">Transport Type</label>
+                                    <label for="delivery_transport_type" class="form-label">Transport Type</label>
                                     <select name="delivery[transport_type]" id="delivery_transport_type" class="form-select">
                                         <option value="">Select Transport Type</option>
                                         <option value="vessel" {{ $transaction->delivery && $transaction->delivery->transport_type == 'vessel' ? 'selected' : '' }}>Vessel</option>
@@ -411,7 +411,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="delivery_vessel_id_field" style="display: none;">
-                                    <label for="delivery_vessel_id" class="form-label required">Vessel</label>
+                                    <label for="delivery_vessel_id" class="form-label">Vessel</label>
                                     <select name="delivery[vessel_id]" id="delivery_vessel_id" class="form-select">
                                         <option value="">Select Vessel</option>
                                         @foreach($vessels as $vessel)
@@ -426,7 +426,7 @@
                             <div id="delivery_truck_fields" class="form-field" style="display: none;">
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6 mb-3 mb-md-0">
-                                        <label for="delivery_truck_number" class="form-label required">Truck</label>
+                                        <label for="delivery_truck_number" class="form-label">Truck</label>
                                         <select name="delivery[truck_number]" id="delivery_truck_number" class="form-select">
                                             <option value="">Select Truck</option>
                                             @foreach($trucks as $truck)
@@ -438,9 +438,9 @@
                                         @enderror
                                     </div>
                                     <div class="col-12 col-md-6">
-                                        <label for="delivery_trailer_number" class="form-label required">Trailer</label>
+                                        <label for="delivery_trailer_number" class="form-label">Trailer</label>
                                         <select name="delivery[trailer_number]" id="delivery_trailer_number" class="form-select">
-                                            <option value="">Select Tank</option>
+                                            <option value="">Select Trailer</option>
                                             @foreach($trailers as $trailer)
                                             <option value="{{ $trailer->trailer_number }}" {{ $transaction->delivery && $transaction->delivery->trailer_number == $trailer->trailer_number ? 'selected' : '' }}>{{ $trailer->trailer_number }}</option>
                                             @endforeach
@@ -452,7 +452,7 @@
                                 </div>
                                 <div class="row mb-3">
                                     <div class="col-12 col-md-6">
-                                        <label for="delivery_driver_name" class="form-label required">Driver</label>
+                                        <label for="delivery_driver_name" class="form-label">Driver</label>
                                         <select name="delivery[driver_name]" id="delivery_driver_name" class="form-select">
                                             <option value="">Select Driver</option>
                                             @foreach($drivers as $driver)
@@ -510,8 +510,8 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    <label for="bill_of_lading_number" class="form-label">Bill of Lading Number</label>
-                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ $transaction->bill_of_lading_number }}">
+                                    <label for="bill_of_lading_number" class="form-label required">Bill of Lading Number</label>
+                                    <input type="text" name="bill_of_lading_number" id="bill_of_lading_number" class="form-control" value="{{ $transaction->bill_of_lading_number }}" required>
                                     @error('bill_of_lading_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -526,14 +526,14 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="charge_permit_number_field" style="display: none;">
-                                    <label for="charge_permit_number" class="form-label required">Charge Permit Number</label>
+                                    <label for="charge_permit_number" class="form-label">Charge Permit Number</label>
                                     <input type="text" name="charge_permit_number" id="charge_permit_number" class="form-control" value="{{ $transaction->charge_permit_number }}">
                                     @error('charge_permit_number')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_number_field" style="display: none;">
-                                    <label for="discharge_permit_number" class="form-label required">Discharge Permit Number</label>
+                                    <label for="discharge_permit_number" class="form-label">Discharge Permit Number</label>
                                     <input type="text" name="discharge_permit_number" id="discharge_permit_number" class="form-control" value="{{ $transaction->discharge_permit_number }}">
                                     @error('discharge_permit_number')
                                     <div class="text-danger">{{ $message }}</div>
@@ -557,7 +557,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                                <div class="col-12 col-md-6">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="inspection_form" class="form-label">Inspection Form</label>
                                     <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
@@ -568,9 +568,7 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <div class="col-12 col-md-6">
                                     <label for="customs_release_form" class="form-label">Customs Release Form</label>
                                     <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
@@ -581,8 +579,10 @@
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
+                            </div>
+                            <div class="row mb-3">
                                 <div class="col-12 col-md-6" id="charge_permit_document_field" style="display: none;">
-                                    <label for="charge_permit_document" class="form-label required">Charge Permit Document</label>
+                                    <label for="charge_permit_document" class="form-label">Charge Permit Document</label>
                                     <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
                                     @if($transaction->documents->where('type', 'charge_permit_document')->first())
@@ -593,7 +593,7 @@
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_document_field" style="display: none;">
-                                    <label for="discharge_permit_document" class="form-label required">Discharge Permit Document</label>
+                                    <label for="discharge_permit_document" class="form-label">Discharge Permit Document</label>
                                     <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
                                     <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
                                     @if($transaction->documents->where('type', 'discharge_permit_document')->first())
@@ -707,7 +707,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const fieldsToReset = [
             'destination_tank_id', 'charge_permit_number', 'discharge_permit_number',
-            'charge_permit_document', 'discharge_permit_document',
+            'charge_permit_document', 'discharge_permit_document', 'measurement_report',
+            'inspection_form', 'customs_release_form',
             'shipment_vessel_id', 'shipment_truck_number', 'shipment_trailer_number',
             'shipment_driver_name', 'shipment_berth_number',
             'delivery_vessel_id', 'delivery_truck_number', 'delivery_trailer_number',
@@ -718,6 +719,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (element) element.required = false;
         });
 
+        // Keep bill_of_lading_number and bill_of_lading_document required
+        document.getElementById('bill_of_lading_number').required = true;
+
         if (type) {
             formFields.forEach(field => {
                 if (field.querySelector('#tank_id') || field.querySelector('#original_vessel_id') ||
@@ -725,8 +729,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     field.querySelector('#quantity') || field.querySelector('#date') ||
                     field.querySelector('#work_order_number') || field.querySelector('#bill_of_lading_number') ||
                     field.querySelector('#customs_release_number') || field.querySelector('#engineer_id') ||
-                    field.querySelector('#technician_id') || field.querySelector('#measurement_report') ||
-                    field.querySelector('#inspection_form') || field.querySelector('#customs_release_form') ||
+                    field.querySelector('#technician_id') ||
+                    field.querySelector('#measurement_report') || field.querySelector('#inspection_form') ||
+                    field.querySelector('#customs_release_form') ||
                     field.tagName === 'DIV' && field.classList.contains('d-flex')) {
                     field.style.display = 'block';
                 }
@@ -739,22 +744,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 chargePermitDocumentField.style.display = 'block';
                 dischargePermitDocumentField.style.display = 'block';
                 document.getElementById('destination_tank_id').required = true;
-                document.getElementById('charge_permit_number').required = true;
-                document.getElementById('discharge_permit_number').required = true;
-                document.getElementById('charge_permit_document').required = false;
-                document.getElementById('discharge_permit_document').required = false;
             } else if (type === 'loading') {
                 chargePermitNumberField.style.display = 'block';
                 chargePermitDocumentField.style.display = 'block';
                 shipmentDetails.style.display = 'block';
-                document.getElementById('charge_permit_number').required = true;
-                document.getElementById('charge_permit_document').required = false;
             } else if (type === 'discharging') {
                 dischargePermitNumberField.style.display = 'block';
                 dischargePermitDocumentField.style.display = 'block';
                 deliveryDetails.style.display = 'block';
-                document.getElementById('discharge_permit_number').required = true;
-                document.getElementById('discharge_permit_document').required = false;
             }
 
             fetchAvailableTanks(type);
@@ -801,13 +798,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
 
-                // Update the select elements' values to reflect the selected options
                 sourceTankSelect.value = initialSourceTankId;
                 if (type === 'transfer' && destinationTankSelect) {
                     destinationTankSelect.value = initialDestinationTankId || '';
                 }
 
-                // Fetch tank data for selected tanks
                 if (sourceTankSelect.value) {
                     fetchTankData(sourceTankSelect.value, true);
                 }
@@ -821,7 +816,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (destinationTankSelect) {
                     destinationTankSelect.innerHTML = '<option value="">Select Tank</option>';
                 }
-                // Restore initial selections on error
                 sourceTankSelect.value = initialSourceTankId;
                 if (destinationTankSelect) {
                     destinationTankSelect.value = initialDestinationTankId || '';
@@ -958,7 +952,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Calculate effective tank levels after reversing original transaction
         let effectiveSourceLevel = sourceTankData.current_level;
         let effectiveSourceFreeSpace = sourceTankData.free_space;
         let effectiveDestinationLevel = destinationTankData.current_level;
@@ -1040,7 +1033,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         quantityInput.disabled = false;
 
-        // Validate final tank state
         if (type === 'loading' && currentQuantity > 0) {
             if (effectiveSourceLevel + currentQuantity > sourceTankData.max_capacity) {
                 quantityError.textContent = 'Quantity would exceed source tank capacity';

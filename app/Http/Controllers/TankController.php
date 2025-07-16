@@ -54,8 +54,10 @@ class TankController extends Controller
     // {
     //     $this->authorize('create', Tank::class);
     //     $validated = $request->validate([
+    //         'number' => 'required|string|unique:tanks|max:255',
     //         'cubic_meter_capacity' => 'required|numeric|min:0',
     //         'current_level' => 'required|numeric|min:0',
+    //         'temperature' => 'nullable|numeric|min:-50|max:100',
     //         'product_id' => 'nullable|exists:products,id',
     //         'company_id' => 'nullable|exists:companies,id',
     //     ]);
@@ -81,7 +83,9 @@ class TankController extends Controller
     {
         $this->authorize('update', Tank::class);
         $validated = $request->validate([
+            'cubic_meter_capacity' => 'required|numeric|min:0',
             'current_level' => 'required|numeric|min:0',
+            'temperature' => 'nullable|numeric|min:-50|max:100',
             'product_id' => 'nullable|exists:products,id',
             'company_id' => 'nullable|exists:companies,id',
         ]);
@@ -133,6 +137,8 @@ class TankController extends Controller
         $tank = $this->tankService->getTank($id);
         return response()->json([
             'current_level' => $tank->current_level,
+            'temperature' => $tank->temperature !== null ? number_format($tank->temperature, 2) : null,
+            'temperature_fahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) : null,
             'max_capacity' => $tank->maxCapacity()
         ]);
     }
@@ -171,6 +177,8 @@ class TankController extends Controller
             'id' => $tank->number,
             'maxCapacity' => number_format($tank->maxCapacity(), 1) . ' mt',
             'currentLevel' => number_format($tank->current_level ?? 0, 1) . ' mt',
+            'temperatureCelsius' => $tank->temperature !== null ? number_format($tank->temperature, 2) . '°C' : 'N/A',
+            'temperatureFahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) . '°F' : 'N/A',
             'capacityUtilization' => $tank->cubic_meter_capacity > 0 && $tank->product && $tank->product->density ?
                 number_format(($tank->current_level / ($tank->cubic_meter_capacity * $tank->product->density)) * 100, 0) . '%' : ($tank->cubic_meter_capacity > 0 ? number_format(($tank->current_level / $tank->cubic_meter_capacity) * 100, 0) . '%' : '0%'),
             'rentals' => $rentals,
@@ -197,6 +205,8 @@ class TankController extends Controller
                     'id' => $tank->id,
                     'number' => $tank->number,
                     'current_level' => $tank->current_level,
+                    'temperature' => $tank->temperature !== null ? number_format($tank->temperature, 2) : null,
+                    'temperature_fahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) : null,
                     'max_capacity' => $tank->maxCapacity()
                 ];
             });
@@ -228,6 +238,8 @@ class TankController extends Controller
                         'id' => $tank->id,
                         'number' => $tank->number,
                         'current_level' => $tank->current_level,
+                        'temperature' => $tank->temperature !== null ? number_format($tank->temperature, 2) : null,
+                        'temperature_fahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) : null,
                         'max_capacity' => $tank->maxCapacity()
                     ];
                 });

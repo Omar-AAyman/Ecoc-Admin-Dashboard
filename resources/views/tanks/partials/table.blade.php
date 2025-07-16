@@ -6,33 +6,38 @@
     <td>{{ $tank->current_level }}</td>
     <td>
         @if ($tank->maxCapacity() > 0)
-            {{ number_format(($tank->current_level / $tank->maxCapacity()) * 100, 2) }}%
+        {{ number_format(($tank->current_level / $tank->maxCapacity()) * 100, 2) }}%
         @else
-            0%
+        0%
         @endif
     </td>
     <td>
-        <span class="status-flag status-{{ $tank->status }}"></span>
+        @if (in_array($tank->status, ['in_use', 'available']))
+        <span class="status-badge status-{{ $tank->status }}">{{ ucfirst(str_replace('_', ' ', $tank->status)) }}</span>
+        @else
         {{ ucfirst(str_replace('_', ' ', $tank->status)) }}
+        @endif
     </td>
     <td>
         @if ($tank->product)
-            <span class="product-tooltip" data-tooltip="Density: {{ $tank->product->density }} g/cm³">
-                {{ $tank->product->name }}
-            </span>
+        <span class="product-tooltip" data-tooltip="Density: {{ $tank->product->density }} g/cm³">
+            {{ $tank->product->name }}
+        </span>
         @else
-            None
+        None
         @endif
     </td>
     <td>
         @if ($tank->company && null !== $tank->company->users->first())
-            <a href="{{ route('clients.show', $tank->company->users->first()->id) }}">
-                {{ $tank->company->name }}
-            </a>
+        <a href="{{ route('clients.show', $tank->company->users->first()->id) }}">
+            {{ $tank->company->name }}
+        </a>
         @else
-            None
+        None
         @endif
     </td>
+    <td>{{ $tank->temperature !== null ? number_format($tank->temperature, 2) . '°C' : 'N/A' }}</td>
+    <td>{{ $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) . '°F' : 'N/A' }}</td>
     <td>
         <div class="d-flex gap-1 justify-content-start">
             <a href="{{ route('tanks.edit', $tank->id) }}" class="btn btn-sm btn-primary" title="Edit">
