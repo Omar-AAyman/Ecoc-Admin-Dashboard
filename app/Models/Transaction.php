@@ -76,6 +76,6 @@ class Transaction extends Model
     }
     public function documents()
     {
-        return $this->hasMany(TransactionDocument::class);
+        return $this->hasMany(TransactionDocument::class, 'transaction_id');
     }
 }

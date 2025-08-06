@@ -127,6 +127,17 @@
         border-top: none;
     }
 
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .remaining-days {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
     @media (max-width: 768px) {
         .hero-header h2 {
             font-size: 1.75rem;
@@ -139,6 +150,10 @@
         .btn {
             padding: 0.4rem 0.8rem;
             font-size: 0.875rem;
+        }
+
+        .remaining-days {
+            font-size: 0.75rem;
         }
     }
 </style>
@@ -188,10 +203,20 @@
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
+                        <div class="mb-3" id="contract-duration-group" style="display: {{ $tank->company_id ? 'block' : 'none' }};">
+                            <label for="contract_duration" class="form-label">
+                                Contract Duration (months)
+                                <span id="remaining-days" class="remaining-days"></span>
+                            </label>
+                            <input type="number" name="contract_duration" id="contract_duration" class="form-control" value="{{ old('contract_duration', $activeRental ? $activeRental->contract_duration : '') }}" step="1" min="0">
+                            @error('contract_duration')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
                         <div class="mb-3">
                             <label for="product_id" class="form-label">Product</label>
-                            <option value="" {{ old('product_id', $tank->product_id) ? '' : 'selected' }}>None</option>
                             <select name="product_id" id="product_id" class="form-select">
+                                <option value="" {{ old('product_id', $tank->product_id) ? '' : 'selected' }}>None</option>
                                 @foreach ($products as $product)
                                 <option value="{{ $product->id }}" {{ old('product_id', $tank->product_id) == $product->id ? 'selected' : '' }}>{{ $product->name }}</option>
                                 @endforeach
@@ -238,7 +263,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Setting the current capacity or temperature manually is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
+                Setting the current capacity, temperature, or contract duration manually is a critical action that will be logged for auditing and may affect tank transactions. Are you sure you want to proceed?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -260,16 +285,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const productSelect = document.getElementById('product_id');
+    const companySelect = document.getElementById('company_id');
     const cubicMeterCapacityInput = document.getElementById('cubic_meter_capacity');
     const maxCapacityInput = document.getElementById('max_capacity');
     const maxCapacityGroup = document.getElementById('max-capacity-group');
     const currentLevelGroup = document.getElementById('current-level-group');
     const temperatureGroup = document.getElementById('temperature-group');
+    const contractDurationGroup = document.getElementById('contract-duration-group');
     const currentLevelInput = document.getElementById('current_level');
     const temperatureInput = document.getElementById('temperature');
+    const contractDurationInput = document.getElementById('contract_duration');
+    const remainingDaysSpan = document.getElementById('remaining-days');
     const form = document.getElementById('edit-tank-form');
     const confirmModal = new bootstrap.Modal(document.getElementById('confirmLevelModal'));
     const confirmSubmit = document.getElementById('confirmSubmit');
+
+    // Initial data from Blade
+    const activeRental = @json($activeRental ? ['start_date' => $activeRental->start_date->toDateTimeString(), 'contract_duration' => $activeRental->contract_duration] : null);
 
     function updateMaxCapacity() {
         const productId = productSelect.value;
@@ -303,16 +335,52 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function updateContractDurationVisibility() {
+        const companyId = companySelect.value;
+        contractDurationGroup.style.display = companyId ? 'block' : 'none';
+        updateRemainingDays();
+    }
+
+    function updateRemainingDays() {
+        const contractDuration = parseInt(contractDurationInput.value) || 0;
+        let remainingDaysText = '';
+
+        if (activeRental && activeRental.start_date && contractDuration > 0) {
+            const startDate = new Date(activeRental.start_date);
+            const endDate = new Date(startDate);
+            endDate.setMonth(endDate.getMonth() + contractDuration);
+            const today = new Date();
+            const diffTime = endDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 0) {
+                remainingDaysText = `(${diffDays} days remaining)`;
+            } else if (diffDays === 0) {
+                remainingDaysText = '(expires today)';
+            } else {
+                remainingDaysText = '(expired)';
+            }
+        } else {
+            remainingDaysText = contractDuration > 0 ? `(${contractDuration * 30} days total)` : '';
+        }
+
+        remainingDaysSpan.textContent = remainingDaysText;
+    }
+
     productSelect.addEventListener('change', updateMaxCapacity);
     cubicMeterCapacityInput.addEventListener('input', updateMaxCapacity);
+    companySelect.addEventListener('change', updateContractDurationVisibility);
+    contractDurationInput.addEventListener('input', updateRemainingDays);
 
     // Initialize on page load
     updateMaxCapacity();
+    updateContractDurationVisibility();
 
     form.addEventListener('submit', function(event) {
         const currentLevel = parseFloat(currentLevelInput.value) || 0;
         const temperature = parseFloat(temperatureInput.value);
-        if (currentLevel > 0 || temperature) {
+        const contractDuration = parseInt(contractDurationInput.value);
+        if (currentLevel > 0 || temperature || (contractDuration && contractDuration > 0)) {
             event.preventDefault();
             confirmModal.show();
         }

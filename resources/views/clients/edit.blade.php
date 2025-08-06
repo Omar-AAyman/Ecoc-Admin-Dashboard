@@ -76,13 +76,19 @@
         border-radius: 8px;
         font-weight: 500;
         transition: all 0.2s ease;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-primary:hover {
@@ -92,11 +98,15 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    }
+
     .btn-secondary {
         background-color: #6b7280;
         border-color: #6b7280;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-secondary:hover {
@@ -106,11 +116,15 @@
         box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
 
+    .btn-secondary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+    }
+
     .btn-danger {
         background-color: #dc2626;
         border-color: #dc2626;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-danger:hover {
@@ -118,6 +132,11 @@
         border-color: #b91c1c;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
     }
 
     .custom-file-upload {
@@ -142,6 +161,13 @@
         border-radius: 4px;
     }
 
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
     @media (max-width: 768px) {
         .hero-header h2 {
             font-size: 1.75rem;
@@ -153,13 +179,29 @@
         }
 
         .btn {
-            padding: 0.4rem 0.8rem;
+            padding: 0.5rem 1rem;
             font-size: 0.875rem;
+            width: 100%;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: stretch;
         }
 
         .image-preview {
             max-width: 80px;
             max-height: 80px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-header {
+            padding: 1.5rem 0;
+        }
+
+        .action-buttons {
+            gap: 0.75rem;
         }
     }
 </style>
@@ -172,7 +214,7 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h2 class="my-3 my-md-0">
                             <i class="fas fa-user-edit me-2"></i>Edit Client
                         </h2>
@@ -285,19 +327,15 @@
                             </div>
                         </div>
 
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary">Update Client</button>
-                            <a href="{{ route('clients.index') }}" class="btn btn-secondary">Cancel</a>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Client
+                            </button>
+                            <a href="{{ route('clients.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
                         </div>
                     </form>
-
-                    @can('delete', $client)
-                    <form id="delete-client-form" action="{{ route('clients.destroy', $client->id) }}" method="POST" class="d-inline mt-3">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete client {{ $client->first_name }} {{ $client->last_name }}?')">Delete Client</button>
-                    </form>
-                    @endcan
                 </div>
             </div>
         </div>
@@ -346,7 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Prevent accidental delete form submission
     updateForm.addEventListener('submit', function(e) {
-        // Ensure the update form submits to the correct route
         if (updateForm.getAttribute('action').includes('destroy')) {
             e.preventDefault();
             alert('Error: Form action is incorrect. Please try again.');

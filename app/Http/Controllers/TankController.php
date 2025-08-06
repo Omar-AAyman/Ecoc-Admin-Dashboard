@@ -42,41 +42,14 @@ class TankController extends Controller
         return view('tanks.settings', compact('tanks'));
     }
 
-    // public function create()
-    // {
-    //     $this->authorize('create', Tank::class);
-    //     $products = Product::all(['id', 'name']);
-    //     $companies = Company::whereHas('users')->get(['id', 'name']);
-    //     return view('tanks.create', compact('products', 'companies'));
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $this->authorize('create', Tank::class);
-    //     $validated = $request->validate([
-    //         'number' => 'required|string|unique:tanks|max:255',
-    //         'cubic_meter_capacity' => 'required|numeric|min:0',
-    //         'current_level' => 'required|numeric|min:0',
-    //         'temperature' => 'nullable|numeric|min:-50|max:100',
-    //         'product_id' => 'nullable|exists:products,id',
-    //         'company_id' => 'nullable|exists:companies,id',
-    //     ]);
-
-    //     try {
-    //         $this->tankService->createTank($validated, $request->user());
-    //         return redirect()->route('tanks.settings')->with('success', 'Tank created successfully');
-    //     } catch (\Exception $e) {
-    //         return back()->withErrors(['error' => $e->getMessage()])->withInput();
-    //     }
-    // }
-
     public function edit($id)
     {
         $this->authorize('update', Tank::class);
         $tank = $this->tankService->getTank($id);
         $products = Product::all(['id', 'name']);
         $companies = Company::whereHas('users')->get(['id', 'name']);
-        return view('tanks.edit', compact('tank', 'products', 'companies'));
+        $activeRental = $tank->tankRentals()->where('tank_id', '=', $id)->whereNull('end_date')->first();
+        return view('tanks.edit', compact('tank', 'products', 'companies', 'activeRental'));
     }
 
     public function update(Request $request, $id)
@@ -88,6 +61,7 @@ class TankController extends Controller
             'temperature' => 'nullable|numeric|min:-50|max:100',
             'product_id' => 'nullable|exists:products,id',
             'company_id' => 'nullable|exists:companies,id',
+            'contract_duration' => 'nullable|integer|min:0',
         ]);
 
         try {
@@ -160,7 +134,8 @@ class TankController extends Controller
                 'end_date' => $rental->end_date ? $rental->end_date->toDateTimeString() : null,
                 'company_name' => $rental->company ? $rental->company->name : 'N/A',
                 'product_name' => $rental->product ? $rental->product->name : 'N/A',
-                'details' => $rental->details
+                'details' => $rental->details,
+                'contract_duration' => $rental->contract_duration ? $rental->contract_duration . ' months' : 'N/A',
             ];
         });
 
@@ -222,13 +197,11 @@ class TankController extends Controller
                 $sourceTank = Tank::find($sourceTankId);
                 if ($sourceTank && $sourceTank->product_id) {
                     $query->where('product_id', $sourceTank->product_id)
-                          ->where('id', '!=', $sourceTankId);
+                        ->where('id', '!=', $sourceTankId);
                 } else {
-                    // If source_tank_id is invalid or has no product, return empty destination tanks
                     $query->whereRaw('1 = 0');
                 }
             } else {
-                // If no source_tank_id provided, return no destination tanks until source is selected
                 $query->whereRaw('1 = 0');
             }
 

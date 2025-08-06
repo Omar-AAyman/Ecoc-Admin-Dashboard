@@ -282,7 +282,7 @@
                     <ul class="list-group">
                         @foreach($transaction->documents as $doc)
                         <li class="list-group-item">
-                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank">{{ $doc->file_name }} ({{ $doc->type }})</a>
+                            <a href="{{ Storage::url($doc->file_path) }}" target="_blank">{{ $doc->file_name }} ({{ $doc->type }})</a>
                         </li>
                         @endforeach
                     </ul>

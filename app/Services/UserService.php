@@ -18,12 +18,12 @@ class UserService
 
     public function getNonClientUsers()
     {
-        return User::with('role')->whereIn('role_id', [1, 2])->whereNull('deleted_at')->get();
+        return User::with('role')->whereIn('role_id', [1, 2])->get();
     }
 
     public function getPaginatedNonClientUsers($search = null, $perPage = 10)
     {
-        $query = User::with('role')->whereIn('role_id', [1, 2])->whereNull('deleted_at');
+        $query = User::with('role')->whereIn('role_id', [1, 2]);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -41,40 +41,12 @@ class UserService
     public function getUser($id)
     {
         return User::with(['role', 'company.tankRentals.tank.product'])
-            ->whereNull('deleted_at')
             ->findOrFail($id);
     }
 
     public function createNonClientUser(array $data, User $authUser)
     {
         return DB::transaction(function () use ($data, $authUser) {
-            $existingUser = User::withTrashed()->where('email', $data['email'])->first();
-            if ($existingUser && $existingUser->trashed()) {
-                $oldData = $existingUser->only(['first_name', 'last_name', 'email', 'role_id', 'status', 'position']);
-                $existingUser->restore();
-                $updateData = [
-                    'reactivated_at' => now(),
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'password' => Hash::make($data['password']),
-                    'role_id' => $data['role_id'],
-                    'status' => $data['status'],
-                    'position' => $data['position'] ?? 'None',
-                ];
-                $existingUser->update($updateData);
-                $newData = $existingUser->only(['first_name', 'last_name', 'email', 'role_id', 'status', 'position']);
-                $newData['password_changed'] = true;
-                $this->activityLogService->logActivity(
-                    $authUser,
-                    'user.reactivated',
-                    "Reactivated user {$existingUser->email}",
-                    $existingUser,
-                    $oldData,
-                    $newData
-                );
-                return $existingUser;
-            }
-
             $data['password'] = Hash::make($data['password']);
             $data['position'] = $data['position'] ?? 'None';
             $user = User::create($data);
@@ -95,51 +67,24 @@ class UserService
     public function createClientUser(array $data, User $authUser)
     {
         return DB::transaction(function () use ($data, $authUser) {
-            $existingUser = User::withTrashed()->where('email', $data['email'])->first();
             $imagePath = null;
             if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $imagePath = $data['image']->store('logos', 'public');
+                $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
+                $data['image']->move(public_path('storage/logos'), $filename);
+                $imagePath = 'storage/logos/' . $filename;
                 unset($data['image']);
-            }
-
-            if ($existingUser && $existingUser->trashed()) {
-                $oldData = $existingUser->only(['first_name', 'last_name', 'email', 'role_id', 'company_id', 'status', 'position', 'image']);
-                $existingUser->restore();
-                $updateData = [
-                    'reactivated_at' => now(),
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'password' => Hash::make($data['password']),
-                    'role_id' => 3,
-                    'company_id' => $data['company_id'],
-                    'status' => $data['status'],
-                    'position' => 'None',
-                    'image' => $imagePath,
-                ];
-                if ($imagePath && $existingUser->image) {
-                    Storage::disk('public')->delete($existingUser->image);
-                }
-                $existingUser->update($updateData);
-                $newData = $existingUser->only(['first_name', 'last_name', 'email', 'role_id', 'company_id', 'status', 'position', 'image']);
-                $newData['password_changed'] = true;
-                $this->activityLogService->logActivity(
-                    $authUser,
-                    'client.reactivated',
-                    "Reactivated client {$existingUser->email}",
-                    $existingUser,
-                    $oldData,
-                    $newData
-                );
-                return $existingUser;
             }
 
             $data['password'] = Hash::make($data['password']);
             $data['role_id'] = 3;
             $data['position'] = 'None';
             $data['image'] = $imagePath;
+
             $user = User::create($data);
+
             $newData = $user->only(['first_name', 'last_name', 'email', 'role_id', 'company_id', 'status', 'position', 'image']);
             $newData['password_changed'] = true;
+
             $this->activityLogService->logActivity(
                 $authUser,
                 'client.created',
@@ -148,6 +93,7 @@ class UserService
                 [],
                 $newData
             );
+
             return $user;
         });
     }
@@ -155,7 +101,7 @@ class UserService
     public function updateNonClientUser($id, array $data, User $authUser)
     {
         return DB::transaction(function () use ($id, $data, $authUser) {
-            $user = User::whereNull('deleted_at')->findOrFail($id);
+            $user = User::findOrFail($id);
             $oldData = $user->only(['first_name', 'last_name', 'email', 'role_id', 'status', 'position']);
             if (isset($data['password']) && $data['password']) {
                 $data['password'] = Hash::make($data['password']);
@@ -184,7 +130,8 @@ class UserService
     public function updateClientUser($id, array $data, User $authUser)
     {
         return DB::transaction(function () use ($id, $data, $authUser) {
-            $user = User::whereNull('deleted_at')->findOrFail($id);
+            $user = User::findOrFail($id);
+
             $oldData = $user->only(['first_name', 'last_name', 'email', 'phone', 'role_id', 'company_id', 'status', 'position', 'image']);
 
             if (isset($data['company_name'])) {
@@ -193,15 +140,17 @@ class UserService
             }
 
             if (isset($data['remove_image']) && $data['remove_image'] == '1') {
-                if ($user->image) {
-                    Storage::disk('public')->delete($user->image);
+                if ($user->image && file_exists(public_path($user->image))) {
+                    unlink(public_path($user->image));
                 }
                 $data['image'] = null;
             } elseif (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $data['image'] = $data['image']->store('logos', 'public');
-                if ($user->image) {
-                    Storage::disk('public')->delete($user->image);
+                $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
+                $data['image']->move(public_path('storage/logos'), $filename);
+                if ($user->image && file_exists(public_path($user->image))) {
+                    unlink(public_path($user->image));
                 }
+                $data['image'] = 'storage/logos/' . $filename;
             } else {
                 unset($data['image']);
             }
@@ -214,13 +163,17 @@ class UserService
             } else {
                 unset($data['password']);
             }
+
             $data['position'] = 'None';
             $data['phone'] = $data['phone'] ?? null;
+
             $user->update($data);
+
             $newData = $user->only(['first_name', 'last_name', 'email', 'phone', 'role_id', 'company_id', 'status', 'position', 'image']);
             if (isset($data['password'])) {
                 $newData['password_changed'] = true;
             }
+
             $this->activityLogService->logActivity(
                 $authUser,
                 'client.updated',
@@ -229,10 +182,10 @@ class UserService
                 $oldData,
                 $newData
             );
+
             return $user;
         });
     }
-
 
     public function deleteUser($id, User $authUser)
     {
@@ -241,20 +194,45 @@ class UserService
         }
 
         return DB::transaction(function () use ($id, $authUser) {
-            $user = User::whereNull('deleted_at')->findOrFail($id);
+            $user = User::findOrFail($id);
             if ($user->transactionsAsEngineer()->exists() || $user->transactionsAsTechnician()->exists()) {
                 throw new \Exception('Cannot delete user with associated transactions');
+            }
+            // Check if user is associated with a company and if that company has tanks
+            if ($user->company_id && $user->company && $user->company->tanks()->exists()) {
+                throw new \Exception('Cannot delete user associated with a company that has tanks');
             }
             $oldData = $user->only(['first_name', 'last_name', 'email', 'role_id', 'company_id', 'status', 'position', 'image']);
             if ($user->image) {
                 Storage::disk('public')->delete($user->image);
             }
+            // Handle company: delete if no tanks and no other users are associated, otherwise dissociate
+            if ($user->company_id && $user->company) {
+                $company = $user->company;
+                $otherUsersCount = $company->users()->where('id', '!=', $user->id)->count();
+                if ($otherUsersCount === 0) {
+                    // No other users are associated with the company, safe to delete
+                    $company->delete();
+                    $this->activityLogService->logActivity(
+                        $authUser,
+                        'company.deleted',
+                        "Permanently deleted company {$company->name} associated with user {$user->email}",
+                        $user,
+                        ['company_id' => $company->id, 'company_name' => $company->name],
+                        []
+                    );
+                } else {
+                    // Other users are associated, only dissociate the current user
+                    $user->company()->dissociate();
+                    $user->save(); // Ensure dissociation is saved before deletion
+                }
+            }
             $email = $user->email;
-            $user->delete();
+            $user->forceDelete();
             $this->activityLogService->logActivity(
                 $authUser,
                 $user->isClient() ? 'client.deleted' : 'user.deleted',
-                "Soft deleted user {$email}",
+                "Permanently deleted user {$email}",
                 $user,
                 $oldData,
                 []
@@ -263,6 +241,7 @@ class UserService
         });
     }
 
+
     public function updateProfile(array $data, User $authUser)
     {
         return DB::transaction(function () use ($data, $authUser) {
@@ -270,15 +249,17 @@ class UserService
 
             if ($authUser->isClient()) {
                 if (isset($data['remove_image']) && $data['remove_image'] == '1') {
-                    if ($authUser->image) {
-                        Storage::disk('public')->delete($authUser->image);
+                    if ($authUser->image && file_exists(public_path($authUser->image))) {
+                        unlink(public_path($authUser->image));
                     }
                     $data['image'] = null;
                 } elseif (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                    $data['image'] = $data['image']->store('logos', 'public');
-                    if ($authUser->image) {
-                        Storage::disk('public')->delete($authUser->image);
+                    $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
+                    $data['image']->move(public_path('storage/logos'), $filename);
+                    if ($authUser->image && file_exists(public_path($authUser->image))) {
+                        unlink(public_path($authUser->image));
                     }
+                    $data['image'] = 'storage/logos/' . $filename;
                 } else {
                     unset($data['image']);
                 }

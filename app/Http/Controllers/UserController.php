@@ -225,7 +225,7 @@ class UserController extends Controller
             'company_name' => 'required|string|max:255|unique:companies,name',
             'status' => 'required|in:active,inactive',
             'phone' => 'nullable|string|max:20',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ], [
             'first_name.required' => 'The first name is required.',
             'first_name.string' => 'The first name must be a string.',
@@ -250,7 +250,7 @@ class UserController extends Controller
             'phone.max' => 'The phone number may not be greater than 20 characters.',
             'image.image' => 'The logo must be an image.',
             'image.mimes' => 'The logo must be a file of type: jpeg, png, jpg.',
-            'image.max' => 'The logo may not be greater than 2MB.',
+            'image.max' => 'The logo may not be greater than 4MB.',
         ]);
 
         if ($validator->fails()) {
@@ -307,7 +307,7 @@ class UserController extends Controller
             'company_name' => 'required|string|max:255|unique:companies,name,' . $client->company_id,
             'status' => 'required|in:active,inactive',
             'phone' => 'nullable|string|max:20',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
             'remove_image' => 'nullable|boolean',
         ], [
             'first_name.required' => 'The first name is required.',
@@ -331,7 +331,7 @@ class UserController extends Controller
             'phone.max' => 'The phone number may not be greater than 20 characters.',
             'image.image' => 'The logo must be an image.',
             'image.mimes' => 'The logo must be a file of type: jpeg, png, jpg.',
-            'image.max' => 'The logo may not be greater than 2MB.',
+            'image.max' => 'The logo may not be greater than 4MB.',
             'remove_image.boolean' => 'The remove image option must be a boolean value.',
         ]);
 
@@ -374,7 +374,7 @@ class UserController extends Controller
         ];
 
         if ($user->isClient()) {
-            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg|max:2048';
+            $rules['image'] = 'nullable|image|mimes:jpeg,png,jpg|max:4096';
             $rules['remove_image'] = 'nullable|boolean';
         }
 
@@ -389,7 +389,7 @@ class UserController extends Controller
             'password.confirmed' => 'The password confirmation does not match.',
             'image.image' => 'The company logo must be an image.',
             'image.mimes' => 'The company logo must be a file of type: jpeg, png, jpg.',
-            'image.max' => 'The company logo may not be greater than 2MB.',
+            'image.max' => 'The company logo may not be greater than 4MB.',
             'remove_image.boolean' => 'The remove image option must be a boolean value.',
         ];
 

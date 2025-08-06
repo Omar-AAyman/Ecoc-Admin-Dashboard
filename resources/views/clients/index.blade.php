@@ -79,13 +79,18 @@
         border-radius: 8px;
         font-weight: 500;
         transition: all 0.2s ease;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
 
     .btn-primary {
         background-color: #000b43;
         border-color: #000b43;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-primary:hover {
@@ -95,11 +100,15 @@
         box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
     }
 
+    .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+    }
+
     .btn-secondary {
         background-color: #6b7280;
         border-color: #6b7280;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-secondary:hover {
@@ -109,11 +118,15 @@
         box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
     }
 
+    .btn-secondary:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(107, 114, 128, 0.2);
+    }
+
     .btn-danger {
         background-color: #dc2626;
         border-color: #dc2626;
         color: #ffffff;
-        padding: 0.5rem 1rem;
     }
 
     .btn-danger:hover {
@@ -121,6 +134,11 @@
         border-color: #b91c1c;
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+
+    .btn-danger:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
     }
 
     .btn-sm {
@@ -171,6 +189,42 @@
         border-radius: 4px;
     }
 
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1.5rem 1.5rem 0;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 0 1.5rem 1.5rem;
+    }
+
+    .modal-footer .btn {
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+    }
+
+    .warning-text {
+        color: #dc2626;
+        font-weight: 500;
+        margin-top: 0.5rem;
+    }
+
     @media (max-width: 768px) {
         .hero-header h2 {
             font-size: 1.75rem;
@@ -185,6 +239,7 @@
         .btn {
             padding: 0.4rem 0.8rem;
             font-size: 0.875rem;
+            width: 100%;
         }
 
         .btn-sm {
@@ -205,7 +260,6 @@
             height: 30px;
         }
     }
-
 </style>
 @endsection
 
@@ -216,7 +270,7 @@
             <!-- Page Header -->
             <div class="hero-header">
                 <div class="container">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h2 class="my-3 my-md-0">
                             <i class="fas fa-users me-2"></i>All Clients
                         </h2>
@@ -247,7 +301,7 @@
             <!-- Filters and Pagination -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <div class="search-container">
                             <input type="text" id="client-search" class="form-control" placeholder="Search by name, email, or company..." value="{{ request('search') }}">
                         </div>
@@ -296,6 +350,30 @@
                     {{ $clients->appends(request()->all())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div class="modal fade" id="deleteClientModal" tabindex="-1" aria-labelledby="deleteClientModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteClientModalLabel">Confirm Client Deletion</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete client <strong id="deleteClientName"></strong>? This action cannot be undone.
+                            <p class="warning-text">All associated data will be permanently removed.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary d-inline w-25" data-bs-dismiss="modal">Cancel</button>
+                            <form id="deleteClientForm" action="" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete Client</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
             @endif
         </div>
     </div>
@@ -304,102 +382,126 @@
 
 @section('js')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Debounce function to limit AJAX calls
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure Bootstrap is loaded
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap JavaScript is not loaded. Please check your script inclusions.');
+        alert('Error: Bootstrap JavaScript is not loaded. Please contact support.');
+        return;
+    }
+
+    // Debounce function to limit AJAX calls
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
                 clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
+                func(...args);
             };
-        }
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
 
-        // Function to fetch clients via AJAX
-        function fetchClients(search = '', perPage = 10, page = 1) {
-            $.ajax({
-                url: '{{ route("clients.index") }}'
-                , type: 'GET'
-                , data: {
-                    search: search
-                    , per_page: perPage
-                    , page: page
-                    , ajax: true
-                }
-                , success: function(response) {
-                    // Update table body
-                    $('#clients-table-body').html(response.table);
-                    // Update pagination links
-                    $('#pagination-links').html(response.pagination);
-                    // Update showing info
-                    $('#pagination-info').text(`Showing ${response.first_item} to ${response.last_item} of ${response.total} entries`);
-                    // Reattach delete confirmation handlers
-                    attachDeleteHandlers();
-                }
-                , error: function(xhr) {
-                    console.error('AJAX error:', xhr);
-                    alert('An error occurred while fetching clients. Please try again.');
-                }
-            });
-        }
-
-        // Attach delete confirmation handlers
-        function attachDeleteHandlers() {
-            document.querySelectorAll('.delete-client-form').forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const clientName = this.querySelector('.delete-btn').dataset.clientName;
-                    if (confirm(`Are you sure you want to delete client ${clientName}?`)) {
-                        this.submit();
-                    }
-                });
-            });
-        }
-
-        // Initial delete handlers
-        attachDeleteHandlers();
-
-        // Search functionality
-        const searchInput = document.getElementById('client-search');
-        const debouncedSearch = debounce(function() {
-            const searchTerm = searchInput.value;
-            const perPage = document.getElementById('per-page').value;
-            fetchClients(searchTerm, perPage);
-        }, 300);
-        searchInput.addEventListener('input', debouncedSearch);
-
-        // Per-page change handler
-        document.getElementById('per-page').addEventListener('change', function() {
-            const perPage = this.value;
-            const searchTerm = document.getElementById('client-search').value;
-            fetchClients(searchTerm, perPage);
-        });
-
-        // Pagination link click handler
-        document.getElementById('pagination-links').addEventListener('click', function(e) {
-            e.preventDefault();
-            if (e.target.tagName === 'A' && e.target.getAttribute('href')) {
-                const url = new URL(e.target.getAttribute('href'));
-                const page = url.searchParams.get('page') || 1;
-                const searchTerm = document.getElementById('client-search').value;
-                const perPage = document.getElementById('per-page').value;
-                fetchClients(searchTerm, perPage, page);
+    // Function to fetch clients via AJAX
+    function fetchClients(search = '', perPage = 10, page = 1) {
+        $.ajax({
+            url: '{{ route("clients.index") }}',
+            type: 'GET',
+            data: {
+                search: search,
+                per_page: perPage,
+                page: page,
+                ajax: true
+            },
+            success: function(response) {
+                // Update table body
+                $('#clients-table-body').html(response.table);
+                // Update pagination links
+                $('#pagination-links').html(response.pagination);
+                // Update showing info
+                $('#pagination-info').text(`Showing ${response.first_item} to ${response.last_item} of ${response.total} entries`);
+                // Reattach delete confirmation handlers
+                attachDeleteHandlers();
+            },
+            error: function(xhr) {
+                console.error('AJAX error:', xhr);
+                alert('An error occurred while fetching clients. Please try again.');
             }
         });
+    }
 
-        // Inject CSRF token meta tag if it doesn't exist
-        let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-        if (!csrfTokenMeta) {
-            csrfTokenMeta = document.createElement('meta');
-            csrfTokenMeta.name = 'csrf-token';
-            csrfTokenMeta.content = '{{ csrf_token() }}';
-            document.head.appendChild(csrfTokenMeta);
-            console.log('CSRF token meta tag created');
+    // Attach delete confirmation handlers
+    function attachDeleteHandlers() {
+        document.querySelectorAll('.delete-btn').forEach(button => {
+            button.removeEventListener('click', handleDeleteClick); // Remove previous listeners to prevent duplicates
+            button.addEventListener('click', handleDeleteClick);
+        });
+    }
+
+    function handleDeleteClick() {
+        const clientId = this.dataset.clientId;
+        const clientName = this.dataset.clientName;
+        const form = document.getElementById('deleteClientForm');
+        const deleteUrl = '{{ route("clients.destroy", ":id") }}'.replace(':id', clientId);
+        form.action = deleteUrl;
+        document.getElementById('deleteClientName').textContent = clientName;
+        console.log('Delete button clicked for client ID:', clientId, 'URL:', deleteUrl);
+
+        // Initialize modal
+        try {
+            const modalElement = document.getElementById('deleteClientModal');
+            const modal = new bootstrap.Modal(modalElement, {
+                backdrop: true,
+                keyboard: true
+            });
+            modal.show();
+        } catch (error) {
+            console.error('Error initializing modal:', error);
+            alert('Error: Unable to open delete confirmation modal. Please try again.');
+        }
+    }
+
+    // Initial delete handlers
+    attachDeleteHandlers();
+
+    // Search functionality
+    const searchInput = document.getElementById('client-search');
+    const debouncedSearch = debounce(function() {
+        const searchTerm = searchInput.value;
+        const perPage = document.getElementById('per-page').value;
+        fetchClients(searchTerm, perPage);
+    }, 300);
+    searchInput.addEventListener('input', debouncedSearch);
+
+    // Per-page change handler
+    document.getElementById('per-page').addEventListener('change', function() {
+        const perPage = this.value;
+        const searchTerm = document.getElementById('client-search').value;
+        fetchClients(searchTerm, perPage);
+    });
+
+    // Pagination link click handler
+    document.getElementById('pagination-links').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (e.target.tagName === 'A' && e.target.getAttribute('href')) {
+            const url = new URL(e.target.getAttribute('href'));
+            const page = url.searchParams.get('page') || 1;
+            const searchTerm = document.getElementById('client-search').value;
+            const perPage = document.getElementById('per-page').value;
+            fetchClients(searchTerm, perPage, page);
         }
     });
 
+    // Inject CSRF token meta tag if it doesn't exist
+    let csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    if (!csrfTokenMeta) {
+        csrfTokenMeta = document.createElement('meta');
+        csrfTokenMeta.name = 'csrf-token';
+        csrfTokenMeta.content = '{{ csrf_token() }}';
+        document.head.appendChild(csrfTokenMeta);
+        console.log('CSRF token meta tag created');
+    }
+});
 </script>
 @endsection

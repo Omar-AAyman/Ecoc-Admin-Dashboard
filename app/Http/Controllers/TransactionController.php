@@ -192,9 +192,9 @@ class TransactionController extends Controller
             'customs_release_number' => 'nullable|string|max:100',
             'engineer_id' => 'nullable|exists:users,id',
             'technician_id' => 'nullable|exists:users,id',
-            'measurement_report' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
-            'inspection_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
-            'customs_release_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
+            'measurement_report' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
+            'inspection_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
+            'customs_release_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
         ];
 
         if ($request->input('type') === 'loading') {
@@ -205,7 +205,7 @@ class TransactionController extends Controller
             $rules['shipment.driver_name'] = 'required_if:shipment.transport_type,truck|string|max:255|nullable';
             $rules['shipment.berth_number'] = 'required_if:shipment.transport_type,vessel|string|max:255|nullable';
             $rules['charge_permit_number'] = 'nullable|string|max:100';
-            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         } elseif ($request->input('type') === 'discharging') {
             $rules['delivery.transport_type'] = 'required|in:vessel,truck';
             $rules['delivery.vessel_id'] = 'required_if:delivery.transport_type,vessel|exists:vessels,id|nullable';
@@ -213,13 +213,13 @@ class TransactionController extends Controller
             $rules['delivery.trailer_number'] = 'required_if:delivery.transport_type,truck|string|max:50|nullable';
             $rules['delivery.driver_name'] = 'required_if:delivery.transport_type,truck|string|max:255|nullable';
             $rules['discharge_permit_number'] = 'nullable|string|max:100';
-            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         } elseif ($request->input('type') === 'transfer') {
             $rules['destination_tank_id'] = 'required|exists:tanks,id|different:tank_id';
             $rules['charge_permit_number'] = 'nullable|string|max:100';
             $rules['discharge_permit_number'] = 'nullable|string|max:100';
-            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
-            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
+            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         }
 
         $validated = $request->validate($rules);
@@ -264,9 +264,9 @@ class TransactionController extends Controller
             'customs_release_number' => 'nullable|string|max:100',
             'engineer_id' => 'nullable|exists:users,id',
             'technician_id' => 'nullable|exists:users,id',
-            'measurement_report' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
-            'inspection_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
-            'customs_release_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048',
+            'measurement_report' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
+            'inspection_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
+            'customs_release_form' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096',
         ];
 
         if ($request->input('type') === 'loading') {
@@ -277,7 +277,7 @@ class TransactionController extends Controller
             $rules['shipment.driver_name'] = 'required_if:shipment.transport_type,truck|string|max:255|nullable';
             $rules['shipment.berth_number'] = 'required_if:shipment.transport_type,vessel|string|max:255|nullable';
             $rules['charge_permit_number'] = 'nullable|string|max:100';
-            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         } elseif ($request->input('type') === 'discharging') {
             $rules['delivery.transport_type'] = 'required|in:vessel,truck';
             $rules['delivery.vessel_id'] = 'required_if:delivery.transport_type,vessel|exists:vessels,id|nullable';
@@ -285,13 +285,13 @@ class TransactionController extends Controller
             $rules['delivery.trailer_number'] = 'required_if:delivery.transport_type,truck|string|max:50|nullable';
             $rules['delivery.driver_name'] = 'required_if:delivery.transport_type,truck|string|max:255|nullable';
             $rules['discharge_permit_number'] = 'nullable|string|max:100';
-            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         } elseif ($request->input('type') === 'transfer') {
             $rules['destination_tank_id'] = 'required|exists:tanks,id|different:tank_id';
             $rules['charge_permit_number'] = 'nullable|string|max:100';
             $rules['discharge_permit_number'] = 'nullable|string|max:100';
-            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
-            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:2048';
+            $rules['charge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
+            $rules['discharge_permit_document'] = 'nullable|file|mimes:pdf,jpeg,jpg,png|max:4096';
         }
 
         $validated = $request->validate($rules);

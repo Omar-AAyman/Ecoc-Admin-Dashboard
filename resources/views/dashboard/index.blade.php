@@ -100,7 +100,7 @@
         position: absolute;
         top: 1rem;
         right: 1rem;
-        z-index: 20;
+        /* z-index: 20; */
     }
 
     .x-button:hover {
@@ -301,7 +301,6 @@
         max-height: 60px;
         border-radius: 8px;
         object-fit: contain;
-        /* background-color: rgba(255, 255, 255, 0.85); */
         margin-bottom: 0.5rem;
     }
 
@@ -318,11 +317,13 @@
     }
 
     .enlarged-container-detail {
-        width: 180px;
-        height: 324px;
+        width: 100%;
+        max-width: 250px;
+        height: 360px;
         opacity: 0;
         visibility: hidden;
         transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+        margin: 0 auto;
     }
 
     .enlarged-container-detail.active {
@@ -390,6 +391,14 @@
         margin-bottom: 2rem;
     }
 
+    .capacity-chart-container {
+        position: relative;
+        height: 200px;
+        width: 100%;
+        max-width: 200px;
+        margin: 1rem auto;
+    }
+
     .details-table {
         font-size: 0.85rem;
         margin-top: 1rem;
@@ -398,6 +407,22 @@
     .details-table th, .details-table td {
         padding: 0.25rem;
         vertical-align: middle;
+    }
+
+    .tank-details-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        /* align-items: center; */
+        height: 100%;
+        max-width: 250px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+
+    .tank-details-container p {
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
     }
 
     #gallery {
@@ -425,8 +450,8 @@
             height: 308px;
         }
         .enlarged-container-detail {
-            width: 171px;
-            height: 308px;
+            max-width: 190px;
+            height: 342px;
         }
         .container-label {
             font-size: 1.1rem;
@@ -443,11 +468,9 @@
         .container-card.small .container-info #capacity {
             line-height: 1.3;
         }
-
         .client-image {
             max-width: 57px;
             max-height: 57px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.small .container-label {
             font-size: 0.85rem;
@@ -468,7 +491,6 @@
         .container-card.small .client-image {
             max-width: 46px;
             max-height: 46px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.selected .container-label {
             font-size: 1rem;
@@ -483,6 +505,13 @@
         .container-card.selected .client-image {
             max-width: 51px;
             max-height: 51px;
+        }
+        .capacity-chart-container {
+            max-width: 190px;
+            height: 190px;
+        }
+        .tank-details-container {
+            max-width: 190px;
         }
     }
 
@@ -503,8 +532,8 @@
             height: 292px;
         }
         .enlarged-container-detail {
-            width: 162px;
-            height: 292px;
+            max-width: 180px;
+            height: 324px;
         }
         .container-label {
             font-size: 1rem;
@@ -521,11 +550,9 @@
         .container-card.small .container-info #capacity {
             line-height: 1.3;
         }
-
         .client-image {
             max-width: 54px;
             max-height: 54px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.small .container-label {
             font-size: 0.8rem;
@@ -546,7 +573,6 @@
         .container-card.small .client-image {
             max-width: 40px;
             max-height: 40px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.selected .container-label {
             font-size: 0.95rem;
@@ -573,6 +599,13 @@
             padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
         }
+        .capacity-chart-container {
+            max-width: 180px;
+            height: 180px;
+        }
+        .tank-details-container {
+            max-width: 180px;
+        }
     }
 
     @media (max-width: 768px) {
@@ -592,8 +625,8 @@
             height: 275px;
         }
         .enlarged-container-detail {
-            width: 153px;
-            height: 275px;
+            max-width: 170px;
+            height: 306px;
         }
         .container-label {
             font-size: 0.95rem;
@@ -610,11 +643,9 @@
         .container-card.small .container-info #capacity {
             line-height: 1.3;
         }
-
         .client-image {
             max-width: 51px;
             max-height: 51px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.small .container-label {
             font-size: 0.75rem;
@@ -635,7 +666,6 @@
         .container-card.small .client-image {
             max-width: 41px;
             max-height: 41px;
-            /* background-color: rgba(255, 255, 255, 0.85); */
         }
         .container-card.selected .container-label {
             font-size: 0.9rem;
@@ -670,8 +700,15 @@
         .chart-container {
             height: 200px;
         }
-        .details-table {
-            font-size: 0.75rem;
+        .capacity-chart-container {
+            max-width: 170px;
+            height: 170px;
+        }
+        .tank-details-container {
+            max-width: 170px;
+        }
+        .tank-details-container p {
+            font-size: 0.8rem;
         }
     }
 
@@ -692,8 +729,8 @@
             height: 259px;
         }
         .enlarged-container-detail {
-            width: 144px;
-            height: 259px;
+            max-width: 160px;
+            height: 288px;
         }
         .container-label {
             font-size: 0.9rem;
@@ -710,11 +747,9 @@
         .container-card.small .container-info #capacity {
             line-height: 1.3;
         }
-
         .client-image {
             max-width: 48px;
             max-height: 48px;
-            /* background-color: rgba(255, 255, 255, 0.8); */
         }
         .container-card.small .container-label {
             font-size: 0.7rem;
@@ -735,7 +770,6 @@
         .container-card.small .client-image {
             max-width: 30px;
             max-height: 30px;
-            /* background-color: rgba(255, 255, 255, 0.8); */
         }
         .container-card.selected .container-label {
             font-size: 0.85rem;
@@ -757,6 +791,16 @@
         .btn {
             font-size: 0.8rem;
             padding: 0.35rem 0.7rem;
+        }
+        .capacity-chart-container {
+            max-width: 160px;
+            height: 160px;
+        }
+        .tank-details-container {
+            max-width: 160px;
+        }
+        .tank-details-container p {
+            font-size: 0.75rem;
         }
     }
 </style>
@@ -788,7 +832,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12 col-md-4 d-flex justify-content-center">
+                        <div class="col-12 col-md-3 d-flex justify-content-center">
                             <div id="enlarged-container-display" class="container-card enlarged-container-detail">
                                 <div class="barrel">
                                     <div class="barrel-top"></div>
@@ -813,27 +857,40 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12 col-md-8">
-                            <p><strong>ID:</strong> <span id="detail-id"></span></p>
-                            <p><strong>Content:</strong> <span id="detail-content"></span></p>
-                            <p><strong>Status:</strong> <span id="detail-status"></span></p>
-                            <p><strong>Max Capacity:</strong> <span id="detail-max-capacity"></span></p>
-                            <p><strong>Current Capacity:</strong> <span id="detail-current-level"></span></p>
-                            <p><strong>Capacity Utilization:</strong> <span id="detail-capacity-utilization"></span></p>
-                            <p><strong>Client:</strong> <span id="detail-company"></span></p>
-                            <p><strong>Temperature:</strong> <span id="detail-temperature"></span></p>
-                            <div class="mt-3 d-flex gap-2">
-                                @if (auth()->user() && auth()->user()->isSuperAdmin())
-                                    <a id="edit-settings-button" class="btn btn-primary action-button">Edit Settings</a>
-                                @endif
-                                <button id="more-details-button" class="btn btn-primary action-button">See More Analysis</button>
+                        <div class="col-12 col-md-5 d-flex justify-content-center">
+                            <div class="tank-details-container">
+                                <p><strong>ID:</strong> <span id="detail-id"></span></p>
+                                <p><strong>Content:</strong> <span id="detail-content"></span></p>
+                                <p><strong>Status:</strong> <span id="detail-status"></span></p>
+                                <p><strong>Max Capacity:</strong> <span id="detail-max-capacity"></span></p>
+                                <p><strong>Current Capacity:</strong> <span id="detail-current-level"></span></p>
+                                <p><strong>Capacity Utilization:</strong> <span id="detail-capacity-utilization"></span></p>
+                                <p><strong>Client:</strong> <span id="detail-company"></span></p>
+                                <p><strong>Temperature:</strong> <span id="detail-temperature"></span></p>
+                                <div class="mt-3 d-flex gap-2 justify-content-center">
+                                    @if (auth()->user() && auth()->user()->isSuperAdmin())
+                                        <a id="edit-settings-button" class="btn btn-primary action-button">Edit Settings</a>
+                                    @endif
+                                    <button id="more-details-button" class="btn btn-primary action-button">See More Analysis</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4 d-flex justify-content-center">
+                            <div class="capacity-chart-container">
+                                <canvas id="capacityChart"></canvas>
                             </div>
                         </div>
                     </div>
                     <div id="detailed-analysis-section" class="mt-4">
                         <h5 class="fw-semibold mb-3">Detailed Analysis for <span id="analysis-container-id"></span></h5>
+                        <div class="current-contract-details" style="display: none;">
+                            <h6>Current Contract</h6>
+                            <p><strong>Start Date:</strong> <span id="current-start-date"></span></p>
+                            <p><strong>Duration:</strong> <span id="current-duration"></span></p>
+                            <p><strong>End Date:</strong> <span id="current-end-date"></span></p>
+                            <p><strong>Days Left:</strong> <span id="current-days-left" class="text-muted"></span></p>
+                        </div>
                         <div class="details-table">
-                            <p><strong>Temperature:</strong> <span id="analysis-temperature"></span></p>
                             <h6>Rental History</h6>
                             <div class="table-responsive">
                                 <table class="table table-striped table-sm text-center">
@@ -841,6 +898,7 @@
                                         <tr>
                                             <th>Client</th>
                                             <th>Product</th>
+                                            <th>Contract Duration</th>
                                             <th>Start Date</th>
                                             <th>End Date</th>
                                         </tr>
@@ -850,7 +908,7 @@
                             </div>
                             <div class="table-responsive">
                                 <h6 class="mt-3">Transactions</h6>
-                                <table class="table table-striped table-sm text-center">
+                                <table class="table table-striped table-sm ">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -959,6 +1017,7 @@
 @endsection
 
 @section('js')
+{{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> --}}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const tanks = @json($tanks) || [];
@@ -976,6 +1035,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const editSettingsButton = document.getElementById('edit-settings-button');
     const rentalHistoryTable = document.getElementById('rental-history-table');
     const transactionsTable = document.getElementById('transactions-table');
+    let capacityChart = null;
 
     // Initial render of gallery
     renderGallery(tanks);
@@ -996,7 +1056,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }]
             },
             options: {
-                scales: { y: { beginAtZero: true } }
+                scales: { y: { beginAtZero: true } },
+                responsive: true,
+                maintainAspectRatio: false
             }
         });
 
@@ -1019,7 +1081,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }]
             },
             options: {
-                scales: { y: { beginAtZero: true } }
+                scales: { y: { beginAtZero: true } },
+                responsive: true,
+                maintainAspectRatio: false
             }
         });
     }
@@ -1036,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function renderGallery(tanks = []) {
-        console.log('Rendering gallery with tanks:', tanks);
+        // console.log('Rendering gallery with tanks:', tanks);
         if (!tanks || tanks.length === 0) {
             gallery.innerHTML = '<p class="text-center">No tanks available.</p>';
             return;
@@ -1105,10 +1169,14 @@ document.addEventListener('DOMContentLoaded', function () {
         detailedAnalysisSection.style.display = 'none';
         moreDetailsButton.style.backgroundColor = '';
         moreDetailsButton.classList.add('btn-primary', 'text-white');
+        if (capacityChart) {
+            capacityChart.destroy();
+            capacityChart = null;
+        }
     }
 
     function showContainerBasicDetails(container) {
-        console.log('Showing details for container:', container);
+        // console.log('Showing details for container:', container);
         selectedContainerSection.style.display = 'block';
         setTimeout(() => {
             selectedContainerSection.classList.add('visible');
@@ -1180,6 +1248,32 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('detail-company').textContent = container.company || '';
             document.getElementById('detail-temperature').textContent = temperatureText || '';
 
+            if (capacityChart) {
+                capacityChart.destroy();
+            }
+            const capacityPercentage = parseFloat(container.capacityUtilization.replace('%', '')) || 0;
+            capacityChart = new Chart(document.getElementById('capacityChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Filled', 'Free'],
+                    datasets: [{
+                        data: [capacityPercentage, 100 - capacityPercentage],
+                        backgroundColor: [container.liquidColor[0], '#e5e7eb'],
+                        borderColor: ['#ffffff', '#ffffff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: "'Inter', sans-serif", size: 12 }, color: '#1f2937' } },
+                        tooltip: { callbacks: { label: function(context) { return `${context.label}: ${context.parsed.toFixed(1)}%`; } } }
+                    },
+                    cutout: '70%'
+                }
+            });
+
             if (editSettingsButton) {
                 editSettingsButton.href = `/tanks/${encodeURIComponent(container.dbId)}/edit`;
             }
@@ -1199,11 +1293,73 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function populateDetailedAnalysis(container) {
+        // console.log('Populating detailed analysis for container:', container);
+        // console.log('Rental history:', container.rentalHistory);
+
+        // Set the tank ID in the analysis header
         document.getElementById('analysis-container-id').textContent = container.id;
 
-        const temperatureText = container.temperatureCelsius !== 'N/A' ? `${container.temperatureCelsius}°C / ${container.temperatureFahrenheit}°F` : '';
-        document.getElementById('analysis-temperature').textContent = temperatureText;
+        // Find the current rental where end_date is 'Ongoing'
+        const currentRental = container.rentalHistory.find(rental => rental.end_date === 'Ongoing');
+        // console.log('Current rental:', currentRental);
 
+        // Handle current contract details
+        if (currentRental && currentRental.start_date !== 'N/A' && currentRental.contract_duration !== 'N/A') {
+            // console.log('Processing current rental:', currentRental);
+            // Parse start_date
+            const startDate = new Date(currentRental.start_date);
+            // console.log('Parsed start date:', startDate);
+
+            // Parse contract_duration (e.g., "6 months" -> 6)
+            const durationMatch = currentRental.contract_duration.match(/(\d+)/);
+            const contractDuration = durationMatch ? parseInt(durationMatch[1], 10) : 0;
+            // console.log('Contract duration (months):', contractDuration);
+
+            // Calculate projected end date
+            let projectedEndDate = null;
+            if (contractDuration > 0) {
+                projectedEndDate = new Date(startDate);
+                projectedEndDate.setMonth(startDate.getMonth() + contractDuration);
+            }
+            // console.log('Projected end date:', projectedEndDate);
+
+            // Calculate days left (relative to July 27, 2025, 12:01 PM EEST)
+            let daysLeftText = '';
+            if (projectedEndDate) {
+                const today = new Date('2025-07-27T12:01:00+03:00'); // Updated to 12:01 PM EEST
+                const timeDiff = projectedEndDate - today;
+                const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)); // Convert ms to days
+                // console.log('Days left:', daysLeft);
+
+                if (daysLeft > 0) {
+                    daysLeftText = `(${daysLeft} days remaining)`;
+                } else if (daysLeft === 0) {
+                    daysLeftText = '(expires today)';
+                } else {
+                    daysLeftText = '(expired)';
+                }
+            }
+            // console.log('Days left text:', daysLeftText);
+
+            // Format projected end date
+            const formattedEndDate = projectedEndDate
+                ? `${projectedEndDate.getFullYear()}-${String(projectedEndDate.getMonth() + 1).padStart(2, '0')}-${String(projectedEndDate.getDate()).padStart(2, '0')}`
+                : 'N/A';
+            // console.log('Formatted end date:', formattedEndDate);
+
+            // Update DOM elements
+            document.getElementById('current-start-date').textContent = currentRental.start_date;
+            document.getElementById('current-duration').textContent = currentRental.contract_duration;
+            document.getElementById('current-end-date').textContent = formattedEndDate;
+            document.getElementById('current-days-left').textContent = daysLeftText;
+            document.querySelector('.current-contract-details').style.display = 'block';
+            // console.log('Contract details displayed');
+        } else {
+            // console.log('No valid current rental found or missing data');
+            document.querySelector('.current-contract-details').style.display = 'none';
+        }
+
+        // Populate rental history table
         rentalHistoryTable.innerHTML = '';
         if (container.rentalHistory && container.rentalHistory.length > 0) {
             container.rentalHistory.forEach(rental => {
@@ -1211,17 +1367,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 row.innerHTML = `
                     <td>${rental.company || ''}</td>
                     <td>${rental.product || ''}</td>
+                    <td>${rental.contract_duration || ''}</td>
                     <td>${rental.start_date || ''}</td>
                     <td>${rental.end_date || ''}</td>
                 `;
                 rentalHistoryTable.appendChild(row);
             });
+            // console.log('Rental history table populated');
         } else {
             const row = document.createElement('tr');
-            row.innerHTML = '<td colspan="4">No rental history available.</td>';
+            row.innerHTML = '<td colspan="5">No rental history available.</td>';
             rentalHistoryTable.appendChild(row);
+            // console.log('No rental history available');
         }
 
+        // Populate transactions table
         transactionsTable.innerHTML = '';
         if (container.transactions && container.transactions.length > 0) {
             container.transactions.forEach(transaction => {
@@ -1240,10 +1400,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 `;
                 transactionsTable.appendChild(row);
             });
+            // console.log('Transactions table populated');
         } else {
             const row = document.createElement('tr');
             row.innerHTML = '<td colspan="10">No transactions available.</td>';
             transactionsTable.appendChild(row);
+            // console.log('No transactions available');
         }
     }
 
@@ -1251,17 +1413,21 @@ document.addEventListener('DOMContentLoaded', function () {
     moreDetailsButton.addEventListener('click', function() {
         selectedContainer = tanks.find(t => t.id === document.getElementById('detail-id').textContent);
         if (selectedContainer) {
+            // console.log('More details clicked, selected container:', selectedContainer);
             populateDetailedAnalysis(selectedContainer);
             detailedAnalysisSection.style.display = 'block';
             setTimeout(() => {
                 detailedAnalysisSection.classList.add('visible');
+                detailedAnalysisSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 0);
             moreDetailsButton.style.display = 'none';
+        } else {
+            console.error('No container found for ID:', document.getElementById('detail-id').textContent);
         }
     });
 
     backButton.addEventListener('click', () => {
-        console.log('Back to gallery clicked');
+        // console.log('Back to gallery clicked');
         selectedContainerSection.classList.remove('visible');
         detailedAnalysisSection.classList.remove('visible');
         enlargedContainerDisplay.classList.remove('active');
@@ -1276,8 +1442,13 @@ document.addEventListener('DOMContentLoaded', function () {
             detailedAnalysisSection.style.display = 'none';
         }, 500);
 
+        moreDetailsButton.style.display = 'inline-block';
         moreDetailsButton.style.backgroundColor = '';
         moreDetailsButton.classList.add('btn-primary', 'text-white');
+        if (capacityChart) {
+            capacityChart.destroy();
+            capacityChart = null;
+        }
         renderGallery(tanks);
     });
 
@@ -1286,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', function () {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             const searchTerm = searchInput.value.toLowerCase();
-            console.log('Search term:', searchTerm);
+            // console.log('Search term:', searchTerm);
             const filteredTanks = tanks.filter(container =>
                 container.id.toLowerCase().includes(searchTerm) ||
                 container.content.toLowerCase().includes(searchTerm) ||

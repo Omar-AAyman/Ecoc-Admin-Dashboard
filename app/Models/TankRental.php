@@ -10,6 +10,7 @@ class TankRental extends Model
         'tank_id',
         'company_id',
         'product_id',
+        'contract_duration',
         'start_date',
         'end_date',
         'details',

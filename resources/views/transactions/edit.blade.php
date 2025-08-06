@@ -548,8 +548,8 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="measurement_report" class="form-label">Measurement Report</label>
-                                    <input type="file" name="measurement_report" id="measurement_report" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="measurement_report" id="measurement_report" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @if($transaction->documents->where('type', 'measurement_report')->first())
                                     <div class="file-note">Current: <a href="{{ Storage::url($transaction->documents->where('type', 'measurement_report')->first()->file_path) }}" target="_blank">{{ $transaction->documents->where('type', 'measurement_report')->first()->file_name }}</a></div>
                                     @endif
@@ -559,8 +559,8 @@
                                 </div>
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="inspection_form" class="form-label">Inspection Form</label>
-                                    <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @if($transaction->documents->where('type', 'inspection_form')->first())
                                     <div class="file-note">Current: <a href="{{ Storage::url($transaction->documents->where('type', 'inspection_form')->first()->file_path) }}" target="_blank">{{ $transaction->documents->where('type', 'inspection_form')->first()->file_name }}</a></div>
                                     @endif
@@ -570,8 +570,8 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="customs_release_form" class="form-label">Customs Release Form</label>
-                                    <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @if($transaction->documents->where('type', 'customs_release_form')->first())
                                     <div class="file-note">Current: <a href="{{ Storage::url($transaction->documents->where('type', 'customs_release_form')->first()->file_path) }}" target="_blank">{{ $transaction->documents->where('type', 'customs_release_form')->first()->file_name }}</a></div>
                                     @endif
@@ -583,8 +583,8 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6" id="charge_permit_document_field" style="display: none;">
                                     <label for="charge_permit_document" class="form-label">Charge Permit Document</label>
-                                    <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @if($transaction->documents->where('type', 'charge_permit_document')->first())
                                     <div class="file-note">Current: <a href="{{ Storage::url($transaction->documents->where('type', 'charge_permit_document')->first()->file_path) }}" target="_blank">{{ $transaction->documents->where('type', 'charge_permit_document')->first()->file_name }}</a></div>
                                     @endif
@@ -594,8 +594,8 @@
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_document_field" style="display: none;">
                                     <label for="discharge_permit_document" class="form-label">Discharge Permit Document</label>
-                                    <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @if($transaction->documents->where('type', 'discharge_permit_document')->first())
                                     <div class="file-note">Current: <a href="{{ Storage::url($transaction->documents->where('type', 'discharge_permit_document')->first()->file_path) }}" target="_blank">{{ $transaction->documents->where('type', 'discharge_permit_document')->first()->file_name }}</a></div>
                                     @endif
@@ -1150,12 +1150,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const file = this.files[0];
                 if (file) {
                     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    const maxSize = 2 * 1024 * 1024; // 4MB
                     if (!validTypes.includes(file.type)) {
                         alert('Invalid file type. Only PDF, JPG, and PNG are accepted.');
                         this.value = '';
                     } else if (file.size > maxSize) {
-                        alert('File size exceeds 2MB limit.');
+                        alert('File size exceeds 4MB limit.');
                         this.value = '';
                     }
                 }

@@ -2561,6 +2561,7 @@ namespace App\Models {
      * @property array|null $details
      * @property \Illuminate\Support\Carbon|null $end_date
      * @property \Illuminate\Support\Carbon $start_date
+     * @property int|null $contract_duration
      * @property int|null $product_id
      * @property int $company_id
      * @property int $tank_id
@@ -2572,6 +2573,7 @@ namespace App\Models {
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereTankId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereCompanyId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereProductId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereContractDuration($value)
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereStartDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereEndDate($value)
      * @method static \Illuminate\Database\Eloquent\Builder<TankRental>|TankRental whereDetails($value)

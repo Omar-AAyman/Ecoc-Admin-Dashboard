@@ -547,8 +547,8 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="measurement_report" class="form-label">Measurement Report</label>
-                                    <input type="file" name="measurement_report" id="measurement_report" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="measurement_report" id="measurement_report" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @error('measurement_report')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -557,16 +557,16 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <label for="inspection_form" class="form-label">Inspection Form</label>
-                                    <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="inspection_form" id="inspection_form" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @error('inspection_form')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label for="customs_release_form" class="form-label">Customs Release Form</label>
-                                    <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="customs_release_form" id="customs_release_form" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @error('customs_release_form')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -575,16 +575,16 @@
                             <div class="row mb-3">
                                 <div class="col-12 col-md-6" id="charge_permit_document_field" style="display: none;">
                                     <label for="charge_permit_document" class="form-label">Charge Permit Document</label>
-                                    <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="charge_permit_document" id="charge_permit_document" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @error('charge_permit_document')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="col-12 col-md-6" id="discharge_permit_document_field" style="display: none;">
                                     <label for="discharge_permit_document" class="form-label">Discharge Permit Document</label>
-                                    <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="2048">
-                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 2MB.</div>
+                                    <input type="file" name="discharge_permit_document" id="discharge_permit_document" class="form-control" accept=".pdf,image/*" max-size="4096">
+                                    <div class="file-note">Accepted formats: PDF, JPG, PNG. Maximum file size: 4MB.</div>
                                     @error('discharge_permit_document')
                                     <div class="text-danger">{{ $message }}</div>
                                     @enderror
@@ -1035,12 +1035,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 const file = this.files[0];
                 if (file) {
                     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-                    const maxSize = 2 * 1024 * 1024; // 2MB
+                    const maxSize = 4 * 1024 * 1024; // 4MB
                     if (!validTypes.includes(file.type)) {
                         alert('Invalid file type. Only PDF, JPG, and PNG are accepted.');
                         this.value = '';
                     } else if (file.size > maxSize) {
-                        alert('File size exceeds 2MB limit.');
+                        alert('File size exceeds 4MB limit.');
                         this.value = '';
                     }
                 }

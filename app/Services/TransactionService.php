@@ -55,21 +55,21 @@ class TransactionService
             }
 
             $query->where('company_id', $companyId)
-                  ->where(function ($q) use ($rentedTankIds) {
-                      $q->whereIn('tank_id', $rentedTankIds)
+                ->where(function ($q) use ($rentedTankIds) {
+                    $q->whereIn('tank_id', $rentedTankIds)
                         ->orWhereIn('destination_tank_id', $rentedTankIds);
-                  })
-                  ->whereExists(function ($subQuery) use ($companyId) {
-                      $subQuery->select(DB::raw(1))
-                               ->from('tank_rentals')
-                               ->where(function ($q) {
-                                   $q->whereColumn('tank_rentals.tank_id', 'transactions.tank_id')
-                                     ->orWhereColumn('tank_rentals.tank_id', 'transactions.destination_tank_id');
-                               })
-                               ->where('tank_rentals.company_id', $companyId)
-                               ->whereNull('tank_rentals.end_date')
-                               ->whereColumn('transactions.date', '>', 'tank_rentals.start_date');
-                  });
+                })
+                ->whereExists(function ($subQuery) use ($companyId) {
+                    $subQuery->select(DB::raw(1))
+                        ->from('tank_rentals')
+                        ->where(function ($q) {
+                            $q->whereColumn('tank_rentals.tank_id', 'transactions.tank_id')
+                                ->orWhereColumn('tank_rentals.tank_id', 'transactions.destination_tank_id');
+                        })
+                        ->where('tank_rentals.company_id', $companyId)
+                        ->whereNull('tank_rentals.end_date')
+                        ->whereColumn('transactions.date', '>', 'tank_rentals.start_date');
+                });
         }
 
         // Apply additional filters
@@ -104,12 +104,12 @@ class TransactionService
                 $q->whereHas('company', function ($q) use ($filters) {
                     $q->where('name', 'like', '%' . $filters['search'] . '%');
                 })
-                  ->orWhereHas('product', function ($q) use ($filters) {
-                      $q->where('name', 'like', '%' . $filters['search'] . '%');
-                  })
-                  ->orWhereHas('tank', function ($q) use ($filters) {
-                      $q->where('number', 'like', '%' . $filters['search'] . '%');
-                  });
+                    ->orWhereHas('product', function ($q) use ($filters) {
+                        $q->where('name', 'like', '%' . $filters['search'] . '%');
+                    })
+                    ->orWhereHas('tank', function ($q) use ($filters) {
+                        $q->where('number', 'like', '%' . $filters['search'] . '%');
+                    });
             });
         }
         if (!empty($filters['from'])) {
@@ -311,20 +311,24 @@ class TransactionService
                 'charge_permit_document',
                 'discharge_permit_document'
             ];
+
             foreach ($documentTypes as $type) {
                 if (isset($files[$type]) && $files[$type]->isValid()) {
                     $file = $files[$type];
                     $fileName = $file->getClientOriginalName();
-                    $filePath = $file->storeAs(
-                        "transactions/{$transaction->id}",
-                        "{$type}_" . time() . '_' . $fileName,
-                        'public'
-                    );
+                    $finalName = "{$type}_" . time() . '_' . $fileName;
+                    $directory = public_path("storage/transactions/{$transaction->id}");
+
+                    if (!is_dir($directory)) {
+                        mkdir($directory, 0775, true);
+                    }
+
+                    $file->move($directory, $finalName);
 
                     TransactionDocument::create([
                         'transaction_id' => $transaction->id,
                         'type' => $type,
-                        'file_path' => $filePath,
+                        'file_path' => "storage/transactions/{$transaction->id}/{$finalName}",
                         'file_name' => $fileName,
                         'uploaded_by' => $user->id,
                     ]);
@@ -505,27 +509,33 @@ class TransactionService
                     $existingDoc = TransactionDocument::where('transaction_id', $transaction->id)
                         ->where('type', $type)
                         ->first();
-                    if ($existingDoc) {
-                        Storage::disk('public')->delete($existingDoc->file_path);
+
+                    if ($existingDoc && file_exists(public_path($existingDoc->file_path))) {
+                        unlink(public_path($existingDoc->file_path));
                         $existingDoc->delete();
                     }
+
                     $file = $files[$type];
                     $fileName = $file->getClientOriginalName();
-                    $filePath = $file->storeAs(
-                        "transactions/{$transaction->id}",
-                        "{$type}_" . time() . '_' . $fileName,
-                        'public'
-                    );
+                    $finalName = "{$type}_" . time() . '_' . $fileName;
+                    $directory = public_path("storage/transactions/{$transaction->id}");
+
+                    if (!is_dir($directory)) {
+                        mkdir($directory, 0775, true);
+                    }
+
+                    $file->move($directory, $finalName);
 
                     TransactionDocument::create([
                         'transaction_id' => $transaction->id,
                         'type' => $type,
-                        'file_path' => $filePath,
+                        'file_path' => "storage/transactions/{$transaction->id}/{$finalName}",
                         'file_name' => $fileName,
                         'uploaded_by' => $user->id,
                     ]);
                 }
             }
+
 
             $newData = $transaction->toArray();
             $newData['shipment'] = $transaction->shipment ? $transaction->shipment->toArray() : null;
@@ -581,7 +591,9 @@ class TransactionService
             // Delete associated documents and their files
             $documents = TransactionDocument::where('transaction_id', $transaction->id)->get();
             foreach ($documents as $document) {
-                Storage::disk('public')->delete($document->file_path);
+                if ($document->file_path && file_exists(public_path($document->file_path))) {
+                    unlink(public_path($document->file_path));
+                }
                 $document->delete();
             }
 

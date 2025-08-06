@@ -70,6 +70,7 @@ class TankService
                     'start_date' => $rental->start_date ? $rental->start_date->format('Y-m-d') : 'N/A',
                     'end_date' => $rental->end_date ? $rental->end_date->format('Y-m-d') : 'Ongoing',
                     'details' => $rental->details ? json_encode($rental->details) : 'N/A',
+                    'contract_duration' => $rental->contract_duration ? $rental->contract_duration . ' months' : 'N/A',
                 ];
             })->values();
 
@@ -222,6 +223,13 @@ class TankService
                 }
             }
 
+            // Validate contract_duration
+            if (isset($data['contract_duration']) && $data['contract_duration'] !== null) {
+                if (!is_numeric($data['contract_duration']) || $data['contract_duration'] < 0) {
+                    throw new \Exception("Contract duration must be a non-negative number of months.");
+                }
+            }
+
             // Set status based on company_id or product_id
             $data['status'] = (isset($data['company_id']) && $data['company_id']) || (isset($data['product_id']) && $data['product_id']) ? 'In Use' : 'Available';
             $tank = Tank::create($data);
@@ -233,6 +241,7 @@ class TankService
                     'company_id' => $data['company_id'],
                     'product_id' => $data['product_id'] ?? null,
                     'start_date' => Carbon::now(),
+                    'contract_duration' => $data['contract_duration'] ?? null,
                 ]);
             }
 
@@ -267,6 +276,17 @@ class TankService
                 );
             }
 
+            if (isset($data['contract_duration']) && $data['contract_duration'] !== null) {
+                $this->activityLogService->logActivity(
+                    $user,
+                    'tank_rental.contract_duration_set',
+                    "Set contract duration for tank {$tank->number} to {$data['contract_duration']} months",
+                    $tank,
+                    [],
+                    ['contract_duration' => $data['contract_duration']]
+                );
+            }
+
             return $tank;
         });
     }
@@ -293,6 +313,13 @@ class TankService
             if (isset($data['temperature']) && $data['temperature'] !== null) {
                 if (!is_numeric($data['temperature']) || $data['temperature'] < -50 || $data['temperature'] > 100) {
                     throw new \Exception("Temperature must be a number between -50°C and 100°C.");
+                }
+            }
+
+            // Validate contract_duration
+            if (isset($data['contract_duration']) && $data['contract_duration'] !== null) {
+                if (!is_numeric($data['contract_duration']) || $data['contract_duration'] < 0) {
+                    throw new \Exception("Contract duration must be a non-negative number of months.");
                 }
             }
 
@@ -325,6 +352,7 @@ class TankService
                         'company_id' => $data['company_id'],
                         'product_id' => $data['product_id'] ?? null,
                         'start_date' => Carbon::now(),
+                        'contract_duration' => $data['contract_duration'] ?? null,
                     ]);
                     $this->activityLogService->logActivity(
                         $user,
@@ -335,6 +363,18 @@ class TankService
                         $newRental->getAttributes()
                     );
                 }
+            } elseif ($activeRental && isset($data['contract_duration']) && $data['contract_duration'] != $activeRental->contract_duration) {
+                // Update contract_duration for existing active rental
+                $oldDuration = $activeRental->contract_duration;
+                $activeRental->update(['contract_duration' => $data['contract_duration']]);
+                $this->activityLogService->logActivity(
+                    $user,
+                    'tank_rental.contract_duration_updated',
+                    "Updated contract duration for tank {$tank->number} from " . ($oldDuration ?? 'N/A') . " months to {$data['contract_duration']} months",
+                    $tank,
+                    ['contract_duration' => $oldDuration],
+                    ['contract_duration' => $data['contract_duration']]
+                );
             }
 
             $oldData = $tank->getAttributes();
