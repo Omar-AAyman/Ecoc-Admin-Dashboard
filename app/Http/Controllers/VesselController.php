@@ -12,7 +12,7 @@ class VesselController extends Controller
 
     public function __construct(VesselService $vesselService)
     {
-        $this->middleware('restrict.to.role:super_admin');
+        $this->middleware('restrict.to.role:super_admin,engineer');
         $this->vesselService = $vesselService;
     }
 

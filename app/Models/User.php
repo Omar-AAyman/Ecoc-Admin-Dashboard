@@ -89,6 +89,11 @@ class User extends Authenticatable
         return $this->role->name === 'super_admin';
     }
 
+    public function isEngineer()
+    {
+        return $this->role->name === 'engineer';
+    }
+
     public function isCEO()
     {
         return $this->role->name === 'ceo';
@@ -108,6 +113,7 @@ class User extends Authenticatable
         if (!is_array($roles)) {
             $roles = [$roles];
         }
+        // dd($roles,$this->role && in_array($this->role->name, $roles));
         return $this->role && in_array($this->role->name, $roles);
     }
 
@@ -124,7 +130,7 @@ class User extends Authenticatable
 
     public function getImageUrlAttribute(): string
     {
-        
+
         return $this->image ? Storage::url($this->image) : asset('panel/assets/img/users/1.jpg');
     }
 }

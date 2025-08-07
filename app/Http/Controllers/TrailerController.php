@@ -12,7 +12,7 @@ class TrailerController extends Controller
 
     public function __construct(TrailerService $trailerService)
     {
-        $this->middleware('restrict.to.role:super_admin');
+        $this->middleware('restrict.to.role:super_admin,engineer');
         $this->trailerService = $trailerService;
     }
 

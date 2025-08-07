@@ -18,12 +18,12 @@ class UserService
 
     public function getNonClientUsers()
     {
-        return User::with('role')->whereIn('role_id', [1, 2])->get();
+        return User::with('role')->whereIn('role_id', [1, 2, 3])->get();
     }
 
     public function getPaginatedNonClientUsers($search = null, $perPage = 10)
     {
-        $query = User::with('role')->whereIn('role_id', [1, 2]);
+        $query = User::with('role')->whereIn('role_id', [1, 2, 3]);
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -76,7 +76,7 @@ class UserService
             }
 
             $data['password'] = Hash::make($data['password']);
-            $data['role_id'] = 3;
+            $data['role_id'] = 4;
             $data['position'] = 'None';
             $data['image'] = $imagePath;
 
@@ -240,7 +240,6 @@ class UserService
             return true;
         });
     }
-
 
     public function updateProfile(array $data, User $authUser)
     {

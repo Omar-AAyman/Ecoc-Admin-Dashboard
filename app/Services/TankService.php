@@ -24,7 +24,7 @@ class TankService
     public function getTanks(User $user)
     {
         $tanks = collect();
-        if ($user->hasAnyRole(['super_admin', 'ceo'])) {
+        if ($user->hasAnyRole(['super_admin', 'engineer', 'ceo'])) {
             $tanks = Tank::with(['product', 'company', 'tankRentals', 'transactions', 'destinationTransactions'])
                 ->orderBy('id', 'asc')
                 ->get();
@@ -166,7 +166,7 @@ class TankService
     {
         $query = Tank::with(['product', 'company'])->orderBy('id', 'asc');
 
-        if ($user->hasAnyRole(['super_admin', 'ceo'])) {
+        if ($user->hasAnyRole(['super_admin', 'engineer', 'ceo'])) {
             // No filtering for super_admin or ceo
         } elseif ($user->isClient()) {
             if (!$user->company_id || !Tank::where('company_id', $user->company_id)->exists()) {

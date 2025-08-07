@@ -12,7 +12,7 @@ class SearchController extends Controller
 
     public function __construct(SearchService $searchService)
     {
-        $this->middleware(['auth', 'localeSessionRedirect', 'localizationRedirect', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,ceo,client']);
+        $this->middleware(['auth', 'localeSessionRedirect', 'localizationRedirect', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,engineer,ceo,client']);
         $this->searchService = $searchService;
     }
 

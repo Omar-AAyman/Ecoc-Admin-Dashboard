@@ -12,7 +12,7 @@ class TruckController extends Controller
 
     public function __construct(TruckService $truckService)
     {
-        $this->middleware('restrict.to.role:super_admin');
+        $this->middleware('restrict.to.role:super_admin,engineer');
         $this->truckService = $truckService;
     }
 

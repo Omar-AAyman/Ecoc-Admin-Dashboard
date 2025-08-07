@@ -43,7 +43,7 @@
             <a href="{{ route('tanks.edit', $tank->id) }}" class="btn btn-sm btn-primary" title="Edit">
                 <i class="fas fa-edit"></i>
             </a>
-            @if (auth()->user()->hasRole('super_admin'))
+            @if (auth()->user()->hasRole('super_admin','engineer'))
             <button type="button" class="btn btn-sm btn-secondary reset-btn" data-tank-id="{{ $tank->id }}" data-tank-number="{{ $tank->number }}" data-bs-toggle="modal" data-bs-target="#resetModal" title="Reset">
                 <i class="fas fa-undo"></i>
             </button>

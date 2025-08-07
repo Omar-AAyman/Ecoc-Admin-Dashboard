@@ -22,7 +22,7 @@ class TransactionController extends Controller
 
     public function __construct(TransactionService $transactionService, TankService $tankService)
     {
-        $this->middleware('restrict.to.role:super_admin,ceo,client');
+        $this->middleware('restrict.to.role:super_admin,engineer,ceo,client');
         $this->transactionService = $transactionService;
         $this->tankService = $tankService;
     }

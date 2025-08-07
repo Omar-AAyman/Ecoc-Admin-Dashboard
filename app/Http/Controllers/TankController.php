@@ -15,7 +15,7 @@ class TankController extends Controller
 
     public function __construct(TankService $tankService)
     {
-        $this->middleware('restrict.to.role:super_admin,ceo');
+        $this->middleware('restrict.to.role:super_admin,engineer,ceo');
         $this->tankService = $tankService;
     }
 

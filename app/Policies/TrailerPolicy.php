@@ -8,26 +8,26 @@ class TrailerPolicy
 {
     public function viewAny(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'engineer']);
     }
 
     public function view(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'engineer']);
     }
 
     public function create(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'engineer']);
     }
 
     public function update(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'engineer']);
     }
 
     public function delete(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasAnyRole(['super_admin', 'engineer']);
     }
 }

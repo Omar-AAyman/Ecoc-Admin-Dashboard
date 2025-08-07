@@ -16,7 +16,7 @@ class UserController extends Controller
 
     public function __construct(UserService $userService)
     {
-        $this->middleware('restrict.to.role:super_admin')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        $this->middleware('restrict.to.role:super_admin,engineer')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
         $this->middleware('auth')->only(['profile', 'updateProfile']);
         $this->userService = $userService;
     }
@@ -47,7 +47,7 @@ class UserController extends Controller
     public function create()
     {
         $this->authorize('create', \App\Models\User::class);
-        $roles = Role::whereIn('name', ['super_admin', 'ceo'])->get();
+        $roles = Role::whereIn('name', ['super_admin', 'engineer', 'ceo'])->get();
         return view('users.create', compact('roles'));
     }
 
@@ -59,7 +59,7 @@ class UserController extends Controller
             'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id|in:1,2',
+            'role_id' => 'required|exists:roles,id|in:1,2,3',
             'status' => 'required|in:active,inactive',
             'position' => 'nullable|in:Engineer,Technician,CEO,Other,None',
         ], [
@@ -77,10 +77,10 @@ class UserController extends Controller
             'password.confirmed' => 'The password confirmation does not match.',
             'role_id.required' => 'The role is required.',
             'role_id.exists' => 'The selected role is invalid.',
-            'role_id.in' => 'The role must be either super_admin or ceo.',
+            'role_id.in' => 'The role must be either super_admin, engineer, or ceo.',
             'status.required' => 'The status is required.',
             'status.in' => 'The status must be active or inactive.',
-            'status.in' => 'The position must be Engineer or Technician, CEO, Other or None!.',
+            'position.in' => 'The position must be Engineer, Technician, CEO, Other, or None.',
         ]);
 
         if ($validator->fails()) {
@@ -102,7 +102,7 @@ class UserController extends Controller
         if ($user->isClient()) {
             return redirect()->route('users.index')->with('error', 'Cannot edit client users here');
         }
-        $roles = Role::whereIn('name', ['super_admin', 'ceo'])->get();
+        $roles = Role::whereIn('name', ['super_admin', 'engineer', 'ceo'])->get();
         return view('users.edit', compact('user', 'roles'));
     }
 
@@ -117,7 +117,7 @@ class UserController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'password' => 'nullable|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id|in:1,2',
+            'role_id' => 'required|exists:roles,id|in:1,2,3',
             'status' => 'required|in:active,inactive',
             'position' => 'nullable|in:Engineer,Technician,CEO,Other,None',
         ], [
@@ -131,9 +131,10 @@ class UserController extends Controller
             'password.confirmed' => 'The password confirmation does not match.',
             'role_id.required' => 'The role is required.',
             'role_id.exists' => 'The selected role is invalid.',
-            'role_id.in' => 'The role must be either super_admin or ceo.',
+            'role_id.in' => 'The role must be either super_admin, engineer, or ceo.',
             'status.required' => 'The status is required.',
             'status.in' => 'The status must be active or inactive.',
+            'position.in' => 'The position must be Engineer, Technician, CEO, Other, or None.',
         ]);
 
         if ($validator->fails()) {
@@ -166,7 +167,7 @@ class UserController extends Controller
         $perPage = $request->input('per_page', 10);
         $search = $request->input('search');
 
-        $query = User::with(['role', 'company'])->where('role_id', 3)->whereNull('deleted_at');
+        $query = User::with(['role', 'company'])->where('role_id', 4)->whereNull('deleted_at');
         if ($request->user()->hasRole('client')) {
             $query->where('company_id', $request->user()->company_id);
         }
@@ -194,7 +195,14 @@ class UserController extends Controller
             ]);
         }
 
-        return view('clients.index', compact('clients'));
+        $hasActions = false;
+        foreach ($clients as $client) {
+            if (auth()->user()->can('view', $client) || (auth()->user()->hasAnyRole(['super_admin', 'ceo']) && (auth()->user()->can('update', $client) || auth()->user()->can('delete', $client)))) {
+                $hasActions = true;
+                break;
+            }
+        }
+        return view('clients.index', compact('clients', 'hasActions'));
     }
 
     public function clientShow($id)

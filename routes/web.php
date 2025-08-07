@@ -35,25 +35,28 @@ Route::group(
             'auth',
             'check.user.status',
             'restrict.client.no.tanks',
-            'restrict.to.role:super_admin,ceo,client'
+            'restrict.to.role:super_admin,engineer,ceo,client'
         ]
     ],
     function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::resource('tanks', TankController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
-        Route::get('/tanks/settings', [TankController::class, 'settings'])->name('tanks.settings');
-        Route::post('/tanks/{id}/settings', [TankController::class, 'updateSettings'])->name('tanks.updateSettings');
-        Route::post('/tanks/{id}/reset', [TankController::class, 'resetTank'])->middleware('restrict.to.role:super_admin,ceo')->name('tanks.reset');
+        Route::resource('tanks', TankController::class)->only(['settings', 'create', 'store', 'edit', 'update', 'destroy'])
+            ->middleware('restrict.to.role:super_admin,engineer,ceo');
+        Route::get('/tanks/settings', [TankController::class, 'settings'])->name('tanks.settings')
+            ->middleware('restrict.to.role:super_admin,engineer,ceo');
+        Route::post('/tanks/{id}/settings', [TankController::class, 'updateSettings'])->name('tanks.updateSettings')
+            ->middleware('restrict.to.role:super_admin,engineer,ceo');
+        Route::post('/tanks/{id}/reset', [TankController::class, 'resetTank'])->middleware('restrict.to.role:super_admin')->name('tanks.reset');
         Route::resource('products', ProductController::class);
         Route::resource('vessels', VesselController::class);
 
         Route::resource('trucks', TruckController::class);
         Route::resource('trailers', TrailerController::class);
         Route::resource('drivers', DriverController::class);
-        Route::resource('users', UserController::class)->middleware('restrict.to.role:super_admin,ceo')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+        Route::resource('users', UserController::class)->middleware('restrict.to.role:super_admin')->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
-        Route::prefix('clients')->middleware('restrict.to.role:super_admin,ceo')->group(function () {
+        Route::prefix('clients')->middleware('restrict.to.role:super_admin,ceo,engineer')->group(function () {
             Route::get('/', [UserController::class, 'clientIndex'])->name('clients.index');
             Route::get('/create', [UserController::class, 'clientCreate'])->name('clients.create');
             Route::post('/', [UserController::class, 'clientStore'])->name('clients.store');
@@ -65,13 +68,19 @@ Route::group(
 
         Route::prefix('/transactions')->group(function () {
             Route::get('/', [TransactionController::class, 'index'])->name('transactions.index');
-            Route::get('/create', [TransactionController::class, 'create'])->name('transactions.create');
-            Route::get('/{id}/edit', [TransactionController::class, 'edit'])->name('transactions.edit');
-            Route::put('/{id}', [TransactionController::class, 'update'])->name('transactions.update');
-            Route::post('/', [TransactionController::class, 'store'])->name('transactions.store');
+            Route::get('/create', [TransactionController::class, 'create'])->name('transactions.create')
+                ->middleware('restrict.to.role:super_admin,engineer');
+            Route::get('/{id}/edit', [TransactionController::class, 'edit'])->name('transactions.edit')
+                ->middleware('restrict.to.role:super_admin,engineer');
+            Route::put('/{id}', [TransactionController::class, 'update'])->name('transactions.update')
+                ->middleware('restrict.to.role:super_admin,engineer');
+            Route::post('/', [TransactionController::class, 'store'])->name('transactions.store')
+                ->middleware('restrict.to.role:super_admin,engineer');
             Route::get('/{id}', [TransactionController::class, 'showDetails'])->name('transactions.show');
-            Route::get('/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate');
-            Route::delete('/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+            Route::get('/{id}/duplicate', [TransactionController::class, 'duplicate'])->name('transactions.duplicate')
+                ->middleware('restrict.to.role:super_admin,engineer');
+            Route::delete('/{id}', [TransactionController::class, 'destroy'])->name('transactions.destroy')
+                ->middleware('restrict.to.role:super_admin');
         });
 
         // Profile Management
@@ -81,7 +90,7 @@ Route::group(
         });
 
         // Activity logs
-        Route::prefix('/activity-logs')->group(function () {
+        Route::prefix('/activity-logs')->middleware('restrict.to.role:super_admin,ceo')->group(function () {
             Route::get('/', [ActivityLogController::class, 'index'])->name('activity-logs.index');
             Route::get('/{id}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
         });
@@ -93,7 +102,7 @@ Route::group(
 
 Route::prefix(LaravelLocalization::setLocale())->group(function () {
 
-    Route::prefix('/api')->middleware(['auth', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,ceo,client'])->group(function () {
+    Route::prefix('/api')->middleware(['auth', 'restrict.client.no.tanks', 'restrict.to.role:super_admin,engineer,ceo,client'])->group(function () {
         Route::get('/tanks/{id}/company', [TankController::class, 'getCompany']);
         Route::get('/tanks/{id}/product', [TankController::class, 'getProduct']);
         Route::get('/tanks/{id}/capacity', [TankController::class, 'getCapacity']);
@@ -105,7 +114,6 @@ Route::prefix(LaravelLocalization::setLocale())->group(function () {
         Route::get('/search', [SearchController::class, 'ajaxSearch'])->name('search.ajax');
     });
 });
-
 
 // Auth routes (outside localization)
 require __DIR__ . '/auth.php';

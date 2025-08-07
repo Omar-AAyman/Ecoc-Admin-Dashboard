@@ -8,12 +8,12 @@ class UserPolicy
 {
     public function viewAny(User $user)
     {
-        return $user->hasRole('super_admin') || $user->hasRole('client');
+        return $user->hasAnyRole(['super_admin', 'engineer', 'client']);
     }
 
     public function view(User $user)
     {
-        return $user->hasRole('super_admin');
+        return $user->hasRole('super_admin', 'engineer');
     }
 
     public function create(User $user)
@@ -25,21 +25,24 @@ class UserPolicy
     {
         if (!$model) {
             // Class-based authorization (e.g., for accessing edit form)
-            return $user->hasRole('super_admin') || $user->hasRole('client');
+            return $user->hasAnyRole(['super_admin', 'client']);
         }
 
         // Instance-based authorization
-        return $user->hasRole('super_admin') || ($user->hasRole('client') && $user->company_id === $model->company_id) || $user->id === $model->id;
+        return $user->hasRole('super_admin', 'engineer') ||
+            ($user->hasRole('client') && $user->company_id === $model->company_id) ||
+            $user->id === $model->id;
     }
 
     public function delete(User $user, User $model = null)
     {
         if (!$model) {
             // Class-based authorization (e.g., for accessing delete routes)
-            return $user->hasRole('super_admin') || $user->hasRole('client');
+            return $user->hasAnyRole(['super_admin', 'client']);
         }
 
         // Instance-based authorization
-        return ($user->hasRole('super_admin') && $user->id !== $model->id) || ($user->hasRole('client') && $user->company_id === $model->company_id && $user->id !== $model->id);
+        return ($user->hasRole('super_admin') && $user->id !== $model->id) ||
+            ($user->hasRole('client') && $user->company_id === $model->company_id && $user->id !== $model->id);
     }
 }

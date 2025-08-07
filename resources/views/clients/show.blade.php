@@ -264,7 +264,7 @@
                             <i class="fas fa-user me-2"></i>Client Details
                         </h2>
                         <div class="d-flex gap-2">
-                            @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
+                            @if (auth()->user()->hasAnyRole(['super_admin', 'engineer', 'ceo']))
                             <a href="{{ route('clients.edit', $client->id) }}" class="btn btn-primary d-flex align-items-center" title="Edit Client">
                                 <i class="fas fa-edit me-2"></i>Edit Client
                             </a>

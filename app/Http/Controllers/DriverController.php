@@ -12,7 +12,7 @@ class DriverController extends Controller
 
     public function __construct(DriverService $driverService)
     {
-        $this->middleware('restrict.to.role:super_admin');
+        $this->middleware('restrict.to.role:super_admin,engineer');
         $this->driverService = $driverService;
     }
 

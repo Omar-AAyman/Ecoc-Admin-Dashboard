@@ -13,7 +13,7 @@ class ProductController extends Controller
 
     public function __construct(ProductService $productService)
     {
-        $this->middleware('restrict.to.role:super_admin');
+        $this->middleware('restrict.to.role:super_admin,engineer');
         $this->productService = $productService;
     }
 

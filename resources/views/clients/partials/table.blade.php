@@ -17,7 +17,7 @@
                 <i class="fas fa-eye"></i>
             </a>
             @endcan
-            @if (auth()->user()->hasAnyRole(['super_admin', 'ceo']))
+            @if (auth()->user()->hasAnyRole(['super_admin', 'engineer', 'ceo']))
             @can('update', $client)
             <a href="{{ route('clients.edit', $client->id) }}" class="btn btn-sm btn-primary" title="Edit Client">
                 <i class="fas fa-edit"></i>

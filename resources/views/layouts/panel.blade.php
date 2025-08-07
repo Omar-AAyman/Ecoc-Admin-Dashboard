@@ -125,15 +125,13 @@
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Dashboard</span>
                         </a>
                     </li>
-                    @if (auth()->user() && auth()->user()->isSuperAdmin())
-                    <li class="nav-item @if(Route::currentRouteName() === 'tanks.settings') active @endif">
+                    {{-- <li class="nav-item @if(Route::currentRouteName() === 'tanks.index') active @endif">
                         <a class="nav-link" href="{{ route('tanks.settings') }}">
                             <span class="shape1"></span><span class="shape2"></span>
                             <i class="ti-settings sidemenu-icon"></i>
-                            <span class="sidemenu-label" style="font-size: 0.9rem;">Tank Settings</span>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Tanks</span>
                         </a>
-                    </li>
-                    @endif
+                    </li> --}}
                     <li class="nav-item @if(Route::currentRouteName() === 'transactions.index') active @endif">
                         <a class="nav-link" href="{{ route('transactions.index') }}">
                             <span class="shape1"></span><span class="shape2"></span>
@@ -141,13 +139,47 @@
                             <span class="sidemenu-label" style="font-size: 0.9rem;">Transactions</span>
                         </a>
                     </li>
-
-                    @if (auth()->user() && auth()->user()->isSuperAdmin())
-                        <li class="nav-item @if(Route::currentRouteName() === 'users.index') active @endif">
-                            <a class="nav-link" href="{{ route('users.index') }}">
+                    <li class="nav-item @if(Route::currentRouteName() === 'products.index') active @endif">
+                        <a class="nav-link" href="{{ route('products.index') }}">
+                            <span class="shape1"></span><span class="shape2"></span>
+                            <i class="ti-package sidemenu-icon"></i>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Products</span>
+                        </a>
+                    </li>
+                    <li class="nav-item @if(Route::currentRouteName() === 'vessels.index') active @endif">
+                        <a class="nav-link" href="{{ route('vessels.index') }}">
+                            <span class="shape1"></span><span class="shape2"></span>
+                            <i class="fas fa-ship sidemenu-icon"></i>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Vessels</span>
+                        </a>
+                    </li>
+                    <li class="nav-item @if(Route::currentRouteName() === 'trucks.index') active @endif">
+                        <a class="nav-link" href="{{ route('trucks.index') }}">
+                            <span class="shape1"></span><span class="shape2"></span>
+                            <i class="fas fa-truck sidemenu-icon"></i>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Trucks</span>
+                        </a>
+                    </li>
+                    <li class="nav-item @if(Route::currentRouteName() === 'trailers.index') active @endif">
+                        <a class="nav-link" href="{{ route('trailers.index') }}">
+                            <span class="shape1"></span><span class="shape2"></span>
+                            <i class="fas fa-trailer sidemenu-icon"></i>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Trailers</span>
+                        </a>
+                    </li>
+                    <li class="nav-item @if(Route::currentRouteName() === 'drivers.index') active @endif">
+                        <a class="nav-link" href="{{ route('drivers.index') }}">
+                            <span class="shape1"></span><span class="shape2"></span>
+                            <i class="fas fa-user-tie sidemenu-icon"></i>
+                            <span class="sidemenu-label" style="font-size: 0.9rem;">Drivers</span>
+                        </a>
+                    </li>
+                    @if (auth()->user() && (auth()->user()->isSuperAdmin() || auth()->user()->isEngineer() ||auth()->user()->isCEO()))
+                        <li class="nav-item @if(Route::currentRouteName() === 'tanks.settings') active @endif">
+                            <a class="nav-link" href="{{ route('tanks.settings') }}">
                                 <span class="shape1"></span><span class="shape2"></span>
-                                <i class="ti-user sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Admins</span>
+                                <i class="ti-settings sidemenu-icon"></i>
+                                <span class="sidemenu-label" style="font-size: 0.9rem;">Tank Settings</span>
                             </a>
                         </li>
                         <li class="nav-item @if(Route::currentRouteName() === 'clients.index') active @endif">
@@ -157,41 +189,6 @@
                                 <span class="sidemenu-label" style="font-size: 0.9rem;">Clients</span>
                             </a>
                         </li>
-                        <li class="nav-item @if(Route::currentRouteName() === 'products.index') active @endif">
-                            <a class="nav-link" href="{{ route('products.index') }}">
-                                <span class="shape1"></span><span class="shape2"></span>
-                                <i class="ti-package sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Products</span>
-                            </a>
-                        </li>
-                        <li class="nav-item @if(Route::currentRouteName() === 'vessels.index') active @endif">
-                            <a class="nav-link" href="{{ route('vessels.index') }}">
-                                <span class="shape1"></span><span class="shape2"></span>
-                                <i class="fas fa-ship sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Vessels</span>
-                            </a>
-                        </li>
-                        <li class="nav-item @if(Route::currentRouteName() === 'trucks.index') active @endif">
-                            <a class="nav-link" href="{{ route('trucks.index') }}">
-                                <span class="shape1"></span><span class="shape2"></span>
-                                <i class="fas fa-truck sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Trucks</span>
-                            </a>
-                        </li>
-                        <li class="nav-item @if(Route::currentRouteName() === 'trailers.index') active @endif">
-                            <a class="nav-link" href="{{ route('trailers.index') }}">
-                                <span class="shape1"></span><span class="shape2"></span>
-                                <i class="fas fa-trailer sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Trailers</span>
-                            </a>
-                        </li>
-                        <li class="nav-item @if(Route::currentRouteName() === 'drivers.index') active @endif">
-                            <a class="nav-link" href="{{ route('drivers.index') }}">
-                                <span class="shape1"></span><span class="shape2"></span>
-                                <i class="fas fa-user-tie sidemenu-icon"></i>
-                                <span class="sidemenu-label" style="font-size: 0.9rem;">Drivers</span>
-                            </a>
-                        </li>
                         <li class="nav-item @if(in_array(Route::currentRouteName(), ['activity-logs.index', 'activity-logs.show'])) active @endif">
                             <a class="nav-link" href="{{ route('activity-logs.index') }}">
                                 <i class="ti-receipt sidemenu-icon"></i>
@@ -199,7 +196,15 @@
                             </a>
                         </li>
                     @endif
-
+                    @if (auth()->user() && auth()->user()->isSuperAdmin())
+                        <li class="nav-item @if(Route::currentRouteName() === 'users.index') active @endif">
+                            <a class="nav-link" href="{{ route('users.index') }}">
+                                <span class="shape1"></span><span class="shape2"></span>
+                                <i class="ti-user sidemenu-icon"></i>
+                                <span class="sidemenu-label" style="font-size: 0.9rem;">Admins</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </div>
@@ -216,60 +221,58 @@
                         <a href="{{ route('dashboard') }}"><img src="{{ url('panel/assets/img/brand/logo.png') }}" class="mobile-logo d-lg-none header-brand-img text-left float-left" alt="ECOC Logo" style="background-color: #000b43; border-radius: 5px; max-height: 52px"></a>
                         <a href="{{ route('dashboard') }}"><img src="{{ url('panel/assets/img/brand/logo.png') }}" class="mobile-logo-dark" alt="logo"></a>
                     </div>
-                    @if (auth()->user() && auth()->user()->isSuperAdmin() )
-                    <div class="input-group position-relative">
-                        <div class="input-group-btn search-panel">
-                            <select class="form-control select2-no-search" id="search-category">
-                                <option value="all" selected>All Categories</option>
-                                <option value="tanks">Tanks</option>
-                                <option value="transactions">Transactions</option>
-                                <option value="clients">Clients</option>
-                                <option value="users">Admins</option>
-                                <option value="products">Products</option>
-                                <option value="vessels">Vessels</option>
-                            </select>
+                    @if (auth()->user() && (auth()->user()->isSuperAdmin() || auth()->user()->isEngineer() ||auth()->user()->isCEO()))
+                        <div class="input-group position-relative">
+                            <div class="input-group-btn search-panel">
+                                <select class="form-control select2-no-search" id="search-category">
+                                    <option value="all" selected>All Categories</option>
+                                    <option value="tanks">Tanks</option>
+                                    <option value="transactions">Transactions</option>
+                                    <option value="clients">Clients</option>
+                                    <option value="users">Admins</option>
+                                    <option value="products">Products</option>
+                                    <option value="vessels">Vessels</option>
+                                </select>
+                            </div>
+                            <input type="search" class="form-control" id="global-search" placeholder="Search for anything..." autocomplete="off">
+                            <button class="btn search-btn" id="search-submit"><i class="fe fe-search"></i></button>
+                            <div class="search-results-dropdown list-group"></div>
                         </div>
-                        <input type="search" class="form-control" id="global-search" placeholder="Search for anything..." autocomplete="off">
-                        <button class="btn search-btn" id="search-submit"><i class="fe fe-search"></i></button>
-                        <div class="search-results-dropdown list-group"></div>
-                    </div>
                     @endif
                 </div>
                 <div class="main-header-right">
-                    @if (auth()->user() && auth()->user()->isSuperAdmin() )
-                    <div class="dropdown header-search d-lg-none">
-
-                        <a class="nav-link icon header-search" data-bs-toggle="dropdown">
-                            <i class="fe fe-search header-icons"></i>
-                        </a>
-                        <div class="dropdown-menu">
-                            <div class="main-form-search p-2">
-                                <div class="input-group position-relative">
-                                    <div class="input-group-btn search-panel">
-                                        <select class="form-control select2-no-search" id="mobile-search-category">
-                                            <option value="all" selected>All Categories</option>
-                                            <option value="tanks">Tanks</option>
-                                            <option value="transactions">Transactions</option>
-                                            <option value="clients">Clients</option>
-                                            <option value="users">Admins</option>
-                                            <option value="products">Products</option>
-                                            <option value="vessels">Vessels</option>
-                                        </select>
+                    @if (auth()->user() && (auth()->user()->isSuperAdmin() || auth()->user()->isEngineer() ||auth()->user()->isCEO()))
+                        <div class="dropdown header-search d-lg-none">
+                            <a class="nav-link icon header-search" data-bs-toggle="dropdown">
+                                <i class="fe fe-search header-icons"></i>
+                            </a>
+                            <div class="dropdown-menu">
+                                <div class="main-form-search p-2">
+                                    <div class="input-group position-relative">
+                                        <div class="input-group-btn search-panel">
+                                            <select class="form-control select2-no-search" id="mobile-search-category">
+                                                <option value="all" selected>All Categories</option>
+                                                <option value="tanks">Tanks</option>
+                                                <option value="transactions">Transactions</option>
+                                                <option value="clients">Clients</option>
+                                                <option value="users">Admins</option>
+                                                <option value="products">Products</option>
+                                                <option value="vessels">Vessels</option>
+                                            </select>
+                                        </div>
+                                        <input type="search" class="form-control" id="mobile-global-search" placeholder="Search for anything..." autocomplete="off">
+                                        <button class="btn search-btn" id="mobile-search-submit">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+                                                <circle cx="11" cy="11" r="8"></circle>
+                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                            </svg>
+                                        </button>
+                                        <div class="search-results-dropdown list-group"></div>
                                     </div>
-                                    <input type="search" class="form-control" id="mobile-global-search" placeholder="Search for anything..." autocomplete="off">
-                                    <button class="btn search-btn" id="mobile-search-submit">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                        </svg>
-                                    </button>
-                                    <div class="search-results-dropdown list-group"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
                     @endif
-
                     <div class="dropdown d-md-flex">
                         <a class="nav-link icon full-screen-link" href="#">
                             <i class="fe fe-maximize fullscreen-button fullscreen header-icons"></i>
@@ -309,45 +312,38 @@
             <div class="mb-1 navbar navbar-expand-lg nav nav-item navbar-nav-right responsive-navbar navbar-dark">
                 <div class="collapse navbar-collapse" id="navbarSupportedContent-4">
                     <div class="d-flex order-lg-2 ml-auto">
-                        @if (auth()->user() && auth()->user()->isSuperAdmin() )
-                        <div class="dropdown header-search">
-                            <a class="nav-link icon header-search" data-bs-toggle="dropdown">
-                                <i class="fe fe-search header-icons"></i>
-                            </a>
-                            <div class="dropdown-menu">
-                                <div class="main-form-search p-2">
-                                    <div class="input-group position-relative">
-                                        <div class="input-group-btn search-panel">
-                                            <select class="form-control select2-no-search" id="mobile-search-category">
-                                                <option value="all" selected>All Categories</option>
-                                                <option value="tanks">Tanks</option>
-                                                <option value="transactions">Transactions</option>
-                                                <option value="clients">Clients</option>
-                                                <option value="users">Admins</option>
-                                                <option value="products">Products</option>
-                                                <option value="vessels">Vessels</option>
-                                            </select>
+                        @if (auth()->user() && (auth()->user()->isSuperAdmin() || auth()->user()->hasRole('ceo')))
+                            <div class="dropdown header-search">
+                                <a class="nav-link icon header-search" data-bs-toggle="dropdown">
+                                    <i class="fe fe-search header-icons"></i>
+                                </a>
+                                <div class="dropdown-menu">
+                                    <div class="main-form-search p-2">
+                                        <div class="input-group position-relative">
+                                            <div class="input-group-btn search-panel">
+                                                <select class="form-control select2-no-search" id="mobile-search-category">
+                                                    <option value="all" selected>All Categories</option>
+                                                    <option value="tanks">Tanks</option>
+                                                    <option value="transactions">Transactions</option>
+                                                    <option value="clients">Clients</option>
+                                                    <option value="users">Admins</option>
+                                                    <option value="products">Products</option>
+                                                    <option value="vessels">Vessels</option>
+                                                </select>
+                                            </div>
+                                            <input type="search" class="form-control" id="mobile-global-search" placeholder="Search for anything..." autocomplete="off">
+                                            <button class="btn search-btn" id="mobile-search-submit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+                                                    <circle cx="11" cy="11" r="8"></circle>
+                                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                                </svg>
+                                            </button>
+                                            <div class="search-results-dropdown list-group"></div>
                                         </div>
-                                        <input type="search" class="form-control" id="mobile-global-search" placeholder="Search for anything..." autocomplete="off">
-                                        <button class="btn search-btn" id="mobile-search-submit">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                                                <circle cx="11" cy="11" r="8"></circle>
-                                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                            </svg>
-                                        </button>
-                                        <div class="search-results-dropdown list-group"></div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         @endif
-
-                        {{-- <div class="dropdown">
-                            <a class="nav-link icon full-screen-link">
-                                <i class="fe fe-maximize fullscreen-button fullscreen header-icons"></i>
-                                <i class="fe fe-minimize fullscreen-button exit-fullscreen header-icons"></i>
-                            </a>
-                        </div> --}}
                         <div class="dropdown main-profile-menu">
                             <a class="d-flex" href="#">
                                 <span class="main-img-user"><img alt="avatar" src="{{ url(auth()->user()->image_url) }}"></span>
@@ -388,11 +384,9 @@
                                 <a href="#">{{ env('APP_NAME') }}</a>
                             </strong>
                             . All rights reserved. Designed and developed by
-                            {{-- <a href="https://omar-aayman.github.io/Portfolio/"> --}}
-                                <strong>
-                                    Brand Bakers
-                                </strong>
-                            {{-- </a> --}}
+                            <strong>
+                                Brand Bakers
+                            </strong>
                             .</span>
                     </div>
                 </div>
@@ -405,7 +399,6 @@
     <!-- Back-to-top -->
     <a href="#top" id="back-to-top"><i class="fe fe-arrow-up"></i></a>
 
-
     <!-- Jquery JS -->
     <script src="{{ url('panel/assets/plugins/jquery/jquery.min.js') }}"></script>
 
@@ -414,7 +407,6 @@
 
     <!-- Perfect Scrollbar -->
     <script src="{{ url('panel/assets/plugins/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
-
 
     <!-- Sidemenu JS -->
     @if (App::getLocale() == 'en')

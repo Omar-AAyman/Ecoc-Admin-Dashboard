@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
     {
         // Roles
         Role::create(['name' => 'super_admin', 'display_name' => 'Super Admin']);
+        Role::create(['name' => 'engineer', 'display_name' => 'Responsible Engineer']);
         Role::create(['name' => 'ceo', 'display_name' => 'CEO']);
         Role::create(['name' => 'client', 'display_name' => 'Client']);
 
@@ -54,6 +55,7 @@ class DatabaseSeeder extends Seeder
         }
 
         // Users
+        // Users
         $users = [
             [
                 'first_name' => 'Super',
@@ -64,11 +66,19 @@ class DatabaseSeeder extends Seeder
                 'status' => 'active',
             ],
             [
+                'first_name' => 'Engineer',
+                'last_name' => 'Test',
+                'email' => 'engineer@ecoc.com',
+                'password' => Hash::make('password@1234'),
+                'role_id' => '2',
+                'status' => 'active',
+            ],
+            [
                 'first_name' => 'CEO',
                 'last_name' => 'Test',
                 'email' => 'ceo@ecoc.com',
                 'password' => Hash::make('password@1234'),
-                'role_id' => '2',
+                'role_id' => '3',
                 'status' => 'active',
             ],
             [
@@ -76,7 +86,7 @@ class DatabaseSeeder extends Seeder
                 'last_name' => 'Test',
                 'email' => 'client@ecoc.com',
                 'password' => Hash::make('password@1234'),
-                'role_id' => '3',
+                'role_id' => '4',
                 'status' => 'active',
             ],
         ];

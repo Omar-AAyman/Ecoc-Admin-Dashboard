@@ -330,7 +330,9 @@
                                     <th>Email</th>
                                     <th>Company</th>
                                     <th>Status</th>
+                                    @if ($hasActions)
                                     <th>Actions</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody id="clients-table-body">
