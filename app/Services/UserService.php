@@ -69,10 +69,7 @@ class UserService
         return DB::transaction(function () use ($data, $authUser) {
             $imagePath = null;
             if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
-                $data['image']->move(public_path('storage/logos'), $filename);
-                $imagePath = 'storage/logos/' . $filename;
-                unset($data['image']);
+                $data['image'] = $this->storeImage($data['image']);
             }
 
             $data['password'] = Hash::make($data['password']);
@@ -140,21 +137,14 @@ class UserService
             }
 
             if (isset($data['remove_image']) && $data['remove_image'] == '1') {
-                if ($user->image && file_exists(public_path($user->image))) {
-                    unlink(public_path($user->image));
-                }
+                $this->deleteImage($user->image);
                 $data['image'] = null;
-            } elseif (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
-                $data['image']->move(public_path('storage/logos'), $filename);
-                if ($user->image && file_exists(public_path($user->image))) {
-                    unlink(public_path($user->image));
-                }
-                $data['image'] = 'storage/logos/' . $filename;
+            } elseif (isset($data['image'])) {
+                $this->deleteImage($user->image);
+                $data['image'] = $this->storeImage($data['image']);
             } else {
                 unset($data['image']);
             }
-
             unset($data['remove_image']);
 
             if (isset($data['password']) && $data['password']) {
@@ -204,7 +194,7 @@ class UserService
             }
             $oldData = $user->only(['first_name', 'last_name', 'email', 'role_id', 'company_id', 'status', 'position', 'image']);
             if ($user->image) {
-                Storage::disk('public')->delete($user->image);
+                $this->deleteImage($user->image);
             }
             // Handle company: delete if no tanks and no other users are associated, otherwise dissociate
             if ($user->company_id && $user->company) {
@@ -248,17 +238,11 @@ class UserService
 
             if ($authUser->isClient()) {
                 if (isset($data['remove_image']) && $data['remove_image'] == '1') {
-                    if ($authUser->image && file_exists(public_path($authUser->image))) {
-                        unlink(public_path($authUser->image));
-                    }
+                    $this->deleteImage($authUser->image);
                     $data['image'] = null;
-                } elseif (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                    $filename = uniqid() . '.' . $data['image']->getClientOriginalExtension();
-                    $data['image']->move(public_path('storage/logos'), $filename);
-                    if ($authUser->image && file_exists(public_path($authUser->image))) {
-                        unlink(public_path($authUser->image));
-                    }
-                    $data['image'] = 'storage/logos/' . $filename;
+                } elseif (isset($data['image'])) {
+                    $this->deleteImage($authUser->image);
+                    $data['image'] = $this->storeImage($data['image']);
                 } else {
                     unset($data['image']);
                 }
@@ -290,5 +274,24 @@ class UserService
 
             return $authUser;
         });
+    }
+
+    private function storeImage($image)
+    {
+        if (!$image instanceof \Illuminate\Http\UploadedFile) {
+            return null;
+        }
+
+        $filename = Str::uuid() . '.' . $image->getClientOriginalExtension();
+        Storage::disk('public')->putFileAs('logos', $image, $filename);
+        return 'logos/' . $filename;
+    }
+
+    private function deleteImage($path)
+    {
+        if ($path) {
+            $cleanPath = str_replace('storage/', '', $path);
+            Storage::disk('public')->delete($cleanPath);
+        }
     }
 }
