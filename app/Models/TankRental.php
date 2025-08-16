@@ -14,6 +14,8 @@ class TankRental extends Model
         'start_date',
         'end_date',
         'details',
+        'reminder_30_days_sent',
+        'reminder_60_days_sent'
     ];
 
     protected $casts = [

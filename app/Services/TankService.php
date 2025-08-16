@@ -43,9 +43,9 @@ class TankService
                         $query->where('company_id', $user->company_id);
                     }
                 ])
-                ->where('company_id', $user->company_id)
-                ->orderBy('id', 'asc')
-                ->get();
+                    ->where('company_id', $user->company_id)
+                    ->orderBy('id', 'asc')
+                    ->get();
             } else {
                 Log::warning('No company assigned or no tanks for client: ' . $user->email);
             }
@@ -189,7 +189,57 @@ class TankService
 
         return $query->paginate($perPage);
     }
+    public function getAllTanks()
+    {
+        return Tank::with(['product', 'company', 'tankRentals', 'transactions', 'destinationTransactions'])
+            ->orderBy('id', 'asc')
+            ->get()
+            ->map(function ($tank) {
+                $maxCapacity = $tank->product && $tank->product->density ? $tank->cubic_meter_capacity * $tank->product->density : $tank->cubic_meter_capacity;
+                $currentLevel = $tank->current_level ?? 0;
+                $capacityUtilization = $maxCapacity > 0 ? min(($currentLevel / $maxCapacity) * 100, 100) : 0;
 
+                $rentalHistory = $tank->tankRentals->map(function ($rental) {
+                    return [
+                        'company' => $rental->company ? $rental->company->name : 'N/A',
+                        'product' => $rental->product ? $rental->product->name : 'N/A',
+                        'start_date' => $rental->start_date ? $rental->start_date->format('Y-m-d') : 'N/A',
+                        'end_date' => $rental->end_date ? $rental->end_date->format('Y-m-d') : 'Ongoing',
+                        'details' => $rental->details ? json_encode($rental->details) : 'N/A',
+                        'contract_duration' => $rental->contract_duration ? $rental->contract_duration . ' months' : 'N/A',
+                    ];
+                })->values();
+
+                $transactions = $tank->transactions->merge($tank->destinationTransactions)->map(function ($transaction) use ($tank) {
+                    $type = $transaction->type;
+                    if ($type === 'transfer') {
+                        $type = $tank->id === $transaction->tank_id ? 'discharge (transfer)' : 'load (transfer)';
+                    }
+                    return [
+                        'id' => $transaction->id,
+                        'type' => $type,
+                        'quantity' => $transaction->quantity . ' mt',
+                        'date' => $transaction->date ? $transaction->date->format('Y-m-d') : 'N/A',
+                    ];
+                })->values();
+
+                return [
+                    'id' => $tank->number,
+                    'dbId' => $tank->id,
+                    'product' => $tank->product ? $tank->product->name : 'N/A',
+                    'status' => ucfirst($tank->status),
+                    'cubicMeterCapacity' => $tank->cubic_meter_capacity,
+                    'currentLevel' => $currentLevel,
+                    'maxCapacity' => number_format($maxCapacity, 2, '.', ''),
+                    'companyName' => $tank->company ? $tank->company->name : 'Unassigned',
+                    'capacityUtilization' => number_format($capacityUtilization, 0) . '%',
+                    'temperatureCelsius' => $tank->temperature !== null ? number_format($tank->temperature, 2) : 'N/A',
+                    'temperatureFahrenheit' => $tank->temperature_fahrenheit !== null ? number_format($tank->temperature_fahrenheit, 2) : 'N/A',
+                    'rentalHistory' => $rentalHistory,
+                    'transactions' => $transactions,
+                ];
+            })->all();
+    }
     public function getAssignedTanks(User $user)
     {
         $query = Tank::with(['product', 'company'])->whereNotNull('company_id')->orderBy('id', 'asc');
@@ -563,10 +613,10 @@ class TankService
                 'product',
                 'tankRentals' => function ($query) use ($month, $user) {
                     $query->where('start_date', '<=', $month->endOfMonth())
-                          ->where(function ($q) use ($month) {
-                              $q->where('end_date', '>=', $month->startOfMonth())
+                        ->where(function ($q) use ($month) {
+                            $q->where('end_date', '>=', $month->startOfMonth())
                                 ->orWhereNull('end_date');
-                          });
+                        });
                     if ($user->isClient()) {
                         $query->where('company_id', $user->company_id);
                     }
@@ -584,34 +634,34 @@ class TankService
                     }
                 }
             ])
-            ->where(function ($query) use ($month, $user) {
-                $query->whereHas('tankRentals', function ($q) use ($month, $user) {
-                    $q->where('start_date', '<=', $month->endOfMonth())
-                      ->where(function ($q) use ($month) {
-                          $q->where('end_date', '>=', $month->startOfMonth())
-                            ->orWhereNull('end_date');
-                      });
+                ->where(function ($query) use ($month, $user) {
+                    $query->whereHas('tankRentals', function ($q) use ($month, $user) {
+                        $q->where('start_date', '<=', $month->endOfMonth())
+                            ->where(function ($q) use ($month) {
+                                $q->where('end_date', '>=', $month->startOfMonth())
+                                    ->orWhereNull('end_date');
+                            });
+                        if ($user->isClient()) {
+                            $q->where('company_id', $user->company_id);
+                        }
+                    })
+                        ->orWhereHas('transactions', function ($q) use ($month, $user) {
+                            $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                            if ($user->isClient()) {
+                                $q->where('company_id', $user->company_id);
+                            }
+                        })
+                        ->orWhereHas('destinationTransactions', function ($q) use ($month, $user) {
+                            $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
+                            if ($user->isClient()) {
+                                $q->where('company_id', $user->company_id);
+                            }
+                        });
                     if ($user->isClient()) {
-                        $q->where('company_id', $user->company_id);
+                        $query->where('company_id', $user->company_id);
                     }
                 })
-                ->orWhereHas('transactions', function ($q) use ($month, $user) {
-                    $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
-                    if ($user->isClient()) {
-                        $q->where('company_id', $user->company_id);
-                    }
-                })
-                ->orWhereHas('destinationTransactions', function ($q) use ($month, $user) {
-                    $q->whereBetween('date', [$month->startOfMonth(), $month->endOfMonth()]);
-                    if ($user->isClient()) {
-                        $q->where('company_id', $user->company_id);
-                    }
-                });
-                if ($user->isClient()) {
-                    $query->where('company_id', $user->company_id);
-                }
-            })
-            ->get();
+                ->get();
 
             // Calculate average utilization for tanks with activity in the month
             $totalUtilization = $monthlyTanks->avg(function ($tank) use ($month, $user) {
@@ -656,7 +706,7 @@ class TankService
             $monthlyRentals = TankRental::where('start_date', '<=', $month->endOfMonth())
                 ->where(function ($q) use ($month, $user) {
                     $q->where('end_date', '>=', $month->startOfMonth())
-                      ->orWhereNull('end_date');
+                        ->orWhereNull('end_date');
                     if ($user->isClient()) {
                         $q->where('company_id', $user->company_id);
                     }
